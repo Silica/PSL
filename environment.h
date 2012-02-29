@@ -127,7 +127,7 @@ public:
 	virtual ~OpCode(){}
 	virtual void set(int s){}
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
-	virtual void write(bytecode &b)	{};	// そのうち、コード保存用
+	virtual void write(bytecode &b)	{};
 	virtual void dump(){};
 private:
 };

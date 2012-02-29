@@ -1,3 +1,12 @@
 PSL is Script Language
 
-Embeddable Script Language for C++
+PSL is Embeddable Script Language for C++
+
+C系構文のスクリプト言語
+速くも軽くも高機能でもありません
+そこに山があるから！
+
+C++からPSLの関数を呼び出したり
+PSLからC++の関数を呼び出したり出来ます
+
+includeするだけで使える！
