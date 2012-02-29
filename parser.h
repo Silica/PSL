@@ -680,18 +680,18 @@ private:
 		getexp12(c, l);
 		while (int n = t->checkNext())
 		{
-			EXP('=', 12, SUBSTITUTION)
-			else EXP(Tokenizer::ASSIGN, 12, ASSIGNMENT)
-			else EXP(Tokenizer::SADD, 12, SADD)
-			else EXP(Tokenizer::SSUB, 12, SSUB)
-			else EXP(Tokenizer::SMUL, 12, SMUL)
-			else EXP(Tokenizer::SDIV, 12, SDIV)
-			else EXP(Tokenizer::SMOD, 12, SMOD)
-			else EXP(Tokenizer::SAND, 12, SAND)
-			else EXP(Tokenizer::SOR, 12, SOR)
-			else EXP(Tokenizer::SXOR, 12, SXOR)
-			else EXP(Tokenizer::SSHL, 12, SSHL)
-			else EXP(Tokenizer::SSHR, 12, SSHR)
+			EXP('=', 13, SUBSTITUTION)
+			else EXP(Tokenizer::ASSIGN, 13, ASSIGNMENT)
+			else EXP(Tokenizer::SADD, 13, SADD)
+			else EXP(Tokenizer::SSUB, 13, SSUB)
+			else EXP(Tokenizer::SMUL, 13, SMUL)
+			else EXP(Tokenizer::SDIV, 13, SDIV)
+			else EXP(Tokenizer::SMOD, 13, SMOD)
+			else EXP(Tokenizer::SAND, 13, SAND)
+			else EXP(Tokenizer::SOR, 13, SOR)
+			else EXP(Tokenizer::SXOR, 13, SXOR)
+			else EXP(Tokenizer::SSHL, 13, SSHL)
+			else EXP(Tokenizer::SSHR, 13, SSHR)
 			else
 				break;
 		}
