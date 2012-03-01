@@ -148,6 +148,7 @@ public:
 	void push(const variable &v)		{return x->push(v.x);}
 	variable keys()	{return x->keys();}
 private:
+	#include "PSLlib.h"
 	class Variable
 	{
 	public:

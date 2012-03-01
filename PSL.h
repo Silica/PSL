@@ -53,7 +53,7 @@ public:
 		size -= sizeof(l);
 		variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
-		LoadLibrary();
+		variable::PSLlib::Basic(global);
 		variable::Variable::bcreader::read(b, cc);
 		cc.prepare(*this);
 		return NONE;
@@ -68,19 +68,7 @@ public:
 		int size = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		error e = LoadCompiledCode(fp, size);
-/*		unsigned long l;
-		fread(&l, 1, sizeof(l), fp);
-		if (l != 0xBCDEF01A)
-			return NOT_COMPILED_CODE;
-		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp) - sizeof(l);
-		variable::bytecode b(size);
-		fseek(fp, sizeof(l), SEEK_SET);
-		fread(b.get(), 1, size, fp);*/
 		fclose(fp);
-/*		LoadLibrary();
-		variable::Variable::bcreader::read(b, cc);
-		cc.prepare(*this);*/
 		return e;
 	}
 	variable Run(void)
@@ -100,57 +88,10 @@ public:
 		return *this;
 	}
 private:
-	static variable Print(variable &v)
-	{
-		switch (v.type())
-		{
-		case variable::NIL:			std::printf("nil");break;
-		case variable::INT:			std::printf("%d", (int)v);break;
-		case variable::HEX:			std::printf("%X", (int)v);break;
-		case variable::FLOAT:		std::printf("%f", (double)v);break;
-//		case variable::STRING:		{string s = v;std::printf("%s", (const char*)s);break;}
-//		case variable::RARRAY:		std::printf("[rarray:%d]", v.length());break;
-//		case variable::OBJECT:		std::printf("[object]");break;
-		case variable::METHOD:		std::printf("[method]");break;
-		case variable::CFUNCTION:	std::printf("[cfunc]");break;
-		case variable::THREAD:		std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
-		default://				v.dump();
-			{
-				string s = v;
-				std::printf("%s", (const char*)s);
-				break;
-			}
-		}
-		return v;
-	}
-	static variable Debug(variable &v)
-	{
-		v.dump();
-		return v;
-	}
-	void LoadLibrary()
-	{
-		variable g = global;
-		g["print"] = Print;
-		g["debug"] = Debug;
-		g["int"] = 0;
-		g["float"] = 0.0;
-		g["string"] = "";
-		g["true"] = 1;
-		g["false"] = 0;
-		variable hex = variable::HEX;
-		variable ref = variable::REFERENCE;
-		variable pointer = variable::POINTER;
-		variable thread = variable::THREAD;
-		g["hex"] = hex;
-		g["ref"] = ref;
-		g["pointer"] = pointer;
-		g["thread"] = thread;
-	}
 	bool parse(Tokenizer *t)
 	{
 		Parser p(t);
-		LoadLibrary();
+		variable::PSLlib::Basic(global);
 
 		variable g = global;
 		p.Parse(g);
