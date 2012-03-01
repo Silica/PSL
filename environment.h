@@ -156,7 +156,7 @@ public:
 class Environment
 {
 public:
-	Environment()	{scope = NULL;warning = PSL_ENVIRONMENT_WARNING;}
+	Environment()	{scope = NULL;warning = PSL_ENVIRONMENT_WARNING;PSLlib::Basic(global);}
 	Environment(const Environment &env):global(env.global)	{scope = NULL;warning = env.warning;}
 	~Environment()	{delete scope;if(warning&1)if (int ss=stack.size())std::printf("runtime warning : %d stack remained when deleting env\n", ss);}
 	rsv getVariable(const string &name)
