@@ -174,25 +174,42 @@ private:
 		std::printf("error %s %d: comment not closed from %d\n", filename.c_str(), line, l);
 		++i;
 	}
-	void string_literal()
+	void string_literal(char end = '"')
 	{
 		int h = i;
+		nstr = "";
 		for (; i < len; ++i)
 		{
-			if (s[i] == '\\' && s[i+1] == 'n' && i < len-1)
+			if (s[i] == end)
 			{
-				s[i] = '\r';
-				s[i+1] = '\n';
-				continue;
-			}
-			if (s[i] == '"' && s[i-1] != '\\')
-			{
-				nstr = string(s+h, i-h);
+				nstr += string(s+h, i-h);
 				++i;
 				return;
 			}
-			// これ\"がそのまま\"として認識されるな…
-			// これはちょっと要・変換プロセス
+			if (s[i] == '\\')
+			{
+				nstr += string(s+h, i-h);
+				h = i;
+				int j = i+1;
+				if (s[j] == 'n')		nstr += '\n';
+				else if (s[j] == '"')	nstr += '"';
+				else if (s[j] == 't')	nstr += '\t';
+/*				else if (s[j] == 'r')	nstr += '\r';
+				else if (s[j] == 'a')	nstr += '\a';
+				else if (s[j] == 'f')	nstr += '\f';
+				else if (s[j] == 'v')	nstr += '\v';*/
+/*				else if (s[j] == 'x')
+				{
+					// これは後の課題
+					// バイナリ列をどう扱うかも決めていないので
+					char c = 0;
+					nstr += c;
+				}*/
+				else					continue;
+				h = j+1;
+				i = j;
+				continue;
+			}
 		}
 	}
 	bool getIdentifier()
