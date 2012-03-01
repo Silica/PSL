@@ -15,7 +15,9 @@ void compile(FILE *exe, const char *filename)
 		return;
 
 	string exename = filename;
-	exename -= 4;
+	int period = exename.rfind('.');
+	if (period > 0)
+		exename /= period;
 	exename += ".exe";
 	FILE *fp = fopen(exename, "wb");
 	if (!fp)

@@ -81,8 +81,8 @@ private:
 public:
 	string()	{buf = NULL;}
 	string(const string &s)			{buf = s.buf ? s.buf->inc() : NULL;}
-	string(const char *s)			{buf = new SharedBuffer(s);}
-	string(const char *s, size_t t)	{buf = new SharedBuffer(s, t);}
+	string(const char *s)			{buf = (s[0]==0) ? NULL : new SharedBuffer(s);}
+	string(const char *s, size_t t)	{buf = (s[0]==0||t==0) ? NULL : new SharedBuffer(s, t);}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
 #ifdef PSTRING_USE_DOUBLE
@@ -97,8 +97,7 @@ public:
 	string &operator=(const string &s)
 	{
 		if (buf)	buf->finalize();
-		if (s.buf)	buf = s.buf->inc();
-		else		buf = NULL;
+		buf = s.buf ? s.buf->inc() : NULL;
 		return *this;
 	}
 	string &operator+=(const string &s)
@@ -118,7 +117,7 @@ public:
 		}
 		return *this;
 	}
-	string operator+(const string &s)
+	string operator+(const string &s) const
 	{
 /*		string n = *this; // 実際のとこバッファ共有システムがあるからこれでもそんなにロスがあるわけじゃないと思うけど
 		n += s;
@@ -159,9 +158,9 @@ public:
 		}
 		return *this;
 	}
-	string operator+(const char *s)
+	string operator+(const char *s) const
 	{
-		if (!buf)	new SharedBuffer(s);
+		if (!buf)	return new SharedBuffer(s);
 		size_t l = slen(s);
 		SharedBuffer *n = new SharedBuffer(buf->length() + l);
 		n->fcopy(buf->buffer(), buf->length());
@@ -196,7 +195,7 @@ public:
 		}
 		return *this;
 	}
-	string operator+(int i)
+	string operator+(int i) const
 	{
 //		if (!buf)	return string(i);	// 余計なことしなくていい気がする
 		string s = *this;
@@ -234,7 +233,7 @@ public:
 		}
 		return *this;
 	}
-	string operator+(char c)
+	string operator+(char c) const
 	{
 		string s = *this;
 		s += c;
@@ -294,7 +293,7 @@ public:
 		*this += s;
 		return *this;
 	}
-	string operator+(double d)
+	string operator+(double d) const
 	{
 		string s(d);
 		return *this + s;
@@ -370,7 +369,7 @@ public:
 		return !(*this <= s);
 	}
 
-	int find(char c, size_t i = 0)	/* i位置から検索してcの文字を発見した位置を返す */
+	int find(char c, size_t i = 0) const	/* i位置から検索してcの文字を発見した位置を返す */
 	{
 		if (i >= 0 && buf)
 		{
@@ -382,7 +381,7 @@ public:
 		}
 		return -1;
 	}
-	int rfind(char c, size_t i = 0)	/* i位置から逆方向に検索してcの文字を発見した位置を返す */
+	int rfind(char c, size_t i = 0) const	/* i位置から逆方向に検索してcの文字を発見した位置を返す */
 	{
 		if (i >= 0 && buf)
 		{
@@ -408,7 +407,7 @@ public:
 		buf->setlen(m);
 		return l;
 	}
-	string substr(size_t i = 0, size_t l = 0)	/* iからl文字を切り出した文字列 */
+	string substr(size_t i = 0, size_t l = 0) const	/* iからl文字を切り出した文字列 */
 	{
 		if (!buf)	return string();
 		size_t m = buf->length();
@@ -461,7 +460,7 @@ public:
 		}
 		return *this;
 	}
-	string operator-(size_t i)
+	string operator-(size_t i) const
 	{
 		string s = *this;
 		s -= i;
@@ -480,7 +479,7 @@ public:
 		}
 		return *this;
 	}
-	string operator/(size_t i)
+	string operator/(size_t i) const
 	{
 		string s = *this;
 		s /= i;
@@ -514,7 +513,7 @@ public:
 		}
 		return *this;
 	}
-	string operator%(int i)
+	string operator%(int i) const
 	{
 		string s = *this;
 		s %= i;
