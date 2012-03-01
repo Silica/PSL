@@ -237,6 +237,7 @@ private:
 			virtual ~vBase(){}
 			virtual Type type()	const	{return NIL;}
 			virtual vBase *clone()	{return new vBase();}
+			virtual Variable *referenceTo()	{return NULL;}
 
 			virtual vBase *substitution(Variable *v)	{delete this;return v->x->clone();}
 			virtual vBase *assignment(Variable *v)		{delete this;return v->x->clone();}

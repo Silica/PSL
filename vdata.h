@@ -195,10 +195,11 @@ private:
 class vReference : public vBase
 {
 public:
-	vReference(Variable *v)	{x = v->ref();}
+	vReference(Variable *v)	{Variable *z = v->x->referenceTo();x = (z ? z : v)->ref();}
 	~vReference()			{x->finalize();}
 	Type type()	const	{return x->type();}
 	vBase *clone()	{return x->x->clone();}
+	Variable *referenceTo()	{return x;}
 
 	vBase *substitution(Variable *v)	{x->substitution(v);return this;}
 	vBase *assignment(Variable *v)		{x->assignment(v);return this;}
@@ -286,6 +287,16 @@ public:
 			z->finalize();
 		}
 		return v;
+	}
+	Variable *referenceTo()
+	{
+		if (x.size() == 1)
+		{
+			Variable *v = x[0].get();
+			Variable *r = v->x->referenceTo();
+			return r ? r : v;
+		}
+		return NULL;
 	}
 
 	vBase *substitution(Variable *v)
@@ -406,6 +417,7 @@ public:
 
 	// 演算子系は比較ぐらいはあってもいいが
 	// +=で連結とかどう？って=と同じかそれ、ARRAYだな
+	// あ、arrayに対しては違うな
 
 	bool toBool()		const {return !array.empty() || !member.empty();}
 	int toInt()			const {return array.size();}
