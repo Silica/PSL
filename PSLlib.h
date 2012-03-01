@@ -38,8 +38,8 @@ private:
 		case variable::THREAD:		std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
 		default://				v.dump();
 			{
-				string s = v;
-				std::printf("%s", (const char*)s);
+				std::printf("%s", v.toString().c_str());
+//				std::printf("%s", (const char*)v);
 				break;
 			}
 		}

@@ -135,6 +135,7 @@ public:
 	operator long double()	const	{return x->toDouble();}
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
+	operator const char*()	const	{static string s;s = x->toString();return s.c_str();}
 
 	variable operator[](int i)				{return x->index(i);}
 	variable operator[](const char *s)		{return x->child(s);}
