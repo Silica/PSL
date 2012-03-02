@@ -305,9 +305,8 @@ private:
 		void dump()		{std::printf("rc:%4d, ", rc);x->dump();}
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		#include "memory.h"
-		static void *operator new(size_t t)		{return MemoryManager::Next();}
-		static void operator delete(void *ptr)	{MemoryManager::Release(ptr);}
-		friend class MemoryManager::mpool;
+		static void *operator new(size_t t)		{return VMemoryManager::Next();}
+		static void operator delete(void *ptr)	{VMemoryManager::Release(ptr);}
 #endif
 	private:
 		#include "vdata.h"
