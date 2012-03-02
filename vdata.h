@@ -1,6 +1,10 @@
 class vInt : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vInt)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vInt)>::Release(ptr);}
+#endif
 	vInt(int i)	{x = i;}
 	Type type()	const	{return INT;}
 	vBase *clone()	{return new vInt(x);}
@@ -48,6 +52,10 @@ private:
 class vHex : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vHex)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vHex)>::Release(ptr);}
+#endif
 	vHex(hex i)	{x = i;}
 	Type type()	const	{return HEX;}
 	vBase *clone()	{return new vHex(x);}
@@ -129,6 +137,10 @@ private:
 class vString : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vString)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vString)>::Release(ptr);}
+#endif
 	vString(const string &s)	{x = s;}
 	Type type()	const	{return STRING;}
 	vBase *clone()	{return new vString(x);}
@@ -353,7 +365,7 @@ public:
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
 
 	size_t length()		const {return x.size();}
-	Variable *index(size_t t)			{if(t>=x.size())x.resize(t+1);return x[t].get();}
+	Variable *index(size_t t)	{if(t>=x.size())x.resize(t+1);return x[t].get();}
 	void push(Variable *v)	{x.push_back(v);}
 
 	virtual void dump(){std::printf("vRArray:%d\n", x.size());for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();}
@@ -364,6 +376,10 @@ private:
 class vObject : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vObject)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vObject)>::Release(ptr);}
+#endif
 	vObject()	{_class = NULL;code = NULL;}
 	vObject(Variable *v)	{_class = v->ref();code = NULL;}
 	~vObject()	{

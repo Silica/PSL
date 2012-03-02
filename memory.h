@@ -3,7 +3,7 @@
 // Variableはメンバが0にならない、という仕様を利用しているので
 // 他に応用するには使用中・未使用に関する判定の修正が必要
 
-class MemoryManager
+class VMemoryManager
 {
 public:
 	const static int poolsize = 256;
@@ -12,15 +12,6 @@ public:
 private:
 	class mpool
 	{
-		int *ptr;
-		mpool *next;
-		/*
-		足りなくなったらリンクリストで拡張する
-		NextとReleaseが管理するのではなく
-		こいつのメンバに値を渡して再帰的に処理して貰う
-		*/
-		int current;
-		int count;
 	public:
 		mpool(size_t t)	{current = count = 0;ptr = new int[t];std::memset(ptr, 0, t*sizeof(int));}
 		~mpool()		{
@@ -68,6 +59,66 @@ private:
 			count--;
 			ptr[current] = 0;
 		}
+	private:
+		int *ptr;
+		mpool *next;
+		int current;
+		int count;
+	};
+	static mpool &MemoryPool()
+	{
+		static mpool p(poolsize);
+		return p;
+	}
+};
+
+// 準汎用
+// 最初の4バイトが0にならないオブジェクト限定
+// 仮想関数テーブルがあるからvirtualなら大丈夫、なはず
+template<size_t S> class MemoryManager
+{
+public:
+	const static int poolsize = 1024;
+	static void *Next()				{return MemoryPool().nextptr();}
+	static void Release(void *ptr)	{MemoryPool().release((char*)ptr);}
+	class mpool
+	{
+	public:
+		mpool(size_t t)	{current = count = 0;ptr = new char[t*S];std::memset(ptr, 0, t*S);}
+		~mpool()		{delete []ptr;}
+		void *nextptr()
+		{
+			for (int i = current; i < poolsize; i += S)
+			{
+				if (!ptr[i])
+				{
+					current = i+S;
+					count += 1;
+					return ptr + i;
+				}
+			}
+			for (int i = 0; i < current; i += S)
+			{
+				if (!ptr[i])
+				{
+					current = i+S;
+					count += 1;
+					return ptr + i;
+				}
+			}
+			std::printf("throw,%d,%d\n", count, current);
+			throw std::bad_alloc();
+		}
+		void release(char *p)
+		{
+			current = p - ptr;
+			count--;
+			*(int*)(ptr+current) = 0;
+		}
+	private:
+		char *ptr;
+		int current;
+		int count;
 	};
 	static mpool &MemoryPool()
 	{
