@@ -177,6 +177,10 @@ private:
 class vPointer : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vPointer)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vPointer)>::Release(ptr);}
+#endif
 	vPointer()	{x = NULL;}
 	vPointer(Variable *v)	{x = v ? v->ref() : NULL;}
 	~vPointer()	{if (x)x->finalize();}
@@ -207,6 +211,10 @@ private:
 class vReference : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vReference)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vReference)>::Release(ptr);}
+#endif
 	vReference(Variable *v)	{Variable *z = v->x->referenceTo();x = (z ? z : v)->ref();}
 	~vReference()			{x->finalize();}
 	Type type()	const	{return x->type();}
@@ -604,6 +612,10 @@ private:
 class vCFunction : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vCFunction)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vCFunction)>::Release(ptr);}
+#endif
 	vCFunction(function _f)	{f = _f;}
 	Type type()	const	{return CFUNCTION;}
 	vBase *clone()	{return new vCFunction(f);}

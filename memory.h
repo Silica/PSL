@@ -91,7 +91,7 @@ private:
 	}
 };
 
-// 準汎用
+// 準汎用固定サイズメモリマネージャ
 // 最初の4バイトが0にならないオブジェクト限定
 // 仮想関数テーブルがあるからvirtualなら大丈夫、なはず
 template<size_t S> class MemoryManager
