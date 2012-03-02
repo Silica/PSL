@@ -261,6 +261,11 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
+		if (v->x == this)
+		{
+			delete this;
+			return new vObject();
+		}
 		delete this;
 		return new vReference(v);
 	}
