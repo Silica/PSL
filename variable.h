@@ -3,6 +3,7 @@
 
 #include "pstring.h"
 
+#include <new>
 #include <cstring>
 #include <vector>
 #include <map>
@@ -18,6 +19,8 @@
 #define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
 #define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
 //#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
+
+#define PSL_USE_VARIABLE_MEMORY_MANAGER
 
 #define PSL_USE_TOKENIZER_DEFINE
 
@@ -173,7 +176,8 @@ private:
 			case THREAD:	x = new vThread();break;
 			default:		x = new vObject();break;
 		}}
-		void finalize()	{if (!--rc)	delete this;}
+		void finalize()		{if (!--rc)	delete this;}
+		void safedelete()	{vBase *v = x;x = NULL;delete v;}
 		Type type()	const	{return x->type();}
 
 		void substitution(Variable *v)	{x = x->substitution(v);}
@@ -299,6 +303,12 @@ private:
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
 		void dump()		{std::printf("rc:%4d, ", rc);x->dump();}
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+		#include "memory.h"
+		static void *operator new(size_t t)		{return MemoryManager::Next();}
+		static void operator delete(void *ptr)	{MemoryManager::Release(ptr);}
+		friend class MemoryManager::mpool;
+#endif
 	private:
 		#include "vdata.h"
 		friend class PSL;
@@ -306,6 +316,7 @@ private:
 		friend class vRArray;
 		friend class vObject;
 		friend class vReference;
+		friend class vNReference;
 		#include "bytecode.h"
 	} *x;
 private:
