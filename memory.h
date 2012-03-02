@@ -78,7 +78,7 @@ private:
 template<size_t S> class MemoryManager
 {
 public:
-	const static int poolsize = 1024;
+	const static int poolsize = 256;
 	static void *Next()				{return MemoryPool().nextptr();}
 	static void Release(void *ptr)	{MemoryPool().release((char*)ptr);}
 	class mpool
@@ -88,7 +88,7 @@ public:
 		~mpool()		{delete []ptr;}
 		void *nextptr()
 		{
-			for (int i = current; i < poolsize; i += S)
+			for (int i = current; i < poolsize*S; i += S)
 			{
 				if (!ptr[i])
 				{
