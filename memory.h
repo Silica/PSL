@@ -13,7 +13,7 @@ private:
 	class mpool
 	{
 	public:
-		mpool(size_t t)	{current = count = 0;ptr = new int[t];std::memset(ptr, 0, t*sizeof(int));}
+		mpool(size_t t)	{next = NULL;current = count = 0;ptr = new int[t];std::memset(ptr, 0, t*sizeof(int));}
 		~mpool()		{
 			// これでメモリリークを回避出来る
 			// が、開放されないまま終了するのを回避出来るだけで
@@ -28,10 +28,17 @@ private:
 				}
 			}
 			delete []ptr;
+			delete next;
 //			std::printf("end,%d,%d", count(), current());
 		}
 		int *nextptr()
 		{
+			if (count == poolsize/2)
+			{
+				if (!next)
+					next = new mpool(poolsize);
+				return next->nextptr();
+			}
 			for (int i = current; i < poolsize; i += 2)
 			{
 				if (!ptr[i])
@@ -50,11 +57,23 @@ private:
 					return ptr + i;
 				}
 			}
+			#ifdef _DEBUG
 			std::printf("throw,%d,%d\n", count, current);
 			throw std::bad_alloc();
+			#else
+			return NULL;
+			#endif
 		}
 		void release(int *p)
 		{
+			if (p < ptr || p >= ptr+poolsize)
+			{
+				#ifdef _DEBUG
+				if (next)
+				#endif
+				next->release(p);
+				return;
+			}
 			current = p - ptr;
 			count--;
 			ptr[current] = 0;
@@ -84,10 +103,16 @@ public:
 	class mpool
 	{
 	public:
-		mpool(size_t t)	{current = count = 0;ptr = new char[t*S];std::memset(ptr, 0, t*S);}
-		~mpool()		{delete []ptr;}
+		mpool(size_t t)	{next = NULL;current = count = 0;ptr = new char[t*S];std::memset(ptr, 0, t*S);}
+		~mpool()		{delete []ptr;delete next;}
 		void *nextptr()
 		{
+			if (count == poolsize)
+			{
+				if (!next)
+					next = new mpool(poolsize);
+				return next->nextptr();
+			}
 			for (int i = current; i < poolsize*S; i += S)
 			{
 				if (!ptr[i])
@@ -106,11 +131,23 @@ public:
 					return ptr + i;
 				}
 			}
+			#ifdef _DEBUG
 			std::printf("throw,%d,%d\n", count, current);
 			throw std::bad_alloc();
+			#else
+			return NULL;
+			#endif
 		}
 		void release(char *p)
 		{
+			if (p < ptr || p >= ptr+poolsize*S)
+			{
+				#ifdef _DEBUG
+				if (next)
+				#endif
+				next->release(p);
+				return;
+			}
 			current = p - ptr;
 			count--;
 			*(int*)(ptr+current) = 0;
@@ -119,6 +156,7 @@ public:
 		char *ptr;
 		int current;
 		int count;
+		mpool *next;
 	};
 	static mpool &MemoryPool()
 	{
@@ -126,4 +164,3 @@ public:
 		return p;
 	}
 };
-
