@@ -1,3 +1,10 @@
+class NOP : public OpCode
+{
+public:
+	RC::RETURNCODE Execute(Environment &env){return RC::NONE;}
+	void dump(int d){std::printf("NOP\n");}
+	void write(bytecode &b){b.push(MNEMONIC::NOP);}
+};
 class PUSH_INT : public OpCode
 {
 public:
