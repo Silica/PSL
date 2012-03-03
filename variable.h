@@ -19,6 +19,7 @@
 #define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
 #define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
 //#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
+//#define PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST	// 宣言済みの名前を更に宣言した場合に通知する
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER
 

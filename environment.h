@@ -147,7 +147,12 @@ private:
 #else
 	#define PSL_RW_UI 0
 #endif
-#define PSL_ENVIRONMENT_WARNING (PSL_RW_PES | PSL_RW_SR | PSL_RW_UI)
+#ifdef PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST
+	#define PSL_RW_DIAE 8
+#else
+	#define PSL_RW_DIAE 0
+#endif
+#define PSL_ENVIRONMENT_WARNING (PSL_RW_PES | PSL_RW_SR | PSL_RW_UI | PSL_RW_DIAE)
 
 class Scope;
 #ifdef __GNUC__
@@ -155,25 +160,38 @@ public:
 #endif
 class Environment
 {
+	const static unsigned long WARNING = PSL_ENVIRONMENT_WARNING;
+	void warning(const int n, const string &s = "")
+	{
+		if (WARNING & (1 << n))
+		{
+			switch (n)
+			{
+			case 0:std::printf("runtime warning : %ds stack remained when deleting env\n", s.c_str());break;
+			case 1:std::printf("runtime warning : undeclared identidier %s\n", s.c_str());break;
+			case 2:std::printf("runtime error : pop empty stack\n");break;
+			case 3:std::printf("runtime warning : declared identidier %s already exist, over write\n", s.c_str());break;
+			}
+		}
+	}
 public:
-	Environment()	{scope = NULL;warning = PSL_ENVIRONMENT_WARNING;PSLlib::Basic(global);}
-	Environment(const Environment &env):global(env.global)	{scope = NULL;warning = env.warning;}
-	~Environment()	{delete scope;if(warning&1)if (int ss=stack.size())std::printf("runtime warning : %d stack remained when deleting env\n", ss);}
+	Environment()	{scope = NULL;PSLlib::Basic(global);}
+	Environment(const Environment &env):global(env.global)	{scope = NULL;}
+	~Environment()	{delete scope;if (int ss=stack.size())warning(0, ss);}
 	rsv getVariable(const string &name)
 	{
 		Variable *v = scope->getVariable(name);
 		if (v)								return v;
 		else if (global.get()->exist(name))	return global.get()->child(name);
-		if (warning&2)
-			std::printf("runtime warning : undeclared identidier %s\n", name.c_str());
+		warning(1);
 		variable x;
 		scope->addLocal(name, x);
 		return x;
 	}
-	void addLocal(const string &name, variable &v)		{scope->addLocal(name, v, this);}
-	void addGlobal(const string &name, variable &v)		{global.get()->set(name, v);push(v);}
+	void addLocal(const string &name, variable &v)		{if (!scope->addLocal(name, v, this))warning(3, name);}
+	void addGlobal(const string &name, variable &v)		{if (!global.get()->set(name, v))warning(3, name);push(v);}
 	void addStatic(const string &name, variable &v)		{scope->addStatic(name, v, this);}
-	void Declaration(const string &name, variable &v)	{scope->Declaration(name, v, this);}
+	void Declaration(const string &name, variable &v)	{if (!scope->Declaration(name, v, this))warning(3, name);}
 	void addScope(Scope *s)	{s->set(scope);scope = s;}
 	void Jump(int l)	{scope->Jump(l);}
 	void RJump(int l)	{scope->RJump(l);}
@@ -195,8 +213,7 @@ public:
 	{
 		if (stack.empty())
 		{
-			if (warning&4)
-				std::printf("runtime error : pop empty stack\n");
+			warning(2);
 			return rsv();
 		}
 #ifdef PSL_USE_STL_STACK
@@ -218,7 +235,6 @@ protected:
 	rlist stack;
 #endif
 	Scope *scope;
-	unsigned long warning;
 };
 private:
 
