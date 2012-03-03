@@ -570,7 +570,7 @@ private:
 		getexp8(c, l);
 		while (int n = t->checkNext())
 		{
-			#ifdef PSL_OPTIMIZE_BOOL_AND
+			#if defined(PSL_OPTIMIZE_BOOL_AND) && defined(PSL_OPTIMIZE_IN_COMPILE)
 			if (n==Tokenizer::BAND)
 			{
 				t->getNext();
@@ -594,7 +594,7 @@ private:
 		getexp9(c, l);
 		while (int n = t->checkNext())
 		{
-			#ifdef PSL_OPTIMIZE_BOOL_AND
+			#if defined(PSL_OPTIMIZE_BOOL_AND) && defined(PSL_OPTIMIZE_IN_COMPILE)
 			if (n==Tokenizer::BOR)
 			{
 				t->getNext();
