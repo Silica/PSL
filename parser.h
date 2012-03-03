@@ -570,7 +570,21 @@ private:
 		getexp8(c, l);
 		while (int n = t->checkNext())
 		{
+			#ifdef PSL_OPTIMIZE_BOOL_AND
+			if (n==Tokenizer::BAND)
+			{
+				t->getNext();
+				variable::Variable::OpCode *oc = new variable::Variable::JRF(0);
+				c.pushcode(oc);
+				int b = c.codelength();
+				getexp8(c);
+				oc->set(c.codelength()+1 - b);
+				c.pushcode(new variable::Variable::JR(1));
+				c.pushcode(new variable::Variable::PUSH_NULL);
+			}
+			#else
 			EXP(Tokenizer::BAND, 8, BAND)
+			#endif
 			else
 				break;
 		}
@@ -580,7 +594,21 @@ private:
 		getexp9(c, l);
 		while (int n = t->checkNext())
 		{
+			#ifdef PSL_OPTIMIZE_BOOL_AND
+			if (n==Tokenizer::BOR)
+			{
+				t->getNext();
+				variable::Variable::OpCode *oc = new variable::Variable::JRT(0);
+				c.pushcode(oc);
+				int b = c.codelength();
+				getexp9(c);
+				oc->set(c.codelength()+1 - b);
+				c.pushcode(new variable::Variable::JR(1));
+				c.pushcode(new variable::Variable::PUSH_INT(1));
+			}
+			#else
 			EXP(Tokenizer::BOR, 9, BOR)
+			#endif
 			else
 				break;
 		}
