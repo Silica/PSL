@@ -115,7 +115,7 @@ public:
 	variable operator*()	{return x->deref();}
 //	variable operator&();	// vPointerの為に使いたいが、これをやるのはちょっと…
 	variable operator~();
-	bool operator!();
+	bool operator!()	{return !x->toBool();}
 	variable &operator++();
 	variable &operator--();
 	variable operator++(int i);	// 後置

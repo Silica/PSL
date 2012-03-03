@@ -53,7 +53,7 @@ public:
 		size -= sizeof(l);
 		variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
-		variable::PSLlib::Basic(global);
+//		variable::PSLlib::Basic(global);
 		variable::Variable::bcreader::read(b, cc);
 		cc.prepare(*this);
 		return NONE;
@@ -71,13 +71,24 @@ public:
 		fclose(fp);
 		return e;
 	}
-	variable Run(void)
+	variable::rsv Run(void)
 	{
 		if (!Runable())
 			return variable();
 		variable::Variable::Environment::Run();
 //		std::printf("stack:%d\n", stack.size());
 		return pop();
+	}
+	variable::rsv StepExec()
+	{
+		if (!Runable())
+		{
+			if (stack.size())
+				return pop();
+			return variable(1);
+		}
+		variable::Variable::Environment::StepExec();
+		return variable::rsv();
 	}
 	variable::rsv get(const string &name)
 	{
@@ -91,7 +102,7 @@ private:
 	bool parse(Tokenizer *t)
 	{
 		Parser p(t);
-		variable::PSLlib::Basic(global);
+//		variable::PSLlib::Basic(global);
 
 		variable g = global;
 		p.Parse(g);

@@ -25,6 +25,10 @@ int main(int argc, char **argv)
 	if (argc > 2)
 		p.WriteCompiledCode(argv[2]);
 
+#ifdef PSL_DEBUG
+		variable r;
+		while (!(r = p.StepExec())) if (getch() == 'q')break;
+#endif
 	clock_t start,end;
 	start = clock();
 		variable v = p.Run();

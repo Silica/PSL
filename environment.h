@@ -128,7 +128,7 @@ public:
 	virtual void set(int s){}
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
 	virtual void write(bytecode &b)	{};
-	virtual void dump(){};
+	virtual void dump(int d = 0){};
 private:
 };
 
@@ -179,6 +179,7 @@ public:
 	void RJump(int l)	{scope->RJump(l);}
 	void endScope()		{scope = scope->End(*this);	}
 	void Run()			{while (scope && scope->Run(*this));}
+	void StepExec()		{if (scope) scope->StepExec(*this);}
 	void Return()		{scope = scope->Return();}
 	void Break()		{scope = scope->Break();}
 	void Continue()		{scope = scope->Continue();}
@@ -251,6 +252,25 @@ public:
 		}
 		env.endScope();
 		return true;
+	}
+	void StepExec(Environment &env, size_t &line)
+	{
+		if (line < code.size())
+		{
+			for (table::iterator it = label.begin(); it != label.end(); ++it)
+			{
+				if ((unsigned)it->second.get()->toInt() == line)
+					std::printf("%s:\n", it->first.c_str());
+			}
+			std::printf("exec: ");
+			code[line]->dump(1);
+			code[line++]->Execute(env);
+		}
+		else
+		{
+			std::printf("exec: END\n");
+			env.endScope();
+		}
 	}
 	OpCode::MNEMONIC::mnemonic get(size_t line)
 	{
@@ -342,6 +362,7 @@ public:
 	void Jump(int l)					{line = l;}
 	void RJump(int l)					{line += l;}
 	virtual bool Run(Environment &env)	{return code->Run(env, line);}
+	virtual void StepExec(Environment &env)	{return code->StepExec(env, line);}
 	virtual OpCode::MNEMONIC::mnemonic getNext()	{return code->get(line);}
 	virtual Scope *Return() = 0;
 	virtual Scope *Break() = 0;
