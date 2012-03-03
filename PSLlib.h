@@ -38,20 +38,21 @@ private:
 		case variable::METHOD:		std::printf("[method]");break;
 		case variable::CFUNCTION:	std::printf("[cfunc]");break;
 		case variable::THREAD:		std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
-		default://				v.dump();
+		default:
 			{
 				std::printf("%s", v.toString().c_str());
-//				std::printf("%s", (const char*)v);
 				break;
 			}
 		}
 		return v;
 	}
+	#ifdef PSL_DEBUG
 	static variable Debug(variable &v)
 	{
 		v.dump();
 		return v;
 	}
+	#endif
 	static variable Foreach(variable &v)
 	{
 		variable l = v[0];

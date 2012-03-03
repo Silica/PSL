@@ -607,7 +607,9 @@ public:
 		env.addScope(s);
 		return RC::SCOPE;
 	}
+	#ifdef PSL_DEBUG
 	void dump(int d){std::printf("SCOPE\n");if (!d){statement->dump();std::printf("SCOPE END\n");}}
+	#endif
 	void write(bytecode &b){b.push(MNEMONIC::SCOPE);statement->write(b);}
 protected:
 	Code *statement;
@@ -623,7 +625,9 @@ public:
 		env.addScope(s);
 		return RC::LOOP;
 	}
+	#ifdef PSL_DEBUG
 	void dump(int d){std::printf("LOOP\n");if (!d){statement->dump();std::printf("LOOP END\n");}}
+	#endif
 	void write(bytecode &b){b.push(MNEMONIC::LOOP);b.push(&cline, sizeof(cline));statement->write(b);}
 private:
 	Code *statement;

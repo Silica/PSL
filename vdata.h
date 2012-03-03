@@ -203,7 +203,9 @@ public:
 	string toString()	const {return x ? "[pointer]" : "NULL";}
 
 	size_t length()		const {return x ? 1 : 0;}
+	#ifdef PSL_DEBUG
 	virtual void dump(){std::printf("vPointer:%s\n", x ? "" : "NULL");if(x)x->dump();}
+	#endif
 private:
 	Variable *x;
 };
@@ -267,7 +269,9 @@ public:
 	size_t codelength()			{return x->codelength();}
 	Code *getcode()				{return x->getcode();}
 	void pushcode(OpCode *c)	{x->pushcode(c);}
+	#ifdef PSL_DEBUG
 	void dump(){std::printf("vReference:\n");x->dump();}
+	#endif
 private:
 	Variable *x;
 };
@@ -376,7 +380,9 @@ public:
 	Variable *index(size_t t)	{if(t>=x.size())x.resize(t+1);return x[t].get();}
 	void push(Variable *v)	{x.push_back(v);}
 
+	#ifdef PSL_DEBUG
 	virtual void dump(){std::printf("vRArray:%d\n", x.size());for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();}
+	#endif
 private:
 	mutable rlist x;
 };
@@ -547,11 +553,13 @@ public:
 		code->write(b);
 	}
 
+	#ifdef PSL_DEBUG
 	virtual void dump(){std::printf("vObject:%d,%d,%d\n", array.size(), member.size(), codelength());
 		for (size_t i = 0; i < array.size(); ++i)array[i].get()->dump();
 		for (table::iterator it = member.begin(); it != member.end(); ++it)std::printf("[%s]:\n", it->first.c_str()),it->second.get()->dump();
 		if(code){std::printf("--CODE--\n");code->dump();}
 	}
+	#endif
 private:
 	rlist array;
 	table member;
@@ -688,7 +696,9 @@ public:
 		env.push(r);
 	}
 
+	#ifdef PSL_DEBUG
 	virtual void dump(){std::printf("vThread:%X\n", e);if(x)x->dump();}
+	#endif
 private:
 	Variable *x;
 	Environment *e;

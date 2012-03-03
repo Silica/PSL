@@ -131,7 +131,9 @@ public:
 	virtual void set(int s){}
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
 	virtual void write(bytecode &b)	{};
+	#ifdef PSL_DEBUG
 	virtual void dump(int d = 0){};
+	#endif
 private:
 };
 
@@ -200,7 +202,9 @@ public:
 	void RJump(int l)	{scope->RJump(l);}
 	void endScope()		{scope = scope->End(*this);	}
 	void Run()			{while (scope && scope->Run(*this));}
+	#ifdef PSL_DEBUG
 	void StepExec()		{if (scope) scope->StepExec(*this);}
+	#endif
 	void Return()		{scope = scope->Return();}
 	void Break()		{scope = scope->Break();}
 	void Continue()		{scope = scope->Continue();}
@@ -272,6 +276,7 @@ public:
 		env.endScope();
 		return true;
 	}
+	#ifdef PSL_DEBUG
 	void StepExec(Environment &env, size_t &line)
 	{
 		if (line < code.size())
@@ -291,6 +296,7 @@ public:
 			env.endScope();
 		}
 	}
+	#endif
 	OpCode::MNEMONIC::mnemonic get(size_t line)
 	{
 		if (line < code.size())	return code[line]->get();
@@ -321,6 +327,7 @@ public:
 	}
 	size_t length()	{return code.size();}
 	Code *inc()	{++rc;return this;}
+	#ifdef PSL_DEBUG
 	void dump()
 	{
 		for (size_t i = 0; i < code.size(); ++i)
@@ -330,6 +337,7 @@ public:
 		for (table::iterator it = label.begin(); it != label.end(); ++it)
 			std::printf("%s:%d\n", it->first.c_str(), it->second.get()->toInt());
 	}
+	#endif
 	void write(bytecode &b)
 	{
 		int size = code.size();
@@ -475,7 +483,9 @@ public:
 	void Jump(int l)					{line = l;}
 	void RJump(int l)					{line += l;}
 	virtual bool Run(Environment &env)	{return code->Run(env, line);}
+	#ifdef PSL_DEBUG
 	virtual void StepExec(Environment &env)	{return code->StepExec(env, line);}
+	#endif
 	virtual OpCode::MNEMONIC::mnemonic getNext()	{return code->get(line);}
 	virtual Scope *Return() = 0;
 	virtual Scope *Break() = 0;
