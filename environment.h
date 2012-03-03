@@ -170,7 +170,7 @@ class Environment
 		{
 			switch (n)
 			{
-			case 0:std::printf("runtime warning : %ds stack remained when deleting env\n", s.c_str());break;
+			case 0:std::printf("runtime warning : %s stack remained when deleting env\n", s.c_str());break;
 			case 1:std::printf("runtime warning : undeclared identidier %s\n", s.c_str());break;
 			case 2:std::printf("runtime error : pop empty stack\n");break;
 			case 3:std::printf("runtime warning : declared identidier %s already exist, over write\n", s.c_str());break;

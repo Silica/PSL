@@ -696,6 +696,12 @@ private:
 			else						t->getNext();
 			getexp11(c);
 			oc->set(c.codelength() - b);
+			#ifdef PSL_OPTIMIZE_IMMEDIATELY_POP
+			// 1; ‚â a; ‚ðŽæ‚èœ‚­Å“K‰»‚ª a ? b : c; ‚É”½‰ž‚·‚é‘Îô
+			variable::Variable::OpCode::MNEMONIC::mnemonic n = c.getcode()->get(c.codelength() - 1);
+			if (n == variable::Variable::OpCode::MNEMONIC::CONSTANT || n == variable::Variable::OpCode::MNEMONIC::VARIABLE)
+				c.pushcode(new variable::Variable::NOP);
+			#endif
 		}
 	}
 	void getexp12(variable &c, bool l = false)
