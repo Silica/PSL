@@ -409,7 +409,7 @@ private:
 			}
 		}
 		#ifdef PSL_OPTIMIZE_CONSTANT_CALCULATION
-		if (cn == OpCode::MNEMONIC::UNARY)
+		if (cn == OpCode::MNEMONIC::UNARY || cn == OpCode::MNEMONIC::INC || cn == OpCode::MNEMONIC::DEC)
 		{
 			int s = code.size();
 			if (s >= 1)
