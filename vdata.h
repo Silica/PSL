@@ -308,13 +308,9 @@ public:
 		int size = x.size();
 		if (size == 1)
 			return x[0].get()->x->clone();
-		vRArray *v = new vRArray(size);
+		vObject *v = new vObject();
 		for (int i = 0; i < size; ++i)
-		{
-			Variable *z = x[i].get()->clone();
-			v->push(z);
-			z->finalize();
-		}
+			v->push(x[i].get());
 		return v;
 	}
 	Variable *referenceTo()
@@ -330,9 +326,13 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
+		bool ra = false;
 		Variable *o = v;
 		if (v->type() == RARRAY)
+		{
 			v = v->clone();
+			ra = true;
+		}
 
 		int size = x.size();
 		int vsize = v->length();
@@ -344,16 +344,20 @@ public:
 				x[i].get()->substitution(v->index(i));
 		}
 
-		if (v->type() == RARRAY)
+		if (ra)
 			v->finalize();
 
 		return this;
 	}
 	vBase *assignment(Variable *v)
 	{
+		bool ra = false;
 		Variable *o = v;
 		if (v->type() == RARRAY)
+		{
 			v = v->clone();
+			ra = true;
+		}
 
 		int size = x.size();
 		int vsize = v->length();
@@ -365,7 +369,7 @@ public:
 				x[i].get()->assignment(v->index(i));
 		}
 
-		if (v->type() == RARRAY)
+		if (ra)
 			v->finalize();
 
 		return this;
@@ -438,7 +442,7 @@ public:
 		}
 		k->ref()->finalize();
 
-		if (Code *c = v->getcode())	// これやる必要ある？
+		if (Code *c = v->getcode())	// これやる必要ある？ 恐らく今後無名関数の導入により必要になる
 		{
 			if (code)
 				code->finalize();
