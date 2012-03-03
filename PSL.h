@@ -79,6 +79,7 @@ public:
 //		std::printf("stack:%d\n", stack.size());
 		return pop();
 	}
+	#ifdef PSL_DEBUG
 	variable::rsv StepExec()
 	{
 		if (!Runable())
@@ -90,6 +91,7 @@ public:
 		variable::Variable::Environment::StepExec();
 		return variable::rsv();
 	}
+	#endif
 	variable::rsv get(const string &name)
 	{
 		return global.get()->child(name);

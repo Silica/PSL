@@ -3,11 +3,10 @@
 
 #include "pstring.h"
 
-#include <new>
 #include <cstring>
 #include <vector>
-#include <map>
-#include <stack>
+//#include <map>
+//#include <stack>
 //#define PSL_USE_STL_VECTOR
 //#define PSL_USE_STL_STACK
 //#define PSL_USE_STL_MAP
@@ -35,6 +34,10 @@
 #define PSL_USE_VARIABLE_MEMORY_MANAGER
 
 #define PSL_USE_TOKENIZER_DEFINE
+
+#ifdef _DEBUG
+	#include <new>
+#endif
 
 class variable
 {
@@ -305,7 +308,9 @@ private:
 			virtual void pushlabel(const string &s){}
 			virtual void write(const string &s, bytecode &b){}
 
+		#ifdef PSL_DEBUG
 			virtual void dump(){std::printf("vBase\n");}
+		#endif
 		} *x;
 	private:
 		int rc;
@@ -314,7 +319,9 @@ private:
 		Variable(vBase *v)	{rc = 1;x = v;}
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
+	#ifdef PSL_DEBUG
 		void dump()		{std::printf("rc:%4d, ", rc);x->dump();}
+	#endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		#include "memory.h"
 		static void *operator new(size_t t)		{return VMemoryManager::Next();}
@@ -358,7 +365,9 @@ public:
 	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
 	// ˆêŽžŠÂ‹«‚ÅŽÀs‚·‚é‚Æ•W€Œ^‚·‚ç‘¶Ý‚µ‚È‚¢‚±‚Æ‚Éc
 
+	#ifdef PSL_DEBUG
 	void dump()	{x->dump();}
+	#endif
 };
 
 #endif
