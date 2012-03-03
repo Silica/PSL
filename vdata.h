@@ -452,7 +452,7 @@ public:
 
 	// 演算子系は比較ぐらいはあってもいいが
 	// +=で連結とかどう？って=と同じかそれ、ARRAYだな
-	// あ、arrayに対しては違うな
+	// あ、memberに対しては同じだがarrayに対しては違うな
 
 	bool toBool()		const {return !array.empty() || !member.empty();}
 	int toInt()			const {return array.size();}

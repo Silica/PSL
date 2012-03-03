@@ -144,70 +144,35 @@ public:
 	size_t count(const string &s) const
 	{
 		if (!_reserve)	return 0;
-		hash h = gethash(s, _reserve);
-		for (hash i = h; i < _reserve; ++i)
-			if (d[i] && d[i]->first == s)
-				return 1;
-		for (hash i = 0; i < h; ++i)
-			if (d[i] && d[i]->first == s)
-				return 1;
-		return 0;
+		if (search(s) < 0)
+			return 0;
+		return 1;
 	}
 	rsv &operator[](const string &s) const
 	{
-		if (_reserve == 0)
-			resize();
-		while (1)
+		if (_size)
 		{
-			hash h = gethash(s, _reserve);
-			for (hash i = h; i < _reserve; ++i)
-			{
-				if (d[i] && d[i]->first == s)
-				{
-					return d[i]->second;
-				}
-				else if (d[i] == NULL)
-				{
-//					std::printf("push %3d/%3d:[%d]%s\n", _size, _reserve, i, s.c_str());
-					d[i] = new data(s);
-					_size++;
-					return d[i]->second;
-				}
-			}
-			for (hash i = 0; i < h; ++i)
-			{
-				if (d[i] && d[i]->first == s)
-				{
-					return d[i]->second;
-				}
-				else if (d[i] == NULL)
-				{
-//					std::printf("push %3d/%3d:[%d]%s\n", _size, _reserve, i, s.c_str());
-					d[i] = new data(s);
-					_size++;
-					return d[i]->second;
-				}
-			}
-			resize();
+			int i = search(s);
+			if (i >= 0)
+				return d[i]->second;
 		}
+		if (_size == _reserve)
+			resize();
+		hash h = gethash(s, _reserve);
+		int i = getnextnull(h);
+		d[i] = new data(s);
+		_size++;
+		return d[i]->second;
 	}
 	void erase(const string &s)
 	{
 		if (!_size)
 			return;
-		hash h = gethash(s, _reserve);
-		for (hash i = h; i < _reserve; ++i)
-			if (d[i] && d[i]->first == s)
-			{
-				delete d[i];
-				d[i] = NULL;
-			}
-		for (hash i = 0; i < h; ++i)
-			if (d[i] && d[i]->first == s)
-			{
-				delete d[i];
-				d[i] = NULL;
-			}
+		int i = search(s);
+		if (i < 0)
+			return;
+		delete d[i];
+		d[i] = NULL;
 	}
 	bool empty()	const{return !_size;}
 	size_t size()	const{return _size;}
@@ -224,6 +189,17 @@ public:
 	}
 	iterator end()		{return iterator(this, -1);}
 private:
+	int search(const string &s) const
+	{
+		hash h = gethash(s, _reserve);
+		for (size_t i = h; i < _reserve; ++i)
+			if (d[i] && d[i]->first == s)
+				return i;
+		for (size_t i = 0; i < h; ++i)
+			if (d[i] && d[i]->first == s)
+				return i;
+		return -1;
+	}
 	size_t getnextnull(size_t t) const
 	{
 		for (size_t i = t; i < _reserve; ++i)
