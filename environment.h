@@ -11,6 +11,7 @@ public:
 		enum mnemonic
 		{
 			NOP = 0,
+			CONSTANT,
 			PUSH,
 			PUSH_INT,
 			PUSH_HEX,
@@ -47,6 +48,7 @@ public:
 			ASSIGNMENT,
 			ARGUMENT,
 
+			UNARY,
 			MINUS,		// - neg?
 			PLUS,		// +
 			DEREF,		// *
@@ -58,6 +60,7 @@ public:
 			PINC,
 			PDEC,
 
+			BINARY,
 			ADD,
 			SUB,
 			MUL,
@@ -303,7 +306,13 @@ public:
 //	void pushlabel(const string &s)			{label[s] = code.size();}
 	void pushlabel(const string &s)			{variable v = (int)code.size();label[s] = v;}
 	void pushlabel(const string &s, int l)	{variable v = l;label[s] = v;}
-	void push(OpCode *c)			{code.push_back(c);}
+	void push(OpCode *c)
+	{
+		#ifdef PSL_OPTIMIZE_IN_COMPILE
+		if (optimize(c))
+		#endif
+		code.push_back(c);
+	}
 	void push(Code *c)
 	{
 		for (size_t i = 0; i < c->code.size(); ++i)
@@ -348,6 +357,91 @@ private:
 //	std::map<string,int> label;	// ‚±‚ê‚â‚é‚Æ—e—Ê‚Æ‚Ä‚à‘‚¦‚é‚ñ‚¾
 	table label;
 	int rc;
+	bool optimize(OpCode *c)
+	{
+		static Environment optimizer;
+		OpCode::MNEMONIC::mnemonic cn = c->get();
+		if (cn == OpCode::MNEMONIC::PLUS)
+		{
+			delete c;
+			return false;
+		}
+		if (cn == OpCode::MNEMONIC::POP)
+		{
+			int s = code.size();
+			if (s >= 1)
+			{
+				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
+				#ifdef PSL_OPTIMIZE_IMMEDIATELY_POP
+				if (n == OpCode::MNEMONIC::CONSTANT || n == OpCode::MNEMONIC::VARIABLE)
+				{
+					delete c;
+					delete code[s-1];
+					code.resize(s-1);
+					return false;
+				}
+				#endif
+				#ifdef PSL_OPTIMIZE_SUFFIX_INCREMENT
+				if (n == OpCode::MNEMONIC::INC)
+				{
+					delete code[s-1];
+					code[s-1] = new PINC();
+					return true;
+				}
+				if (n == OpCode::MNEMONIC::DEC)
+				{
+					delete code[s-1];
+					code[s-1] = new PDEC();
+					return true;
+				}
+				#endif
+			}
+		}
+		#ifdef PSL_OPTIMIZE_CONSTANT_CALCULATION
+		if (cn == OpCode::MNEMONIC::UNARY)
+		{
+			int s = code.size();
+			if (s >= 1)
+			{
+				if (code[s-1]->get() == OpCode::MNEMONIC::CONSTANT)
+				{
+					code[s-1]->Execute(optimizer);
+					variable v = optimizer.pop();
+					optimizer.push(v);
+					c->Execute(optimizer);
+					variable a = optimizer.pop();
+					v = a;
+					delete c;
+					return false;
+				}
+			}
+		}
+		if (cn == OpCode::MNEMONIC::BINARY)
+		{
+			int s = code.size();
+			if (s >= 2)
+			{
+				if ((code[s-1]->get() == OpCode::MNEMONIC::CONSTANT) && (code[s-2]->get() == OpCode::MNEMONIC::CONSTANT))
+				{
+					code[s-2]->Execute(optimizer);
+					code[s-1]->Execute(optimizer);
+					variable r = optimizer.pop();
+					variable l = optimizer.pop();
+					optimizer.push(l);
+					optimizer.push(r);
+					c->Execute(optimizer);
+					variable a = optimizer.pop();
+					l = a;
+					delete c;
+					delete code[s-1];
+					code.resize(s-1);
+					return false;
+				}
+			}
+		}
+		#endif
+		return true;
+	}
 };
 
 class Scope

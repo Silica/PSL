@@ -107,8 +107,13 @@ private:
 				oc->set(v.codelength());
 		}
 		if (v.getcode())
+		{
+			#ifdef PSL_DEBUG
+			c.pushcode(new variable::Variable::IF(v));
+			#else
 			c.pushcode(new variable::Variable::SCOPE(v));
-//			c.pushcode(new variable::Variable::IF(v));	// やるとしたらデバッグ時のみ
+			#endif
+		}
 	}
 	void ParseFor(variable &g, variable &c)
 	{
