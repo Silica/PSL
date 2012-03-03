@@ -5,7 +5,9 @@ public:
 	{
 		variable v = r;
 		v["print"] = Print;
+		#ifdef PSL_DEBUG
 		v["debug"] = Debug;
+		#endif
 		v["foreach"] = Foreach;
 		v["int"] = 0;
 		v["float"] = 0.0;

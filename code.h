@@ -1,10 +1,3 @@
-class NOP : public OpCode
-{
-public:
-	RC::RETURNCODE Execute(Environment &env){return RC::NONE;}
-	void dump(int d){std::printf("NOP\n");}
-	void write(bytecode &b){b.push(MNEMONIC::NOP);}
-};
 class PUSH_INT : public OpCode
 {
 public:
@@ -22,6 +15,7 @@ private:
 	// for (int i = 0; i < ++4; i++)
 	// これは以前ならi < 5と等価だったが
 	// 今の実装だと無限ループ突入である
+	// 定数計算の最適化をするかしないかで結果が変わる
 };
 class PUSH_HEX : public OpCode
 {
@@ -440,6 +434,7 @@ public:
 		env.RJump(j);
 		return RC::NONE;
 	}
+	MNEMONIC::mnemonic get()	{return MNEMONIC::JR;}
 	void dump(int d){std::printf("JR %d\n", j);}
 	void write(bytecode &b){b.push(MNEMONIC::JR);b.push(&j, sizeof(j));}
 private:
