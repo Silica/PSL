@@ -21,6 +21,15 @@
 //#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
 //#define PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST	// 宣言済みの名前を更に宣言した場合に通知する
 
+#define PSL_OPTIMIZE_TAILCALL				// 末尾呼び出しの最適化
+#define PSL_OPTIMIZE_IN_COMPILE				// コンパイル時最適化(これ以下)を利用する
+#define PSL_OPTIMIZE_IMMEDIATELY_POP		// PUSHして即POPするコードの最適化(a;の様な文)
+#define PSL_OPTIMIZE_CONSTANT_CALCULATION	// 定数計算の最適化(簡易)
+#define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
+// その他
+// ジャンプ条件が定数の場合
+// デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
+
 #define PSL_USE_VARIABLE_MEMORY_MANAGER
 
 #define PSL_USE_TOKENIZER_DEFINE
