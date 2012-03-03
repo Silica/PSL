@@ -471,9 +471,11 @@ public:
 	}
 	bool set(const string &s, const variable &v)
 	{
-//		if (exist(s))
+		bool r = true;
+		if (exist(s))
+			r = false;
 		member[s] = v;
-		return true;
+		return r;
 	}
 
 	void prepare(Environment &env, Variable *v)
