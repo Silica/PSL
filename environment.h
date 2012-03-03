@@ -375,10 +375,13 @@ private:
 				#ifdef PSL_OPTIMIZE_IMMEDIATELY_POP
 				if (n == OpCode::MNEMONIC::CONSTANT || n == OpCode::MNEMONIC::VARIABLE)
 				{
-					delete c;
-					delete code[s-1];
-					code.resize(s-1);
-					return false;
+					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
+					{
+						delete c;
+						delete code[s-1];
+						code.resize(s-1);
+						return false;
+					}
 				}
 				#endif
 				#ifdef PSL_OPTIMIZE_SUFFIX_INCREMENT
