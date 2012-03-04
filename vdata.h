@@ -401,7 +401,16 @@ public:
 	vObject()	{_class = NULL;code = NULL;}
 	vObject(Variable *v)	{_class = v->ref();code = NULL;}
 	~vObject()	{
-		if (_class)	_class->finalize();
+		if (_class)
+		{
+			if (member.count("destructor"))
+			{
+				Environment env;
+				variable arg;
+				member["destructor"].get()->call(env, arg);
+			}
+			_class->finalize();
+		}
 		if (code)	code->finalize();
 	}
 	Type type()	const	{return OBJECT;}
@@ -538,7 +547,6 @@ public:
 		env.addScope(scope);
 		env.push(arg);
 		env.Run();
-//		scope->Run();	// ‚±‚Á‚¿‚©H
 		return env.pop();
 	}
 
@@ -613,7 +621,6 @@ public:
 		env.addScope(scope);
 		env.push(arg);
 		env.Run();
-//		scope->Run();	// vObject‚É€‚¸‚é
 		return env.pop();
 	}
 

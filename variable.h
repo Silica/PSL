@@ -55,6 +55,7 @@ private:
 	friend class rsv;
 public:
 	typedef variable(*function)(variable&);
+	typedef variable(*method)(variable&,variable&);
 	typedef unsigned long hex;
 	enum Type
 	{
@@ -71,6 +72,8 @@ public:
 		METHOD,
 		CFUNCTION,
 		THREAD,
+		CMETHOD,
+		CPOINTER,
 	};
 
 
@@ -314,7 +317,7 @@ private:
 		} *x;
 	private:
 		int rc;
-		~Variable()	{delete x;}
+		~Variable()	{rc=0x80000000;delete x;}
 	public:
 		Variable(vBase *v)	{rc = 1;x = v;}
 		Variable *clone()	{return new Variable(x->clone());}
