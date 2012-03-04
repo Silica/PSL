@@ -31,7 +31,7 @@
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 
-#define PSL_USE_VARIABLE_MEMORY_MANAGER
+//#define PSL_USE_VARIABLE_MEMORY_MANAGER
 
 #define PSL_USE_TOKENIZER_DEFINE
 
@@ -84,6 +84,8 @@ public:
 	variable(const char *s)		{x = new Variable(s);}
 	variable(const string &s)	{x = new Variable(s);}
 	variable(function f)		{x = new Variable(f);}
+	variable(method f)			{x = new Variable(f);}
+	variable(void *p)			{x = new Variable(p);}
 	variable(const variable &v)	{x = v.x->clone();}
 	variable(Type t)			{x = new Variable(t);}
 	~variable()					{x->finalize();}
@@ -97,13 +99,16 @@ public:
 	variable &operator->*(const variable &v)	{x->assignment(v.x);return *this;}		// 何せ余ってる演算子がこれなので…
 
 	variable &operator=(function f)		{
-		variable v = f;
-		x->substitution(v.x);
-		return *this;
-	}
-	variable &operator=(int i)		{
-		variable v = i;
-		x->substitution(v.x);
+		if (f == NULL)
+		{
+			variable v = 0;
+			x->substitution(v.x);
+		}
+		else
+		{
+			variable v = f;
+			x->substitution(v.x);
+		}
 		return *this;
 	}
 
@@ -157,6 +162,7 @@ public:
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
 	operator const char*()	const	{static string s;s = x->toString();return s.c_str();}
+	operator void*()		const	{return x->toPointer();}
 
 	variable operator[](int i)				{return x->index(i);}
 	variable operator[](const char *s)		{return x->child(s);}
@@ -181,6 +187,8 @@ private:
 //		Variable(const char *s)		{rc = 1;x = new vString(s);}
 		Variable(const string &s)	{rc = 1;x = new vString(s);}
 		Variable(function f)		{rc = 1;x = new vCFunction(f);}
+		Variable(method f)			{rc = 1;x = new vCMethod(f, NULL);}
+		Variable(void *p)			{rc = 1;x = new vCPointer(p);}
 		Variable(Variable *v)		{rc = 1;x = new vPointer(v);}
 		Variable(Type t){rc = 1;switch (t){
 			case NIL:		x = new vBase();break;
@@ -229,6 +237,7 @@ private:
 		int toInt()			const {return x->toInt();}
 		double toDouble()	const {return x->toDouble();}
 		string toString()	const {return x->toString();}
+		void *toPointer()	const {return x->toPointer();}
 
 		size_t length()				const {return x->length();}
 		bool exist(const string &s)	const {return x->exist(s);}
@@ -245,6 +254,7 @@ private:
 	public:
 		void prepare(Environment &env)			{x->prepare(env, this);}
 		void prepareInstance(Environment &env)	{x->prepareInstance(env, this);}
+		Variable *instance()					{return x->instance(this);}
 		variable call(Environment &env, variable &arg)	{return x->call(env, arg, this);}
 
 		size_t codelength()		{return x->codelength();}
@@ -292,6 +302,7 @@ private:
 			virtual int toInt()			const {return 0;}
 			virtual double toDouble()	const {return 0;}
 			virtual string toString()	const {return "";}
+			virtual void *toPointer()	const {return NULL;}
 
 			virtual size_t length()				const {return 0;}
 			virtual bool exist(const string &s)	const {return false;}
@@ -302,7 +313,8 @@ private:
 			virtual bool set(const string &s, const variable &v)	{return false;}
 
 			virtual void prepare(Environment &env, Variable *v)	{}
-			virtual void prepareInstance(Environment &env, Variable *v)	{v = new Variable(clone());env.push(v);v->finalize();}
+			virtual void prepareInstance(Environment &env, Variable *v)	{env.push(rsv(v->clone(), 0));}
+			virtual Variable *instance(Variable *v)	{return v->clone();}
 			virtual rsv call(Environment &env, variable &arg, Variable *v)	{return variable(NIL);}
 
 			virtual size_t codelength()	{return 0;}
@@ -333,6 +345,7 @@ private:
 	private:
 		#include "vdata.h"
 		friend class PSL;
+		friend class PSLlib;
 		friend class vBase;
 		friend class vRArray;
 		friend class vObject;
@@ -354,6 +367,7 @@ private:
 	friend class PSL;
 	friend class Tokenizer;
 	friend class Parser;
+	friend class Variable::vCMethod;
 	friend class Variable::CALL;
 	friend class Variable::SCOPE;
 	friend class Variable::LOOP;
@@ -366,7 +380,7 @@ public:
 	rsv operator()()											{Variable::Environment env;variable v;return x->call(env, v);}
 	rsv operator()(variable &arg)								{Variable::Environment env;return x->call(env, arg);}
 	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
-	// 一時環境で実行すると標準型すら存在しないことに…
+	rsv instance()												{return rsv(x->instance(), 0);}
 
 	#ifdef PSL_DEBUG
 	void dump()	{x->dump();}

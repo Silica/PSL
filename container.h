@@ -24,6 +24,11 @@ public:
 		if (x) x->finalize();
 		x = v->clone();
 	}
+	void set(Variable *v)
+	{
+		if (x) x->finalize();
+		x = v;
+	}
 	Variable *get()	const{if(!x)x = new Variable();return x;}
 #else	// 上で大丈夫である確信が持てない、新規変数を作る時にrsvで作って(共有して)いなければOKの筈だが
 	// そして今や僅差になった
@@ -51,6 +56,11 @@ public:
 	{
 		x->finalize();
 		x = v->clone();
+	}
+	void set(Variable *v)
+	{
+		x->finalize();
+		x = v;
 	}
 	Variable *get()	const{return x;}
 #endif
