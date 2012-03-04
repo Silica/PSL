@@ -381,7 +381,11 @@ public:
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
 
 	size_t length()		const {return x.size();}
-	Variable *index(size_t t)	{if(t>=x.size())x.resize(t+1);return x[t].get();}
+	Variable *index(size_t t)	{
+		if (x.size() == 1)return x[0].get()->index(t);
+		if(t>=x.size())x.resize(t+1);return x[t].get();
+	}
+	Variable *child(const string &s)	{if (x.size() == 1)return x[0].get()->child(s);return NULL;}
 	void push(Variable *v)	{x.push_back(v);}
 
 	#ifdef PSL_DEBUG
@@ -421,7 +425,7 @@ public:
 		array.resize(size);
 		for (int i = 0; i < size; ++i)
 			array[i].copy(v->array[i]);
-		for (table::iterator it = member.begin(); it != member.end(); ++it)
+		for (table::iterator it = v->member.begin(); it != v->member.end(); ++it)
 			member[it->first].copy(it->second);
 		if (v->_class)	_class = v->_class->ref();
 		else			_class = NULL;
@@ -506,26 +510,7 @@ public:
 	}
 	void prepareInstance(Environment &env, Variable *v)
 	{
-		vObject *o = new vObject(v);
-		Variable *x = new Variable(o);
-
-		int size = array.size();
-		for (int i = 0; i < size; ++i)
-			o->array[i].get()->assignment(array[i].get());
-
-		for (table::iterator it = member.begin(); it != member.end(); ++it)
-		{
-			if (it->second.get()->getcode())	// コード持ってれば
-			{
-				Variable *z = new Variable(new vMethod(it->second.get(), x));
-				o->member[it->first] = z;
-				z->finalize();
-			}
-			else
-			{
-				o->member[it->first].get()->assignment(it->second.get());
-			}
-		}
+		Variable *x = instance(v);
 		if (!code)
 		{
 			env.push(x);
@@ -548,6 +533,35 @@ public:
 		env.push(arg);
 		env.Run();
 		return env.pop();
+	}
+	Variable *instance(Variable *v)
+	{
+		vObject *o = new vObject(v);
+		Variable *x = new Variable(o);
+
+		int size = array.size();
+		for (int i = 0; i < size; ++i)
+			o->array[i].get()->assignment(array[i].get());
+
+		for (table::iterator it = member.begin(); it != member.end(); ++it)
+		{
+			if (it->second.get()->getcode())	// コード持ってれば
+			{
+				Variable *z = new Variable(new vMethod(it->second.get(), x));
+				o->member[it->first].set(z);
+			}
+			else if (it->second.get()->type() == CMETHOD)
+			{
+				Variable *z = it->second.get()->clone();
+				z->push(x);
+				o->member[it->first].set(z);
+			}
+			else
+			{
+				o->member[it->first].get()->assignment(it->second.get());
+			}
+		}
+		return x;
 	}
 
 	size_t codelength()		{return code ? code->length() : 0;}
@@ -575,7 +589,6 @@ public:
 private:
 	rlist array;
 	table member;
-//	rsv _class;
 	Variable *_class;
 	Code *code;
 
@@ -605,6 +618,7 @@ public:
 
 	bool toBool()		const {return true;}
 	size_t length()		const {return 1;}
+	void push(Variable *v)	{_this = v;}
 
 	void prepare(Environment &env, Variable *v)
 	{
@@ -656,6 +670,73 @@ private:
 	function f;
 };
 
+class vCMethod : public vBase
+{
+public:
+	vCMethod(method _f, Variable *x)	{f = _f;_this = x;}
+	Type type()	const	{return CMETHOD;}
+	vBase *clone()	{return new vCMethod(f, _this);}
+
+	bool toBool()		const {return true;}
+	size_t length()		const {return 1;}
+	void push(Variable *v)
+	{
+		_this = v;
+	}
+
+	void prepare(Environment &env, Variable *v)
+	{
+		variable x = env.pop();
+		if (_this)
+		{
+			variable t = _this;
+			env.push(f(t, x));
+		}
+		else
+		{
+			variable z;
+			env.push(f(z, x));
+		}
+	}
+	rsv call(Environment &env, variable &arg, Variable *v)
+	{
+		if (_this)
+		{
+			variable t = _this;
+			return f(t, arg);
+		}
+		else
+		{
+			variable z;
+			return f(z, arg);
+		}
+	}
+	virtual void dump(){std::printf("vCMethod:\n");}
+private:
+	method f;
+	Variable *_this;
+};
+
+class vCPointer : public vBase
+{
+public:
+	vCPointer(void *p)	{x = p;}
+	Type type()	const	{return CPOINTER;}
+	vBase *clone()	{return new vCPointer(x);}
+
+	vBase *substitution(Variable *v)	{x = v->toPointer();return this;}
+
+	bool toBool()		const {return x ? true : false;}
+	string toString()	const {return x ? "[cpointer]" : "NULL";}
+	void *toPointer()	const {return x;}
+
+	size_t length()		const {return x ? 1 : 0;}
+
+	virtual void dump(){std::printf("vCPointer:%X\n", x);}
+private:
+	void *x;
+};
+
 class vThread : public vBase
 {
 public:
@@ -682,9 +763,6 @@ public:
 		return e->Runable();
 	}
 
-//	bool exist(const string &s)	const {return e ? (bool)(e->getVariable(s).x) : false;}
-//	Variable *child(const string &s)	{return e ? e->getVariable(s).x : NULL;}
-	// あれ、global変数は共有か、じゃあvの方だな
 	size_t length()		const {return x ? 1 : 0;}
 	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
 	Variable *child(const string &s)	{return x ? x->child(s) : NULL;}

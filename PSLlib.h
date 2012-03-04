@@ -1,7 +1,7 @@
 class PSLlib
 {
 public:
-	static void Basic(rsv &r)
+	static void Basic(const rsv &r)
 	{
 		variable v = r;
 		v["print"] = Print;
@@ -22,6 +22,73 @@ public:
 		v["ref"] = ref;
 		v["pointer"] = pointer;
 		v["thread"] = thread;
+		File(r);
+	}
+	static variable FileRead(variable &_this, variable &v)
+	{
+		using namespace std;
+		FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+		if (!fp)
+			return "";
+		int size = v;
+		if (!size)
+			return "";
+		char *buf = new char[size+1];
+		size = fread(buf, 1, size, fp);
+		buf[size] = 0;
+		::string s = buf;
+		delete[] buf;
+		return s;
+	}
+	static variable FileClose(variable &_this, variable &v)
+	{
+		using namespace std;
+		FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+		if (fp)
+			fclose(fp);
+		_this["$$__FILE*fp__$$"] = NULL;
+		return v;
+	}
+	static variable FileOpen(variable &_this, variable &v)
+	{
+		string name = v.toString();
+		if (!_this)
+		{
+			using namespace std;
+			FILE *fp = fopen(name, "r");
+			if (!fp)
+				return 0;
+			variable f;
+			variable fo = FileOpen;
+			variable fc = FileClose;
+			variable fr = FileRead;
+			f["$$__FILE*fp__$$"] = fp;
+			f["open"] = fo;
+			f["name"] = name;
+			f["read"] = fr;
+			f["close"] = fc;
+			f["destructor"] = fc;
+			variable r = f.instance();
+			return r.pointer();
+		}
+		else
+		{
+			using namespace std;
+			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			if (fp)
+				fclose(fp);
+			_this["$$__FILE*fp__$$"] = NULL;
+			return 0;
+		}
+	}
+	static void File(const rsv &r)
+	{
+		variable v = r;
+		variable f = v["file"];
+		variable fo = FileOpen;
+		variable fc = FileClose;
+		f["open"] = fo;
+		f["destructor"] = fc;
 	}
 private:
 	static variable Print(variable &v)
