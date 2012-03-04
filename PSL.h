@@ -1,3 +1,6 @@
+#ifndef PSL_H
+#define PSL_H
+
 #include "tokenizer.h"
 #include "parser.h"
 
@@ -118,3 +121,5 @@ private:
 		return false;
 	}
 };
+
+#endif

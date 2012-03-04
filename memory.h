@@ -94,10 +94,10 @@ private:
 // 準汎用固定サイズメモリマネージャ
 // 最初の4バイトが0にならないオブジェクト限定
 // 仮想関数テーブルがあるからvirtualなら大丈夫、なはず
-template<size_t S> class MemoryManager
+template<size_t S, int poolsize = 256> class MemoryManager
 {
 public:
-	const static int poolsize = 256;
+//	const static int poolsize = 256;
 	static void *Next()				{return MemoryPool().nextptr();}
 	static void Release(void *ptr)	{MemoryPool().release((char*)ptr);}
 	class mpool
