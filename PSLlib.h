@@ -95,6 +95,7 @@ private:
 					return 0;
 				variable f;
 				f["$$__FILE*fp__$$"] = fp;
+				f["name"] = name;
 				set(f);
 				variable r = f.instance();
 				return r.pointer();
@@ -105,7 +106,9 @@ private:
 				FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
-				_this["$$__FILE*fp__$$"] = fopen(name, "r");;
+				_this["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				if (fp)	_this["name"] = name;
+				else	_this["name"] = "";
 				return 0;
 			}
 		}
@@ -116,6 +119,7 @@ private:
 			if (fp)
 				fclose(fp);
 			_this["$$__FILE*fp__$$"] = NULL;
+			_this["name"] = "";
 			return v;
 		}
 		static variable Read(variable &_this, variable &v)
