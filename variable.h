@@ -4,7 +4,7 @@
 #include "pstring.h"
 
 #include <cstring>
-#include <vector>
+//#include <vector>
 //#include <map>
 //#include <stack>
 //#define PSL_USE_STL_VECTOR
@@ -41,6 +41,7 @@
 
 class variable
 {
+	typedef unsigned long size_t;
 	class rsv;
 #ifdef __GNUC__
 public:
