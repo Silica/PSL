@@ -507,7 +507,7 @@ public:
 			}
 			else
 			{
-				if (i < c)
+				if (i <= c)
 					buf->fcopy(buf->buffer()+i, c-i);
 			}
 		}
