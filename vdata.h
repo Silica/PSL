@@ -720,6 +720,10 @@ private:
 class vCPointer : public vBase
 {
 public:
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return MemoryManager<sizeof(vCPointer)>::Next();}
+	static void operator delete(void *ptr)	{MemoryManager<sizeof(vCPointer)>::Release(ptr);}
+#endif
 	vCPointer(void *p)	{x = p;}
 	Type type()	const	{return CPOINTER;}
 	vBase *clone()	{return new vCPointer(x);}
