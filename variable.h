@@ -345,7 +345,6 @@ private:
 	private:
 		#include "vdata.h"
 		friend class PSL;
-		friend class PSLlib;
 		friend class vBase;
 		friend class vRArray;
 		friend class vObject;
