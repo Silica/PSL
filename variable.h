@@ -31,7 +31,7 @@
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 
-//#define PSL_USE_VARIABLE_MEMORY_MANAGER
+#define PSL_USE_VARIABLE_MEMORY_MANAGER
 
 #define PSL_USE_TOKENIZER_DEFINE
 

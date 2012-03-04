@@ -19,7 +19,7 @@ public:
 private:
 	enum ErrorID
 	{
-		ERROR = 1,
+		_ERROR = 1,
 		TINA,
 		TINSC,
 		TINLAG,

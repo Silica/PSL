@@ -188,7 +188,7 @@ public:
 		Variable *v = scope->getVariable(name);
 		if (v)								return v;
 		else if (global.get()->exist(name))	return global.get()->child(name);
-		warning(1);
+		warning(1, name);
 		variable x;
 		scope->addLocal(name, x);
 		return x;
