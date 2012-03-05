@@ -224,7 +224,7 @@ private:
 		}
 		if (n == Tokenizer::IDENTIFIER)
 		{
-			if (t->nstr == "global" || t->nstr == "static" || t->nstr == "local")
+			if (t->nstr == "global" || t->nstr == "static" || t->nstr == "local" || t->nstr == "yield")
 			{
 				ParseExpression(c, ';');
 				c.pushcode(new variable::Variable::POP);
@@ -269,7 +269,7 @@ private:
 				c.pushcode(new variable::Variable::BREAK);
 				return;
 			}
-			if (t->nstr == "yield")
+/*			if (t->nstr == "yield")
 			{
 				if (t->checkNext() == ';')
 					c.pushcode(new variable::Variable::PUSH_NULL);
@@ -277,7 +277,7 @@ private:
 					ParseExpression(c, ';');
 				c.pushcode(new variable::Variable::YIELD);
 				return;
-			}
+			}*/
 			if (t->nstr == "goto")
 			{
 				if (t->checkNext() != Tokenizer::IDENTIFIER)
@@ -710,28 +710,42 @@ private:
 	}
 	void getexp13(variable &c, bool l = false)
 	{
-		getexp12(c, l);
+		if (!l && t->checkNext() == Tokenizer::IDENTIFIER && t->nstr == "yield")
+		{
+			t->getNext();
+			if (t->checkNext() == ';')
+				c.pushcode(new variable::Variable::PUSH_NULL);
+			else
+				getexp13(c);
+			c.pushcode(new variable::Variable::YIELD);
+		}
+		else
+			getexp12(c, l);
+	}
+	void getexp14(variable &c, bool l = false)
+	{
+		getexp13(c, l);
 		while (int n = t->checkNext())
 		{
 			EXP('=', 13, SUBSTITUTION)
-			else EXP(Tokenizer::ASSIGN, 13, ASSIGNMENT)
-			else EXP(Tokenizer::SADD, 13, SADD)
-			else EXP(Tokenizer::SSUB, 13, SSUB)
-			else EXP(Tokenizer::SMUL, 13, SMUL)
-			else EXP(Tokenizer::SDIV, 13, SDIV)
-			else EXP(Tokenizer::SMOD, 13, SMOD)
-			else EXP(Tokenizer::SAND, 13, SAND)
-			else EXP(Tokenizer::SOR, 13, SOR)
-			else EXP(Tokenizer::SXOR, 13, SXOR)
-			else EXP(Tokenizer::SSHL, 13, SSHL)
-			else EXP(Tokenizer::SSHR, 13, SSHR)
+			else EXP(Tokenizer::ASSIGN, 14, ASSIGNMENT)
+			else EXP(Tokenizer::SADD, 14, SADD)
+			else EXP(Tokenizer::SSUB, 14, SSUB)
+			else EXP(Tokenizer::SMUL, 14, SMUL)
+			else EXP(Tokenizer::SDIV, 14, SDIV)
+			else EXP(Tokenizer::SMOD, 14, SMOD)
+			else EXP(Tokenizer::SAND, 14, SAND)
+			else EXP(Tokenizer::SOR, 14, SOR)
+			else EXP(Tokenizer::SXOR, 14, SXOR)
+			else EXP(Tokenizer::SSHL, 14, SSHL)
+			else EXP(Tokenizer::SSHR, 14, SSHR)
 			else
 				break;
 		}
 	}
 	void ParseExpression(variable &c, char e, bool l = false)
 	{
-		getexp13(c, l);
+		getexp14(c, l);
 		if (t->checkNext() != e)
 			Error(TINAE, e, "", t->getPrevLine());
 		else

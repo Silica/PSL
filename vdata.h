@@ -27,7 +27,7 @@ public:
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
-	#define CMP(n,o) virtual bool n(Variable *v)	{return x o v->toInt();}
+	#define CMP(n,o) bool n(Variable *v)	{return x o v->toInt();}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -375,18 +375,48 @@ public:
 		return this;
 	}
 
+	#define OP(n) void n(Variable *v)	{if (x.size() == 1)x[0].get()->n(v);}
+	OP(add)
+	OP(sub)
+	OP(mul)
+	OP(div)
+	OP(mod)
+	OP(oand)
+	OP(oor)
+	OP(oxor)
+	OP(shl)
+	OP(shr)
+	#undef OP
+	#define CMP(n) bool n(Variable *v)	{if (x.size() == 1)return x[0].get()->n(v);return false;}
+	CMP(eq)
+	CMP(ne)
+	CMP(le)
+	CMP(ge)
+	CMP(lt)
+	CMP(gt)
+	#undef CMP
+	Variable *deref()	{if (x.size() == 1)return x[0].get()->deref();return NULL;}
+
 	bool toBool()		const {if (x.size() == 1)return x[0].get()->toBool();return x.size();}
 	int toInt()			const {if (x.size() == 1)return x[0].get()->toInt();return x.size();}
 	double toDouble()	const {if (x.size() == 1)return x[0].get()->toDouble();return x.size();}
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
+	void *toPointer()	const {if (x.size() == 1)return x[0].get()->toPointer();return NULL;}
 
 	size_t length()		const {return x.size();}
 	Variable *index(size_t t)	{
 		if (x.size() == 1)return x[0].get()->index(t);
-		if(t>=x.size())x.resize(t+1);return x[t].get();
+		if (t>=x.size())x.resize(t+1);return x[t].get();
 	}
 	Variable *child(const string &s)	{if (x.size() == 1)return x[0].get()->child(s);return NULL;}
 	void push(Variable *v)	{x.push_back(v);}
+
+	void prepare(Environment &env, Variable *v)	{if (x.size() == 1)x[0].get()->prepare(env);}
+	rsv call(Environment &env, variable &arg, Variable *v)	{
+		if (x.size() == 1)
+			x[0].get()->call(env, arg);
+		return variable(NIL);
+	}
 
 	#ifdef PSL_DEBUG
 	virtual void dump(){std::printf("vRArray:%d\n", x.size());for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();}
@@ -777,13 +807,12 @@ public:
 			return;
 		if (e && !e->Runable())
 			return;
-		variable arg = env.pop();
 		if (!e)
 		{
 			e = new Environment(env);
 			x->prepare(*e);
-			e->push(arg);
 		}
+		e->push(env.pop());
 		e->Run();
 		variable r = e->pop();
 		env.push(r);
