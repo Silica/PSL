@@ -269,15 +269,6 @@ private:
 				c.pushcode(new variable::Variable::BREAK);
 				return;
 			}
-/*			if (t->nstr == "yield")
-			{
-				if (t->checkNext() == ';')
-					c.pushcode(new variable::Variable::PUSH_NULL);
-				else
-					ParseExpression(c, ';');
-				c.pushcode(new variable::Variable::YIELD);
-				return;
-			}*/
 			if (t->nstr == "goto")
 			{
 				if (t->checkNext() != Tokenizer::IDENTIFIER)
