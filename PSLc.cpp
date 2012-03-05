@@ -45,7 +45,7 @@ bool compiled(FILE *exe)
 	return l == 0xDEADC0DE;
 }
 
-void execute(FILE *exe)
+void execute(FILE *exe, variable &arg)
 {
 	int i = sizeof(dword) * 2;
 	fseek(exe, -i, SEEK_END);
@@ -56,6 +56,8 @@ void execute(FILE *exe)
 	PSL p;
 	if (p.LoadCompiledCode(exe, end - l))
 		return;
+	variable a = p.get("arg");
+	a = arg;
 	p.Run();
 }
 
@@ -72,7 +74,10 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		execute(exe);
+		variable arg;
+		for (int i = 0; i < argc; i++)
+			arg[i] = argv[i];
+		execute(exe, arg);
 		getch();
 	}
 
