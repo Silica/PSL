@@ -79,14 +79,13 @@ class PUSH_NULL : public OpCode
 public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
-		env.push(x);
+		variable v;
+		env.push(v);
 		return RC::NONE;
 	}
 	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
 	void dump(int d){std::printf("PUSH NULL\n");}
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_NULL);}
-private:
-	rsv x;
 };
 class POP_VARIABLE : public OpCode
 {

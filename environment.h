@@ -229,6 +229,9 @@ public:
 #else
 		int size = stack.size();
 		rsv v = stack[size-1];
+		#ifdef PSL_POPSTACK_NULL
+		stack[size-1] = rsv();
+		#endif
 		stack.resize(size-1);
 #endif
 		return v;
