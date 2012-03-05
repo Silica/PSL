@@ -30,6 +30,7 @@
 // ジャンプ条件が定数の場合
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
+#define PSL_POPSTACK_NULL	// POPしたスタックを即空にする(変数の生存期間に影響)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER
 
@@ -41,7 +42,7 @@
 
 class variable
 {
-	typedef unsigned long size_t;
+	typedef unsigned int size_t;
 	class rsv;
 #ifdef __GNUC__
 public:
