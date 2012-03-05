@@ -11,7 +11,7 @@
 
 class string
 {
-	typedef unsigned long size_t;
+	typedef unsigned int size_t;
 public:
 	static size_t slen(const char *s)
 	{
@@ -369,23 +369,23 @@ public:
 		return !(*this <= s);
 	}
 
-	int find(char c, size_t i = 0) const	/* i位置から検索してcの文字を発見した位置を返す */
+	int find(char c, int i = 0) const	/* i位置から検索してcの文字を発見した位置を返す */
 	{
 		if (i >= 0 && buf)
 		{
-			for (; i < buf->length(); ++i)
+			for (size_t t = i; t < buf->length(); ++t)
 			{
-				if (buf->at(i) == c)
-					return i;
+				if (buf->at(t) == c)
+					return t;
 			}
 		}
 		return -1;
 	}
-	int rfind(char c, size_t i = 0) const	/* i位置から逆方向に検索してcの文字を発見した位置を返す */
+	int rfind(char c, int i = -1) const	/* i位置から逆方向に検索してcの文字を発見した位置を返す */
 	{
-		if (i >= 0 && buf)
+		if (buf)
 		{
-			if (i == 0 || i >= buf->length()) i = buf->length()-1;
+			if (i < 0 || i >= (int)buf->length()) i = buf->length()-1;
 			for (; i >= 0; --i)
 			{
 				if (buf->at(i) == c)
@@ -451,7 +451,7 @@ public:
 	{
 		if (buf)
 		{
-			size_t c = buf->length();
+			int c = buf->length();
 			only_and_extend(c);
 			c -= i;
 			if (c < 0)
