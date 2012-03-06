@@ -173,8 +173,8 @@ private:
 			t->getNext();
 			ParseDangling(g, v);
 		}
-		if (variable::Variable::Code *x = v.getcode())
-			c.pushcode(new variable::Variable::LOOP(x, cline));
+		if (variable::Variable::Code *z = v.getcode())
+			c.pushcode(new variable::Variable::LOOP(z, cline));
 	}
 	void ParseWhile(variable &g, variable &c)
 	{
@@ -650,7 +650,6 @@ private:
 			else if (t->nstr == "local")
 				_local = true;
 			if (_global || _static || _local)
-//			if ((_global = (t->nstr == "global")) || (_static = (t->nstr == "static")) || (_local = (t->nstr == "local")))	// Œxo‚é‚Ë‚ñ
 			{
 				string scope = t->nstr;
 				t->getNext();

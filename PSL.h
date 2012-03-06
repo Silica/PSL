@@ -29,7 +29,7 @@ public:
 	}
 	error WriteCompiledCode(std::FILE *fp)
 	{
-		variable::bytecode b;
+		variable::Variable::bytecode b;
 		global.get()->write("", b);
 		unsigned long l = 0xBCDEF01A;
 		fwrite(&l, 1, sizeof(l), fp);
@@ -54,7 +54,7 @@ public:
 		if (l != 0xBCDEF01A)
 			return NOT_COMPILED_CODE;
 		size -= sizeof(l);
-		variable::bytecode b(size);
+		variable::Variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
 //		variable::PSLlib::Basic(global);
 		variable::Variable::bcreader::read(b, cc);
