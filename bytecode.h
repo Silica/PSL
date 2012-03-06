@@ -122,7 +122,7 @@ class bcreader
 			{
 				variable x;
 				readcode(byte, end, x);
-				v.pushcode(new SCOPE(x));
+				v.pushcode(new SCOPE(x.getcode()));
 			}
 			break;
 		case OpCode::MNEMONIC::LOOP:
@@ -131,7 +131,7 @@ class bcreader
 				byte += sizeof(int);
 				variable x;
 				readcode(byte, end, x);
-				v.pushcode(new LOOP(x, l));
+				v.pushcode(new LOOP(x.getcode(), l));
 			}
 			break;
 		case OpCode::MNEMONIC::LABELBEGIN:

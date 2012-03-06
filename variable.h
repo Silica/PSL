@@ -259,6 +259,7 @@ private:
 		Variable *instance()					{return x->instance(this);}
 		variable call(Environment &env, variable &arg)	{return x->call(env, arg, this);}
 
+		Variable(Code *c)		{rc = 1;x = new vObject(c);}
 		size_t codelength()		{return x->codelength();}
 		Code *getcode()			{return x->getcode();}
 		void pushcode(OpCode *c){return x->pushcode(c);}
@@ -370,11 +371,10 @@ private:
 	friend class Parser;
 	friend class Variable::vCMethod;
 	friend class Variable::CALL;
-	friend class Variable::SCOPE;
-	friend class Variable::LOOP;
 	friend class Variable::INSTANCE;
 	friend class Variable::bcreader;
 public:
+	variable(variable::Variable::Code *c)	{x = new Variable(c);}
 	rsv ref()		{return x;}
 	rsv pointer()	{return variable(POINTER, x);}
 
