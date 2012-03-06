@@ -10,8 +10,8 @@ public:
 	void Parse(variable &v)
 	{
 		string arg = "arg";
-		v.pushcode(new variable::Variable::VARIABLE(arg));
-		v.pushcode(new variable::Variable::ARGUMENT);
+		v.pushcode(new Variable::VARIABLE(arg));
+		v.pushcode(new Variable::ARGUMENT);
 		while (t->checkNext())
 			ParseStatement(v, v);
 		if (error)
@@ -83,10 +83,10 @@ private:
 		else
 			ParseExpression(v, /*'('*/')');
 		int l = v.codelength();
-		variable::Variable::OpCode *oc = NULL;
+		Variable::OpCode *oc = NULL;
 		if (l)
 		{
-			oc = new variable::Variable::JF(l);
+			oc = new Variable::JF(l);
 			v.pushcode(oc);	// Žæ‚èŠ¸‚¦‚¸‘«‚·
 		}
 		else
@@ -99,7 +99,7 @@ private:
 			t->getNext();
 			if (oc)
 				oc->set(v.codelength()+1);
-			oc = new variable::Variable::JMP(0);
+			oc = new Variable::JMP(0);
 			v.pushcode(oc);
 			ParseDangling(g, v);
 			oc->set(v.codelength());
@@ -109,12 +109,12 @@ private:
 			if (oc)
 				oc->set(v.codelength());
 		}
-		if (variable::Variable::Code *x = v.getcode())
+		if (Variable::Code *x = v.getcode())
 		{
 			#ifdef PSL_DEBUG
-			c.pushcode(new variable::Variable::IF(x));
+			c.pushcode(new Variable::IF(x));
 			#else
-			c.pushcode(new variable::Variable::SCOPE(x));
+			c.pushcode(new Variable::SCOPE(x));
 			#endif
 		}
 	}
@@ -130,7 +130,7 @@ private:
 			l = v.codelength();
 			if (l)
 			{
-				v.pushcode(new variable::Variable::POP);
+				v.pushcode(new Variable::POP);
 				++l;
 			}
 		}
@@ -139,13 +139,13 @@ private:
 			t->getNext();
 			// ‰Šú‰»Ž®‚ª‹ó
 		}
-		variable::Variable::OpCode *oc = NULL;
+		Variable::OpCode *oc = NULL;
 		if (t->checkNext() != ';')
 		{
 			ParseExpression(v, ';');
 			if (v.codelength() - l)
 			{
-				oc = new variable::Variable::JF(v.codelength());
+				oc = new Variable::JF(v.codelength());
 				v.pushcode(oc);
 			}
 		}
@@ -163,9 +163,9 @@ private:
 		if (x.codelength())
 		{
 			v.getcode()->push(x.getcode());
-			v.pushcode(new variable::Variable::POP);
+			v.pushcode(new Variable::POP);
 		}
-		v.pushcode(new variable::Variable::JMP(l));
+		v.pushcode(new Variable::JMP(l));
 		if (oc)
 			oc->set(v.codelength());
 		if (t->checkNext() == Tokenizer::IDENTIFIER && t->nstr == "else")
@@ -173,8 +173,8 @@ private:
 			t->getNext();
 			ParseDangling(g, v);
 		}
-		if (variable::Variable::Code *z = v.getcode())
-			c.pushcode(new variable::Variable::LOOP(z, cline));
+		if (Variable::Code *z = v.getcode())
+			c.pushcode(new Variable::LOOP(z, cline));
 	}
 	void ParseWhile(variable &g, variable &c)
 	{
@@ -184,10 +184,10 @@ private:
 		else
 			ParseExpression(v, /*'('*/')');
 		int l = v.codelength();
-		variable::Variable::OpCode *oc = NULL;
+		Variable::OpCode *oc = NULL;
 		if (l)
 		{
-			oc = new variable::Variable::JF(l);
+			oc = new Variable::JF(l);
 			v.pushcode(oc);	// Žæ‚èŠ¸‚¦‚¸‘«‚·
 		}
 		else
@@ -195,7 +195,7 @@ private:
 
 		ParseDangling(g, v);
 
-		v.pushcode(new variable::Variable::JMP(0));
+		v.pushcode(new Variable::JMP(0));
 		if (oc)
 			oc->set(v.codelength());
 		if (t->checkNext() == Tokenizer::IDENTIFIER && t->nstr == "else")
@@ -203,8 +203,8 @@ private:
 			t->getNext();
 			ParseDangling(g, v);
 		}
-		if (variable::Variable::Code *x = v.getcode())
-			c.pushcode(new variable::Variable::LOOP(x, 0));
+		if (Variable::Code *x = v.getcode())
+			c.pushcode(new Variable::LOOP(x, 0));
 	}
 	void ParseStatement(variable &g, variable &c)
 	{
@@ -224,7 +224,7 @@ private:
 			variable v;
 			ParseBlock(g, v);
 			if (v.codelength())
-				c.pushcode(new variable::Variable::SCOPE(v.getcode()));
+				c.pushcode(new Variable::SCOPE(v.getcode()));
 			return;
 		}
 		if (n == Tokenizer::IDENTIFIER)
@@ -232,7 +232,7 @@ private:
 			if (t->nstr == "global" || t->nstr == "static" || t->nstr == "local" || t->nstr == "yield")
 			{
 				ParseExpression(c, ';');
-				c.pushcode(new variable::Variable::POP);
+				c.pushcode(new Variable::POP);
 				return;
 			}
 			t->getNext();
@@ -254,24 +254,24 @@ private:
 			if (t->nstr == "return")
 			{
 				if (t->checkNext() == ';')
-					c.pushcode(new variable::Variable::PUSH_NULL);
+					c.pushcode(new Variable::PUSH_NULL);
 				else
 					ParseExpression(c, ';');
-				c.pushcode(new variable::Variable::RETURN);
+				c.pushcode(new Variable::RETURN);
 				return;
 			}
 			if (t->nstr == "continue")
 			{
 				if (t->checkNext() != ';')	Error(TINA, ';', "continue");
 				else	t->getNext();
-				c.pushcode(new variable::Variable::CONTINUE);
+				c.pushcode(new Variable::CONTINUE);
 				return;
 			}
 			if (t->nstr == "break")
 			{
 				if (t->checkNext() != ';')	Error(TINA, ';', "break");
 				else	t->getNext();
-				c.pushcode(new variable::Variable::BREAK);
+				c.pushcode(new Variable::BREAK);
 				return;
 			}
 			if (t->nstr == "goto")
@@ -286,7 +286,7 @@ private:
 						Error(TINA, ';', "goto");
 					else
 						t->getNext();
-					c.pushcode(new variable::Variable::GOTO(label));
+					c.pushcode(new Variable::GOTO(label));
 				}
 				return;
 			}
@@ -307,7 +307,7 @@ private:
 					Error(IIAE, 0, name, line);
 				variable m = g[name];
 				if (!m.getcode())
-					m.pushcode(new variable::Variable::POP);
+					m.pushcode(new Variable::POP);
 				ParseBlock(m, m);
 				return;
 			}
@@ -323,7 +323,7 @@ private:
 				else
 				{
 					t->getNext();
-					arg.pushcode(new variable::Variable::PUSH_NULL);
+					arg.pushcode(new Variable::PUSH_NULL);
 				}
 				n = t->checkNext();
 				if (n == '{'/*'}'*/ || n == Tokenizer::IDENTIFIER)	// ŠÖ”’è‹`
@@ -332,7 +332,7 @@ private:
 						Error(IIAE, 0, name, line);
 					g[name] = arg;
 					variable m = g[name];
-					g[name].pushcode(new variable::Variable::ARGUMENT);
+					g[name].pushcode(new Variable::ARGUMENT);
 					if (n == '{'/*'}'*/)
 					{
 						t->getNext();
@@ -344,30 +344,30 @@ private:
 				}
 				else	// ŠÖ”ŒÄ‚Ño‚µ
 				{
-					c.pushcode(new variable::Variable::VARIABLE(name));
+					c.pushcode(new Variable::VARIABLE(name));
 					c.getcode()->push(arg.getcode());
-					c.pushcode(new variable::Variable::CALL);
+					c.pushcode(new Variable::CALL);
 				}
 			}
 			else if (n == Tokenizer::IDENTIFIER)
 			{
 				t->getNext();
-				c.pushcode(new variable::Variable::VARIABLE(name));
-				c.pushcode(new variable::Variable::INSTANCE);
-				c.pushcode(new variable::Variable::DECLARATION(t->nstr));
+				c.pushcode(new Variable::VARIABLE(name));
+				c.pushcode(new Variable::INSTANCE);
+				c.pushcode(new Variable::DECLARATION(t->nstr));
 			}
 			else
 			{
-				c.pushcode(new variable::Variable::VARIABLE(name));
+				c.pushcode(new Variable::VARIABLE(name));
 			}
 			getSuffOp(c);
 			ParseExpression(c, ';', true);
-			c.pushcode(new variable::Variable::POP);
+			c.pushcode(new Variable::POP);
 		}
 		else
 		{
 			ParseExpression(c, ';');
-			c.pushcode(new variable::Variable::POP);
+			c.pushcode(new Variable::POP);
 		}
 	}
 	void ParseBlock(variable &g, variable &c)
@@ -391,12 +391,12 @@ private:
 			if (n == Tokenizer::INC)
 			{
 				t->getNext();
-				c.pushcode(new variable::Variable::INC);
+				c.pushcode(new Variable::INC);
 			}
 			else if (n == Tokenizer::DEC)
 			{
 				t->getNext();
-				c.pushcode(new variable::Variable::DEC);
+				c.pushcode(new Variable::DEC);
 			}
 			else if (n == '('/*')'*/)
 			{
@@ -408,15 +408,15 @@ private:
 				else
 				{
 					t->getNext();	// ˆø”–³‚µ
-					c.pushcode(new variable::Variable::PUSH_NULL);
+					c.pushcode(new Variable::PUSH_NULL);
 				}
-				c.pushcode(new variable::Variable::CALL);
+				c.pushcode(new Variable::CALL);
 			}
 			else if (n == '[')
 			{
 				t->getNext();
 				ParseExpression(c, ']');
-				c.pushcode(new variable::Variable::INDEX);
+				c.pushcode(new Variable::INDEX);
 			}
 			else if (n == '.')
 			{
@@ -424,7 +424,7 @@ private:
 				if (t->checkNext() == Tokenizer::IDENTIFIER)
 				{
 					t->getNext();
-					c.pushcode(new variable::Variable::MEMBER(t->nstr));
+					c.pushcode(new Variable::MEMBER(t->nstr));
 				}
 				else
 				{
@@ -435,8 +435,8 @@ private:
 				break;
 		}
 	}
-	#define PRE_OP(m,o) if(n==m){t->getNext();getTerm(c);c.pushcode(new variable::Variable::o);}
-	#define TERM(m,o) if(n==m){t->getNext();c.pushcode(new variable::Variable::o);getSuffOp(c);}
+	#define PRE_OP(m,o) if(n==m){t->getNext();getTerm(c);c.pushcode(new Variable::o);}
+	#define TERM(m,o) if(n==m){t->getNext();c.pushcode(new Variable::o);getSuffOp(c);}
 	void getTerm(variable &c)
 	{
 		int n = t->checkNext();
@@ -447,7 +447,7 @@ private:
 			if (t->checkNext() == /*'('*/')')	// ‘¦•Â‚¶‚ÍŠmŽÀ‚É–³–¼ŠÖ”
 			{
 				t->getNext();
-				v.pushcode(new variable::Variable::PUSH_NULL);
+				v.pushcode(new Variable::PUSH_NULL);
 			}
 			else
 			{
@@ -456,10 +456,10 @@ private:
 			if (t->checkNext() == '{'/*'}'*/)
 			{
 				t->getNext();
-				v.pushcode(new variable::Variable::ARGUMENT);
+				v.pushcode(new Variable::ARGUMENT);
 				ParseBlock(v, v);
 				if (v.codelength())
-					c.pushcode(new variable::Variable::PUSH_CODE(v.getcode()));
+					c.pushcode(new Variable::PUSH_CODE(v.getcode()));
 			}
 			else	// Ž®“à‚ÌŠ‡ŒÊ
 			{
@@ -469,7 +469,7 @@ private:
 						c.getcode()->push(v.getcode());
 					else
 						c = v;
-					c.pushcode(new variable::Variable::PARENTHESES);
+					c.pushcode(new Variable::PARENTHESES);
 				}
 			}
 			getSuffOp(c);
@@ -497,7 +497,7 @@ private:
 	}
 	#undef PRE_OP
 	#undef TERM
-	#define EXP0(m,e,o) if(n==m){t->getNext();get##e(c);c.pushcode(new variable::Variable::o);}
+	#define EXP0(m,e,o) if(n==m){t->getNext();get##e(c);c.pushcode(new Variable::o);}
 	#define EXP(m,e,o) EXP0(m,exp##e,o)
 	void getexp1(variable &c, bool l = false)
 	{
@@ -597,13 +597,13 @@ private:
 			if (n==Tokenizer::BAND)
 			{
 				t->getNext();
-				variable::Variable::OpCode *oc = new variable::Variable::JRF(0);
+				Variable::OpCode *oc = new Variable::JRF(0);
 				c.pushcode(oc);
 				int b = c.codelength();
 				getexp8(c);
 				oc->set(c.codelength()+1 - b);
-				c.pushcode(new variable::Variable::JR(1));
-				c.pushcode(new variable::Variable::PUSH_NULL);
+				c.pushcode(new Variable::JR(1));
+				c.pushcode(new Variable::PUSH_NULL);
 			}
 			#else
 			EXP(Tokenizer::BAND, 8, BAND)
@@ -621,13 +621,13 @@ private:
 			if (n==Tokenizer::BOR)
 			{
 				t->getNext();
-				variable::Variable::OpCode *oc = new variable::Variable::JRT(0);
+				Variable::OpCode *oc = new Variable::JRT(0);
 				c.pushcode(oc);
 				int b = c.codelength();
 				getexp9(c);
 				oc->set(c.codelength()+1 - b);
-				c.pushcode(new variable::Variable::JR(1));
-				c.pushcode(new variable::Variable::PUSH_INT(1));
+				c.pushcode(new Variable::JR(1));
+				c.pushcode(new Variable::PUSH_INT(1));
 			}
 			#else
 			EXP(Tokenizer::BOR, 9, BOR)
@@ -661,19 +661,19 @@ private:
 					{
 						t->getNext();
 						l = true;
-						c.pushcode(new variable::Variable::VARIABLE(name));
-						c.pushcode(new variable::Variable::INSTANCE);
-						if (_global)		c.pushcode(new variable::Variable::GLOBAL(t->nstr));
-						else if (_static)	c.pushcode(new variable::Variable::STATIC(t->nstr));
-						else if (_local)	c.pushcode(new variable::Variable::LOCAL(t->nstr));
+						c.pushcode(new Variable::VARIABLE(name));
+						c.pushcode(new Variable::INSTANCE);
+						if (_global)		c.pushcode(new Variable::GLOBAL(t->nstr));
+						else if (_static)	c.pushcode(new Variable::STATIC(t->nstr));
+						else if (_local)	c.pushcode(new Variable::LOCAL(t->nstr));
 					}
 					else
 					{
 						l = true;
-						c.pushcode(new variable::Variable::PUSH_NULL());
-						if (_global)		c.pushcode(new variable::Variable::GLOBAL(name));
-						else if (_static)	c.pushcode(new variable::Variable::STATIC(name));
-						else if (_local)	c.pushcode(new variable::Variable::LOCAL(name));
+						c.pushcode(new Variable::PUSH_NULL());
+						if (_global)		c.pushcode(new Variable::GLOBAL(name));
+						else if (_static)	c.pushcode(new Variable::STATIC(name));
+						else if (_local)	c.pushcode(new Variable::LOCAL(name));
 					}
 				}
 				else
@@ -689,14 +689,14 @@ private:
 				{
 					t->getNext();
 					l = true;
-					c.pushcode(new variable::Variable::VARIABLE(name));
-					c.pushcode(new variable::Variable::INSTANCE);
-					c.pushcode(new variable::Variable::DECLARATION(t->nstr));
+					c.pushcode(new Variable::VARIABLE(name));
+					c.pushcode(new Variable::INSTANCE);
+					c.pushcode(new Variable::DECLARATION(t->nstr));
 				}
 				else
 				{
 					l = true;
-					c.pushcode(new variable::Variable::VARIABLE(name));
+					c.pushcode(new Variable::VARIABLE(name));
 				}
 			}
 			if (l)
@@ -706,12 +706,12 @@ private:
 		if (t->checkNext() == '?')
 		{
 			t->getNext();
-			variable::Variable::OpCode *oc = new variable::Variable::JRF(0);
+			Variable::OpCode *oc = new Variable::JRF(0);
 			c.pushcode(oc);
 			int b = c.codelength();
 			getexp11(c);
 			oc->set(c.codelength()+1 - b);
-			oc = new variable::Variable::JR(0);
+			oc = new Variable::JR(0);
 			c.pushcode(oc);
 			b = c.codelength();
 			if (t->checkNext() != ':')	Error(TINCOT);
@@ -736,10 +736,10 @@ private:
 		{
 			t->getNext();
 			if (t->checkNext() == ';')
-				c.pushcode(new variable::Variable::PUSH_NULL);
+				c.pushcode(new Variable::PUSH_NULL);
 			else
 				getexp13(c);
-			c.pushcode(new variable::Variable::YIELD);
+			c.pushcode(new Variable::YIELD);
 		}
 		else
 			getexp12(c, l);

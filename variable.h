@@ -177,6 +177,8 @@ public:
 	variable keys()	{return x->keys();}
 private:
 	#include "PSLlib.h"
+	#include "tokenizer.h"
+	#include "parser.h"
 	class Variable
 	{
 	public:
@@ -364,7 +366,6 @@ private:
 	void pushcode(Variable::OpCode *c)	{return x->pushcode(c);}
 	void pushlabel(const string &s)		{return x->pushlabel(s);}
 	friend class PSL;
-	friend class Tokenizer;
 	friend class Parser;
 	friend class Variable::vCMethod;
 	friend class Variable::CALL;
