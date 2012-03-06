@@ -373,6 +373,10 @@ public:
 		env.push(v);
 		return RC::NONE;
 	}
+	#ifdef PSL_DEBUG
+	void dump(int d){std::printf("PUSH CODE\n");if (!d){x->dump();std::printf("CODE END\n");}}
+	#endif
+	void write(bytecode &b){b.push(MNEMONIC::PUSH_CODE);x->write(b);}
 private:
 	Code *x;
 };

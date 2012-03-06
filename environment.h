@@ -18,6 +18,7 @@ public:
 			PUSH_FLOAT,
 			PUSH_STRING,
 			PUSH_NULL,
+			PUSH_CODE,
 			POP,
 			VARIABLE,
 
