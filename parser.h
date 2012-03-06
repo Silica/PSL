@@ -9,6 +9,9 @@ public:
 	}
 	void Parse(variable &v)
 	{
+		string arg = "arg";
+		v.pushcode(new variable::Variable::VARIABLE(arg));
+		v.pushcode(new variable::Variable::ARGUMENT);
 		while (t->checkNext())
 			ParseStatement(v, v);
 		if (error)
