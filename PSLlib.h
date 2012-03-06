@@ -14,15 +14,19 @@ public:
 		v["string"] = "";
 		v["true"] = 1;
 		v["false"] = 0;
-		variable hex = variable::HEX;
-		variable ref = variable::REFERENCE;
-		variable pointer = variable::POINTER;
-		variable thread = variable::THREAD;
+		variable nil = NIL;
+		variable hex = HEX;
+		variable ref = REFERENCE;
+		variable pointer = POINTER;
+		variable thread = THREAD;
+		v["nil"] = nil;
+		v["null"] = nil;
 		v["hex"] = hex;
 		v["ref"] = ref;
 		v["pointer"] = pointer;
 		v["thread"] = thread;
 		File::set(v["file"]);
+		Binary::set(v["binary"]);
 	}
 private:
 	static variable Print(variable &v)
@@ -137,6 +141,109 @@ private:
 			::string s = buf;
 			delete[] buf;
 			return s;
+		}
+	};
+	class Binary
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			variable fo = Open;
+			variable fc = Close;
+			variable fr = Read;
+			variable frd = ReadDW;
+			v["open"] = fo;
+			v["close"] = fc;
+			v["destructor"] = fc;
+			v["read"] = fr;
+			v["readdw"] = frd;
+		}
+	private:
+		static variable Open(variable &_this, variable &v)
+		{
+			string name = v.toString();
+			if (!_this)
+			{
+				using namespace std;
+				FILE *fp = fopen(name, "rb");
+				if (!fp)
+					return 0;
+				variable f;
+				f["$$__FILE*fp__$$"] = fp;
+				f["name"] = name;
+				set(f);
+				variable r = f.instance();
+				return r.pointer();
+			}
+			else
+			{
+				using namespace std;
+				FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+				if (fp)
+					fclose(fp);
+				_this["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				if (fp)	_this["name"] = name;
+				else	_this["name"] = "";
+				return 0;
+			}
+		}
+		static variable Close(variable &_this, variable &v)
+		{
+			using namespace std;
+			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			if (fp)
+				fclose(fp);
+			_this["$$__FILE*fp__$$"] = NULL;
+			_this["name"] = "";
+			return v;
+		}
+		static variable Read(variable &_this, variable &v)
+		{
+			using namespace std;
+			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			variable r;
+			if (!fp)
+				return r;
+			int size = v;
+			if (!size)
+				return r;
+			for (int i = 0; i < size; i++)
+			{
+				int c = fgetc(fp);
+				if (c == EOF)
+				{
+					size = i;
+					break;
+				}
+				hex h = c;
+				r[i] = h;
+			}
+			r["length"] = size;
+			return r;
+		}
+		static variable ReadDW(variable &_this, variable &v)
+		{
+			using namespace std;
+			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			variable r;
+			if (!fp)
+				return r;
+			int size = v;
+			if (!size)
+				return r;
+			for (int i = 0; i < size; i++)
+			{
+				hex h;
+				if (fread(&h, 1, sizeof(hex), fp) < sizeof(hex))
+				{
+					size = i;
+					break;
+				}
+				r[i] = h;
+			}
+			r["length"] = size;
+			return r;
 		}
 	};
 };
