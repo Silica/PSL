@@ -114,10 +114,17 @@ class bcreader
 			{
 				variable x;
 				readcode(byte, end, x);
-				v.pushcode(new IF(x));
+				v.pushcode(new IF(x.getcode()));
 			}
 			break;
 		#endif
+		case OpCode::MNEMONIC::PUSH_CODE:
+			{
+				variable x;
+				readcode(byte, end, x);
+				v.pushcode(new PUSH_CODE(x.getcode()));
+			}
+			break;
 		case OpCode::MNEMONIC::SCOPE:
 			{
 				variable x;
