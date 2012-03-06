@@ -432,8 +432,9 @@ public:
 	static void *operator new(size_t t)		{return MemoryManager<sizeof(vObject)>::Next();}
 	static void operator delete(void *ptr)	{MemoryManager<sizeof(vObject)>::Release(ptr);}
 #endif
-	vObject()	{_class = NULL;code = NULL;}
+	vObject()				{_class = NULL;code = NULL;}
 	vObject(Variable *v)	{_class = v->ref();code = NULL;}
+	vObject(Code *c)		{_class = NULL;code = c->inc();}
 	~vObject()	{
 		if (_class)
 		{

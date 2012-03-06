@@ -362,15 +362,19 @@ public:
 
 
 
-// f = function(x){return x+1;};	‚Ý‚½‚¢‚È‚Ì—p
 class PUSH_CODE : public OpCode
 {
+public:
+	PUSH_CODE(Code *c)	{x = c->inc();}
+	~PUSH_CODE()		{x->finalize();}
 	RC::RETURNCODE Execute(Environment &env)
 	{
+		variable v = x;
+		env.push(v);
 		return RC::NONE;
 	}
 private:
-	Code *c;
+	Code *x;
 };
 
 
@@ -598,7 +602,7 @@ private:
 class SCOPE : public OpCode
 {
 public:
-	SCOPE(variable &v)	{statement = v.getcode()->inc();}
+	SCOPE(Code *c)	{statement = c->inc();}
 	~SCOPE()	{statement->finalize();}
 	RC::RETURNCODE Execute(Environment &env)
 	{
@@ -616,7 +620,7 @@ protected:
 class LOOP : public OpCode
 {
 public:
-	LOOP(variable &v, int l)	{statement = v.getcode()->inc();cline = l;}
+	LOOP(Code *c, int l)	{statement = c->inc();cline = l;}
 	~LOOP()	{statement->finalize();}
 	RC::RETURNCODE Execute(Environment &env)
 	{
@@ -636,7 +640,7 @@ private:
 class IF : public SCOPE
 {
 public:
-	IF(variable &v):SCOPE(v){}
+	IF(Code *c):SCOPE(c){}
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		Scope *s = new AnonymousScope(statement);

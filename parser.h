@@ -106,12 +106,12 @@ private:
 			if (oc)
 				oc->set(v.codelength());
 		}
-		if (v.getcode())
+		if (variable::Variable::Code *x = v.getcode())
 		{
 			#ifdef PSL_DEBUG
-			c.pushcode(new variable::Variable::IF(v));
+			c.pushcode(new variable::Variable::IF(x));
 			#else
-			c.pushcode(new variable::Variable::SCOPE(v));
+			c.pushcode(new variable::Variable::SCOPE(x));
 			#endif
 		}
 	}
@@ -168,8 +168,8 @@ private:
 			t->getNext();
 			ParseDangling(g, v);
 		}
-		if (v.getcode())
-			c.pushcode(new variable::Variable::LOOP(v, cline));
+		if (variable::Variable::Code *x = v.getcode())
+			c.pushcode(new variable::Variable::LOOP(x, cline));
 	}
 	void ParseWhile(variable &g, variable &c)
 	{
@@ -198,8 +198,8 @@ private:
 			t->getNext();
 			ParseDangling(g, v);
 		}
-		if (v.getcode())
-			c.pushcode(new variable::Variable::LOOP(v, 0));
+		if (variable::Variable::Code *x = v.getcode())
+			c.pushcode(new variable::Variable::LOOP(x, 0));
 	}
 	void ParseStatement(variable &g, variable &c)
 	{
@@ -219,7 +219,7 @@ private:
 			variable v;
 			ParseBlock(g, v);
 			if (v.codelength())
-				c.pushcode(new variable::Variable::SCOPE(v));
+				c.pushcode(new variable::Variable::SCOPE(v.getcode()));
 			return;
 		}
 		if (n == Tokenizer::IDENTIFIER)
@@ -438,8 +438,35 @@ private:
 		if (n == '('/*')'*/)
 		{
 			t->getNext();
-			ParseExpression(c, /*'('*/')');
-			c.pushcode(new variable::Variable::PARENTHESES);
+			variable v;
+			if (t->checkNext() == /*'('*/')')	// ‘¦•Â‚¶‚ÍŠmŽÀ‚É–³–¼ŠÖ”
+			{
+				t->getNext();
+				v.pushcode(new variable::Variable::PUSH_NULL);
+			}
+			else
+			{
+				ParseExpression(v, /*'('*/')');
+			}
+			if (t->checkNext() == '{'/*'}'*/)
+			{
+				t->getNext();
+				v.pushcode(new variable::Variable::ARGUMENT);
+				ParseBlock(v, v);
+				if (v.codelength())
+					c.pushcode(new variable::Variable::PUSH_CODE(v.getcode()));
+			}
+			else	// Ž®“à‚ÌŠ‡ŒÊ
+			{
+				if (v.codelength())
+				{
+					if (c.codelength())
+						c.getcode()->push(v.getcode());
+					else
+						c = v;
+					c.pushcode(new variable::Variable::PARENTHESES);
+				}
+			}
 			getSuffOp(c);
 		}
 		else PRE_OP('+', PLUS)
