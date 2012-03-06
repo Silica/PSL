@@ -1,3 +1,34 @@
+class bytecode
+{
+public:
+	typedef unsigned char byte;
+	bytecode(){}
+	bytecode(size_t t):code(t){code.resize(t);}
+	byte *get()			{return &code[0];}
+	size_t size()		{return code.size();}
+	void push(byte b)	{code.push_back(b);}
+	void push(const void *p, size_t l)
+	{
+		int size = code.size();
+		code.resize(size + l);
+		std::memcpy(&code[size], p, l);
+	}
+	#ifdef PSL_DEBUG
+	void dump()
+	{
+		int size = code.size();
+		for (int i = 0; i < size; i++)
+		{
+			byte x = code[i];
+			std::printf("%.2X:%c ", x, (x >= 0x80 || x <= 0x20) ? 64 : x);
+		}
+		std::printf("\n");
+	}
+	#endif
+private:
+	vector<byte> code;
+};
+
 class bcreader
 {
 	static bool readbyte(bytecode::byte *&byte, bytecode::byte *end, variable &v)
@@ -14,13 +45,6 @@ class bcreader
 			break;
 		case OpCode::MNEMONIC::END:
 			return true;
-/*		case OpCode::MNEMONIC::PUSH_INT:
-			{
-				int x = *(int*)byte;
-				byte += sizeof(int);
-				v.pushcode(new PUSH_INT(x));
-			}
-			break;*/
 		case OpCode::MNEMONIC::PUSH_HEX:
 			{
 				hex x = *(hex*)byte;

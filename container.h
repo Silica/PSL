@@ -1,12 +1,12 @@
 class rsv	// 要はスマートポインタ
 {
 public:
+	rsv(Variable *v)	{x = v->ref();}
+	rsv(Variable *v,int i)	{x = v;}
+	rsv(const variable &v)	{x = v.x->ref();}
 #ifdef PSL_NULL_RSV
 	rsv()				{x = NULL;}
-	rsv(Variable *v,int i)	{x = v;}
-	rsv(Variable *v)	{x = v->ref();}
 	rsv(const rsv &v)	{x = v.x ? v.x->ref() : NULL;}
-	rsv(const variable &v)	{x = v.x->ref();}
 	~rsv()				{if (x) x->finalize();}
 	rsv &operator=(const rsv &v)
 	{
@@ -36,10 +36,7 @@ public:
 	// 更に速度の違いもあるのだが(多分下の方が速い？)
 	// STL_MAPを使うなら↑、そうでないなら↓がいい、とおもう
 	rsv()				{x = new Variable();}
-	rsv(Variable *v,int i)	{x = v;}
-	rsv(Variable *v)	{x = v->ref();}
 	rsv(const rsv &v)	{x = v.x->ref();}
-	rsv(const variable &v)	{x = v.x->ref();}
 	~rsv()				{x->finalize();}
 	rsv &operator=(const rsv &v)
 	{
@@ -69,6 +66,9 @@ private:
 //	friend variable::variable(const rsv &v);
 };
 
+#ifdef PSL_USE_STL_VECTOR
+typedef std::vector vector;
+#else
 template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
 {
 public:
@@ -110,11 +110,11 @@ private:
 	size_t reserve;
 	size_t len;
 };
+#endif
 
 #ifdef PSL_USE_STL_MAP
 typedef std::map<string,rsv> table;
 #else
-#ifdef PSL_USE_HASH_MAP
 class table
 {
 	typedef unsigned long hash;
@@ -256,95 +256,8 @@ private:
 	}
 	mutable size_t _size;
 	mutable size_t _reserve;
-#ifdef PSL_USE_STL_VECTOR
-	mutable std::vector<data*> d;
-#else
 	mutable vector<data*> d;
-#endif
 };
-#else
-class table
-{
-public:
-	class iterator
-	{
-	public:
-		iterator(table *t)	{ta = t;n = 0;}
-		iterator(table *t, int i, string &f, rsv &s):first(f),second(s)	{ta = t;n = i;}
-		bool operator!=(size_t end)
-		{
-			return n != end;
-		}
-		void operator++()
-		{
-			n += 1;
-			if (n < ta->size())
-			{
-				first = ta->key[n];
-				second = ta->r[n];
-			}
-		}
-		iterator *operator->()
-		{
-			return this;
-		}
-		string first;
-		rsv second;
-	private:
-		table *ta;
-		size_t n;
-	};
-	size_t count(const string &s) const
-	{
-		size_t size = key.size();
-		for (size_t i = 0; i < size; ++i)
-		{
-			if (key[i] == s)
-				return 1;
-		}
-		return 0;
-	}
-	size_t size() const
-	{
-		return key.size();
-	}
-	bool empty() const
-	{
-		return key.empty();
-	}
-	rsv &operator[](const string &s)
-	{
-		size_t size = key.size();
-		for (size_t i = 0; i < size; ++i)
-		{
-			if (key[i] == s)
-				return r[i];
-		}
-		key.push_back(s);
-		r.push_back(rsv());
-		return r[size];
-	}
-	iterator begin()
-	{
-		if (key.size() == 0)
-			return iterator(this);
-		return iterator(this, 0, key[0], r[0]);
-	}
-	size_t end()
-	{
-		return key.size();
-	}
-private:
-#ifdef PSL_USE_STL_VECTOR
-	mutable std::vector<string> key;
-	std::vector<rsv> r;
-#else
-	mutable vector<string> key;
-	vector<rsv> r;
-#endif
-	friend class iterator;
-};	// 問題はこいつはeraseの実装がとても大変ということだ
-#endif
 #endif
 
 #ifdef PSL_USE_STL_VECTOR
@@ -352,32 +265,3 @@ typedef std::vector<rsv> rlist;
 #else
 typedef vector<rsv> rlist;
 #endif
-
-class bytecode
-{
-public:
-	typedef unsigned char byte;
-	bytecode(){}
-	bytecode(size_t t):code(t){code.resize(t);}
-	byte *get()			{return &code[0];}
-	size_t size()		{return code.size();}
-	void push(byte b)	{code.push_back(b);}
-	void push(const void *p, size_t l)
-	{
-		int size = code.size();
-		code.resize(size + l);
-		std::memcpy(&code[size], p, l);
-	}
-	void dump()
-	{
-		int size = code.size();
-		for (int i = 0; i < size; i++)
-		{
-			byte x = code[i];
-			std::printf("%.2X:%c ", x, (x >= 0x80 || x <= 0x20) ? 64 : x);
-		}
-		std::printf("\n");
-	}
-private:
-	vector<byte> code;
-};

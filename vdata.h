@@ -438,11 +438,12 @@ public:
 	~vObject()	{
 		if (_class)
 		{
-			if (member.count("destructor"))
+			const static string destructor = "destructor";
+			if (member.count(destructor))
 			{
 				Environment env;
 				variable arg;
-				member["destructor"].get()->call(env, arg);
+				member[destructor].get()->call(env, arg);
 			}
 			_class->finalize();
 		}

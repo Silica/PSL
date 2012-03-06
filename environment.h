@@ -361,11 +361,7 @@ public:
 		b.push(OpCode::MNEMONIC::END);	// END‚ÍŠÖ”‚¾‚¯‚¶‚á‚È‚­ƒ‹[ƒv‚É‚à‚ ‚é‚Ì‚Å‚â‚Á‚Ï‚è‚±‚±‚É
 	};
 private:
-	#ifdef PSL_USE_STL_VECTOR
-	std::vector<OpCode*> code;
-	#else
 	vector<OpCode*> code;
-	#endif
 //	std::map<string,int> label;	// ‚±‚ê‚â‚é‚Æ—e—Ê‚Æ‚Ä‚à‘‚¦‚é‚ñ‚¾
 	table label;
 	int rc;

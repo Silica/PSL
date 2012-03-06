@@ -10,7 +10,6 @@
 //#define PSL_USE_STL_VECTOR
 //#define PSL_USE_STL_STACK
 //#define PSL_USE_STL_MAP
-	#define PSL_USE_HASH_MAP
 //#define PSL_NULL_RSV		// rsvはNULLを許容する、STL_VECTORを使う場合は必須
 
 //#define PSL_DEBUG
@@ -68,7 +67,6 @@ public:
 		STRING,
 		POINTER,
 		REFERENCE,
-//		ARRAY,
 		RARRAY,
 		OBJECT,
 		METHOD,
@@ -209,7 +207,6 @@ private:
 		Type type()	const	{return x->type();}
 
 		void substitution(Variable *v)	{x = x->substitution(v);}
-//		void assignment(Variable *v)	{x = v->x->clone();}
 		void assignment(Variable *v)	{x = x->assignment(v);}
 
 		#define OP(n) void n(Variable *v)	{x->n(v);}
@@ -250,6 +247,7 @@ private:
 		bool set(const string &s, const variable &v)	{return x->set(s, v);}
 
 	private:
+		#include "bytecode.h"
 		#include "environment.h"
 		friend class Parser;
 		friend class variable;
@@ -353,7 +351,6 @@ private:
 		friend class vObject;
 		friend class vReference;
 		friend class vNReference;
-		#include "bytecode.h"
 	} *x;
 private:
 	variable(Variable *v)	{x = v->ref();}
