@@ -43,11 +43,6 @@ class variable
 {
 	typedef unsigned int size_t;
 	class rsv;
-#ifdef __GNUC__
-public:
-#else
-private:
-#endif
 	class Variable;
 public:
 	variable(const rsv &v)	{x = v.get()->ref();}
@@ -384,6 +379,13 @@ public:
 	#ifdef PSL_DEBUG
 	void dump()	{x->dump();}
 	#endif
+
+#ifdef __GNUC__
+public:
+#else
+private:
+#endif
+	typedef Variable::Environment environment;
 };
 
 #endif

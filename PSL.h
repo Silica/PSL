@@ -3,7 +3,7 @@
 
 #include "variable.h"
 
-class PSL : private variable::Variable::Environment
+class PSL : private variable::environment
 {
 public:
 	enum error

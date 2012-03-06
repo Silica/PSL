@@ -1,8 +1,4 @@
-#ifdef __GNUC__
-public:
-#endif
 class Environment;
-private:
 class OpCode
 {
 public:
@@ -161,9 +157,6 @@ private:
 #define PSL_ENVIRONMENT_WARNING (PSL_RW_PES | PSL_RW_SR | PSL_RW_UI | PSL_RW_DIAE)
 
 class Scope;
-#ifdef __GNUC__
-public:
-#endif
 class Environment
 {
 	const static unsigned long WARNING = PSL_ENVIRONMENT_WARNING;
@@ -247,7 +240,6 @@ protected:
 #endif
 	Scope *scope;
 };
-private:
 
 class Code
 {
