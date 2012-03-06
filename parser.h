@@ -153,6 +153,8 @@ private:
 		variable x;
 		if (t->checkNext() != /*'('*/')')
 			ParseExpression(x, /*'('*/')');
+		else
+			t->getNext();
 		ParseDangling(g, v);
 		int cline = v.codelength();
 		if (x.codelength())
