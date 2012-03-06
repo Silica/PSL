@@ -1,4 +1,3 @@
-#include <cstring>
 class Tokenizer
 {
 public:
@@ -36,7 +35,7 @@ public:
 		BAND,
 		BOR,
 	};
-	static Tokenizer *New(const string &fn, variable::table *dl = NULL)
+	static Tokenizer *New(const string &fn, table *dl = NULL)
 	{
 		using namespace std;
 		FILE *fp = fopen(fn, "r");
@@ -46,7 +45,7 @@ public:
 		fclose(fp);
 		return t;
 	}
-	Tokenizer(std::FILE *fp, const string &fn, variable::table *dl = NULL)
+	Tokenizer(std::FILE *fp, const string &fn, table *dl = NULL)
 	{
 		using namespace std;
 		fseek(fp, 0, SEEK_END);
@@ -57,7 +56,7 @@ public:
 		s[len] = 0;
 		Init(fn, 1, dl);
 	}
-	Tokenizer(const char *str, const string &fn, int l, variable::table *dl = NULL)
+	Tokenizer(const char *str, const string &fn, int l, table *dl = NULL)
 	{
 		using namespace std;
 		len = strlen(str);
@@ -95,7 +94,7 @@ public:
 		return 0;
 	}
 private:
-	void Init(const string &fn, int l, variable::table *dl)
+	void Init(const string &fn, int l, table *dl)
 	{
 		i = 0;
 		next = UNSET;
@@ -110,7 +109,7 @@ private:
 		}
 		else
 		{
-			definelist = new variable::table();
+			definelist = new table();
 			dlnew = true;
 		}
 #endif
@@ -123,7 +122,7 @@ private:
 	int i;
 	int next;
 	Tokenizer *including;
-	variable::table *definelist;
+	table *definelist;
 #ifdef PSL_USE_TOKENIZER_DEFINE
 //	std::map<string,string> definelist;	// Ç±ÇÍÇ‚ÇÈÇ∆Ç≈Ç©Ç¢ÇÒÇæÅc
 	bool dlnew;
@@ -270,14 +269,9 @@ private:
 					return 0;
 				int h = i;
 				lcomment();
-/*				for (; i < len; ++i)
-				{
-					if (s[i] == '\r' || s[i] == '\n')
-						break;
-				}*/
 				variable temp = string(s+h, i-h);
 				#ifdef PSL_USE_STL_MAP
-				definelist->insert(variable::table::value_type(nstr, temp));
+				definelist->insert(table::value_type(nstr, temp));
 				#else
 				(*definelist)[nstr] = temp;
 				#endif

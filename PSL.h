@@ -1,8 +1,7 @@
 #ifndef PSL_H
 #define PSL_H
 
-#include "tokenizer.h"
-#include "parser.h"
+#include "variable.h"
 
 class PSL : private variable::Variable::Environment
 {
@@ -16,7 +15,7 @@ public:
 	};
 	error LoadScript(const char *filename)
 	{
-		Tokenizer *t = Tokenizer::New(filename);
+		variable::Tokenizer *t = variable::Tokenizer::New(filename);
 		if (!t)
 			return FOPEN_ERROR;
 
@@ -105,9 +104,9 @@ public:
 		return *this;
 	}
 private:
-	bool parse(Tokenizer *t)
+	bool parse(variable::Tokenizer *t)
 	{
-		Parser p(t);
+		variable::Parser p(t);
 //		variable::PSLlib::Basic(global);
 
 		variable g = global;

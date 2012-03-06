@@ -1,6 +1,5 @@
 // 詐欺コンパイラ
 // インタプリタ(これ自身)の後ろにバイトコードを埋め込む
-#include "variable.h"
 #include "PSL.h"
 
 #include <stdio.h>
