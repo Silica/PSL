@@ -75,6 +75,7 @@ public:
 	variable()					{x = new Variable();}
 	variable(bool b)			{x = new Variable((int)b);}
 	variable(int i)				{x = new Variable(i);}
+	variable(unsigned u)		{x = new Variable(u);}
 	variable(hex h)				{x = new Variable(h);}
 	variable(double d)			{x = new Variable(d);}
 	variable(const char *s)		{x = new Variable(s);}
@@ -181,6 +182,7 @@ private:
 		Variable()					{rc = 1;x = new vObject();}
 //		Variable()					{rc = 1;x = new vBase();}
 		Variable(int i)				{rc = 1;x = new vInt(i);}
+		Variable(unsigned u)		{rc = 1;x = new vInt(u);}
 		Variable(hex h)				{rc = 1;x = new vHex(h);}
 		Variable(double d)			{rc = 1;x = new vFloat(d);}
 //		Variable(const char *s)		{rc = 1;x = new vString(s);}
@@ -377,6 +379,17 @@ public:
 	rsv operator()(variable &arg)								{Variable::Environment env;return x->call(env, arg);}
 	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
 	rsv instance()												{return rsv(x->instance(), 0);}
+	#define cva(n) const variable &arg##n
+	#define ap(n) arg.push(arg##n);
+	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y Variable::Environment env;return x->call(env, arg);}
+	CALL((cva(1),cva(2)),								ap(1)ap(2))
+	CALL((cva(1),cva(2),cva(3)),						ap(1)ap(2)ap(3))
+	CALL((cva(1),cva(2),cva(3),cva(4)),					ap(1)ap(2)ap(3)ap(4))
+	CALL((cva(1),cva(2),cva(3),cva(4),cva(5)),			ap(1)ap(2)ap(3)ap(4)ap(5))
+	CALL((cva(1),cva(2),cva(3),cva(4),cva(5),cva(6)),	ap(1)ap(2)ap(3)ap(4)ap(5)ap(6))
+	#undef cva
+	#undef ap
+	#undef CALL
 
 	#ifdef PSL_DEBUG
 	void dump()	{x->dump();}

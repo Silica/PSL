@@ -25,6 +25,8 @@ public:
 		v["ref"] = ref;
 		v["pointer"] = pointer;
 		v["thread"] = thread;
+		Array::set(v["array"]);
+		Table::set(v["table"]);
 		File::set(v["file"]);
 		Binary::set(v["binary"]);
 	}
@@ -33,16 +35,14 @@ private:
 	{
 		switch (v.type())
 		{
-		case variable::NIL:			std::printf("nil");break;
-		case variable::INT:			std::printf("%d", (int)v);break;
-		case variable::HEX:			std::printf("%X", (int)v);break;
-		case variable::FLOAT:		std::printf("%f", (double)v);break;
-//		case variable::STRING:		{string s = v;std::printf("%s", (const char*)s);break;}
-//		case variable::RARRAY:		std::printf("[rarray:%d]", v.length());break;
-//		case variable::OBJECT:		std::printf("[object]");break;
-		case variable::METHOD:		std::printf("[method]");break;
-		case variable::CFUNCTION:	std::printf("[cfunc]");break;
-		case variable::THREAD:		std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
+		case NIL:		std::printf("nil");break;
+		case INT:		std::printf("%d", (int)v);break;
+		case HEX:		std::printf("%X", (int)v);break;
+		case FLOAT:		std::printf("%f", (double)v);break;
+//		case RARRAY:	std::printf("[list:%d]", v.length());break;
+		case METHOD:	std::printf("[method]");break;
+		case CFUNCTION:	std::printf("[cfunc]");break;
+		case THREAD:	std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
 		default:
 			{
 				std::printf("%s", v.toString().c_str());
@@ -65,14 +65,98 @@ private:
 		variable k = l.keys();
 		int s = k.length();
 		for (int i = 0; i < s; i++)
-		{
-			variable a(RARRAY);
-			a.push(k[i]);
-			a.push(l[k[i]]);
-			f(a);
-		}
+			f(k[i], l[k[i]]);
 		return k;
 	}
+	class Array
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			variable length = Length;
+			variable push = Push;
+			variable foreach = Foreach;
+			v["length"] = length;
+			v["push"] = push;
+			v["foreach"] = foreach;
+		}
+	private:
+		static variable Length(variable &_this, variable &v)
+		{
+			if (!_this)	return v.length();
+			else		return _this.length();
+		}
+		static variable Push(variable &_this, variable &v)
+		{
+			if (!_this)
+			{
+				variable array = v[0];
+				array.push(v[1]);
+				return array.length();
+			}
+			else
+			{
+				_this.push(v);
+				return _this.length();
+			}
+		}
+		static variable Foreach(variable &_this, variable &v)
+		{
+			int size;
+			if (!_this)
+			{
+				variable array = v[0];
+				size = array.length();
+				for (int i = 0; i < size; i++)
+				{
+					variable a = array[i];
+					v[1](a);
+				}
+			}
+			else
+			{
+				size = _this.length();
+				for (int i = 0; i < size; i++)
+				{
+					variable a = _this[i];
+					v(a);
+				}
+			}
+			return size;
+		}
+	};
+	class Table
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			variable exist = Exist;
+			variable keys = Keys;
+			v["keys"] = keys;
+			v["exist"] = exist;
+		}
+	private:
+		static variable Exist(variable &_this, variable &v)
+		{
+			if (!_this)
+			{
+				variable table = v[0];
+				variable key = v[1];
+				return table.exist(key);
+			}
+			else
+			{
+				return _this.exist(v);
+			}
+		}
+		static variable Keys(variable &_this, variable &v)
+		{
+			if (!_this)	return v.keys();
+			else		return _this.keys();	// “–‘R‚È‚ª‚çexist‚âkeys‚ªŠÜ‚Ü‚ê‚é‚±‚Æ‚É‚È‚éA‚Ü‚ ‚¢‚¢‚©
+		}
+	};
 	class File
 	{
 	public:
