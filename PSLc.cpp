@@ -56,9 +56,9 @@ void execute(FILE *exe, variable &arg)
 	PSL p;
 	if (p.LoadCompiledCode(exe, end - l))
 		return;
-	variable a = p.get("arg");
-	a = arg;
-	p.Run();
+//	variable a = p.get("arg");
+//	a = arg;
+	p.Run(arg);
 }
 
 int main(int argc, char **argv)

@@ -74,10 +74,11 @@ public:
 		fclose(fp);
 		return e;
 	}
-	variable::rsv Run(void)
+	variable::rsv Run(const variable &arg = 0)
 	{
 		if (!Runable())
 			return variable();
+		push(arg);
 		variable::Variable::Environment::Run();
 //		std::printf("stack:%d\n", stack.size());
 		return pop();

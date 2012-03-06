@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 #endif
 	clock_t start,end;
 	start = clock();
-		variable v = p.Run();
+		variable v = p.Run(argv[1]);
 	end = clock();
 	printf("PSL:%.2fsec\n",(double)(end-start)/CLOCKS_PER_SEC);
 //		printf(" - dump returned:\n");
