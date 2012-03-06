@@ -403,7 +403,7 @@ public:
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
 	void *toPointer()	const {if (x.size() == 1)return x[0].get()->toPointer();return NULL;}
 
-	size_t length()		const {return x.size();}
+	size_t length()		const {if (x.size() == 1)return x[0].get()->length();return x.size();}
 	Variable *index(size_t t)	{
 		if (x.size() == 1)return x[0].get()->index(t);
 		if (t>=x.size())x.resize(t+1);return x[t].get();
