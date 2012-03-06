@@ -75,6 +75,7 @@ public:
 	variable()					{x = new Variable();}
 	variable(bool b)			{x = new Variable((int)b);}
 	variable(int i)				{x = new Variable(i);}
+	variable(hex h)				{x = new Variable(h);}
 	variable(double d)			{x = new Variable(d);}
 	variable(const char *s)		{x = new Variable(s);}
 	variable(const string &s)	{x = new Variable(s);}
@@ -180,6 +181,7 @@ private:
 		Variable()					{rc = 1;x = new vObject();}
 //		Variable()					{rc = 1;x = new vBase();}
 		Variable(int i)				{rc = 1;x = new vInt(i);}
+		Variable(hex h)				{rc = 1;x = new vHex(h);}
 		Variable(double d)			{rc = 1;x = new vFloat(d);}
 //		Variable(const char *s)		{rc = 1;x = new vString(s);}
 		Variable(const string &s)	{rc = 1;x = new vString(s);}
