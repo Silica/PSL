@@ -4,11 +4,6 @@ public:
 	static void Basic(const rsv &r)
 	{
 		variable v = r;
-		v["print"] = Print;
-		#ifdef PSL_DEBUG
-		v["debug"] = Debug;
-		#endif
-		v["foreach"] = Foreach;
 		v["int"] = 0;
 		v["float"] = 0.0;
 		v["string"] = "";
@@ -25,6 +20,14 @@ public:
 		v["ref"] = ref;
 		v["pointer"] = pointer;
 		v["thread"] = thread;
+
+		v["print"] = Print;
+		#ifdef PSL_DEBUG
+		v["debug"] = Debug;
+		#endif
+		v["foreach"] = Foreach;
+
+		Strlib::set(v["strlib"]);
 		Array::set(v["array"]);
 		Table::set(v["table"]);
 		File::set(v["file"]);
@@ -68,6 +71,44 @@ private:
 			f(k[i], l[k[i]]);
 		return k;
 	}
+	class Strlib
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			v["char"] = Char;
+			v["ctoi"] = ctoi;
+			v["length"] = Strlen;
+			v["getchar"] = getChar;
+		}
+	private:
+		static variable Char(variable &v)
+		{
+			char c = v;
+			string s = c;
+			variable ch = s;
+			return ch;
+		}
+		static variable Strlen(variable &v)
+		{
+			string s = v;
+			return s.length();
+		}
+		static variable getChar(variable &v)
+		{
+			using namespace std;
+			char c = getchar();
+			::string s = c;
+			variable ch = s;
+			return ch;
+		}
+		static variable ctoi(variable &v)
+		{
+			string s = v;
+			return s[0];
+		}
+	};
 	class Array
 	{
 	public:
@@ -134,8 +175,8 @@ private:
 			variable v = r;
 			variable exist = Exist;
 			variable keys = Keys;
-			v["keys"] = keys;
 			v["exist"] = exist;
+			v["keys"] = keys;
 		}
 	private:
 		static variable Exist(variable &_this, variable &v)
