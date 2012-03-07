@@ -487,7 +487,7 @@ public:
 		}
 		k->ref()->finalize();
 
-		if (Code *c = v->getcode())	// これやる必要ある？ 恐らく今後無名関数の導入により必要になる
+		if (Code *c = v->getcode())
 		{
 			if (code)
 				code->finalize();
@@ -572,6 +572,7 @@ public:
 		Variable *x = new Variable(o);
 
 		int size = array.size();
+		o->array.resize(size);
 		for (int i = 0; i < size; ++i)
 			o->array[i].get()->assignment(array[i].get());
 
@@ -649,6 +650,7 @@ public:
 	vBase *clone()	{return new vMethod(function, _this);}
 
 	bool toBool()		const {return true;}
+	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{_this = v;}
 
@@ -670,6 +672,8 @@ public:
 		return env.pop();
 	}
 
+	Code *getcode()			{return function->getcode();}
+
 	virtual void dump(){std::printf("vMethod:\n");}
 private:
 	Variable *function;
@@ -688,6 +692,7 @@ public:
 	vBase *clone()	{return new vCFunction(f);}
 
 	bool toBool()		const {return true;}
+	string toString()	const {return "[CFunction]";}
 	size_t length()		const {return 1;}
 
 	void prepare(Environment &env, Variable *v)
@@ -710,6 +715,7 @@ public:
 	vBase *clone()	{return new vCMethod(f, _this);}
 
 	bool toBool()		const {return true;}
+	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)
 	{
@@ -798,6 +804,7 @@ public:
 			return x->getcode();
 		return e->Runable();
 	}
+	string toString()	const {return "[Thread]";}
 
 	size_t length()		const {return x ? 1 : 0;}
 	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
