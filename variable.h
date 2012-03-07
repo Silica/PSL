@@ -207,8 +207,8 @@ private:
 		void safedelete()	{vBase *v = x;x = NULL;delete v;}
 		Type type()	const	{return x->type();}
 
-		void substitution(Variable *v)	{x = x->substitution(v);}
-		void assignment(Variable *v)	{x = x->assignment(v);}
+		void substitution(Variable *v)	{x = x->substitution(v);x->method_this(this);}
+		void assignment(Variable *v)	{x = x->assignment(v);x->method_this(this);}
 
 		#define OP(n) void n(Variable *v)	{x->n(v);}
 		OP(add)
@@ -313,6 +313,7 @@ private:
 			virtual void push(Variable *v){}
 			virtual Variable *keys()	{return new Variable();}
 			virtual bool set(const string &s, const variable &v)	{return false;}
+			virtual void method_this(Variable *v)	{}
 
 			virtual void prepare(Environment &env, Variable *v)	{}
 			virtual void prepareInstance(Environment &env, Variable *v)	{env.push(rsv(v->clone(), 0));}
@@ -333,7 +334,7 @@ private:
 		int rc;
 		~Variable()	{rc=0x80000000;delete x;}
 	public:
-		Variable(vBase *v)	{rc = 1;x = v;}
+		Variable(vBase *v)	{rc = 1;x = v;x->method_this(this);}
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
 	#ifdef PSL_DEBUG
