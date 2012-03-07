@@ -13,8 +13,8 @@ private:
 	class mpool
 	{
 	public:
-		mpool(size_t t)	{next = NULL;current = count = 0;ptr = new int[t];std::memset(ptr, 0, t*sizeof(int));}
-		~mpool()		{
+		mpool()		{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*sizeof(int));}
+		~mpool()	{
 			// これでメモリリークを回避出来る
 			// が、開放されないまま終了するのを回避出来るだけで
 			// 開放されるのが終了時では結局意味がないかと
@@ -27,7 +27,6 @@ private:
 					v->safedelete();
 				}
 			}
-			delete []ptr;
 			delete next;
 //			std::printf("end,%d,%d", count(), current());
 		}
@@ -36,7 +35,7 @@ private:
 			if (count == poolsize/2)
 			{
 				if (!next)
-					next = new mpool(poolsize);
+					next = new mpool;
 				return next->nextptr();
 			}
 			for (int i = current; i < poolsize; i += 2)
@@ -79,14 +78,14 @@ private:
 			ptr[current] = 0;
 		}
 	private:
-		int *ptr;
+		int ptr[poolsize];
 		mpool *next;
 		int current;
 		int count;
 	};
 	static mpool &MemoryPool()
 	{
-		static mpool p(poolsize);
+		static mpool p;
 		return p;
 	}
 };
@@ -97,20 +96,19 @@ private:
 template<size_t S, int poolsize = 256> class MemoryManager
 {
 public:
-//	const static int poolsize = 256;
 	static void *Next()				{return MemoryPool().nextptr();}
 	static void Release(void *ptr)	{MemoryPool().release((char*)ptr);}
 	class mpool
 	{
 	public:
-		mpool(size_t t)	{next = NULL;current = count = 0;ptr = new char[t*S];std::memset(ptr, 0, t*S);}
-		~mpool()		{delete []ptr;delete next;}
+		mpool()		{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*S);}
+		~mpool()	{delete next;}
 		void *nextptr()
 		{
 			if (count == poolsize)
 			{
 				if (!next)
-					next = new mpool(poolsize);
+					next = new mpool;
 				return next->nextptr();
 			}
 			for (int i = current; i < poolsize*S; i += S)
@@ -153,14 +151,14 @@ public:
 			*(int*)(ptr+current) = 0;
 		}
 	private:
-		char *ptr;
+		char ptr[poolsize*S];
 		int current;
 		int count;
 		mpool *next;
 	};
 	static mpool &MemoryPool()
 	{
-		static mpool p(poolsize);
+		static mpool p;
 		return p;
 	}
 };
