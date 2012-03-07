@@ -27,6 +27,7 @@ public:
 		v["debug"] = Debug;
 		#endif
 		v["foreach"] = Foreach;
+		v["eval"] = Eval;
 
 		Strlib::set(v["strlib"]);
 		Array::set(v["array"]);
@@ -69,6 +70,15 @@ private:
 		for (int i = 0; i < s; i++)
 			f(k[i], l[k[i]]);
 		return k;
+	}
+	static variable Eval(variable &v)
+	{
+		string s = v;
+		variable g;
+		Tokenizer t(s.c_str(), "eval", 0);
+		Parser p(&t);
+		p.Parse(g);
+		return g;
 	}
 	class Strlib
 	{
