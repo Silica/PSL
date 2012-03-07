@@ -458,7 +458,17 @@ public:
 		for (int i = 0; i < size; ++i)
 			array[i].copy(v->array[i]);
 		for (table::iterator it = v->member.begin(); it != v->member.end(); ++it)
+		{
+			if (it->second.get()->type() == METHOD)	// メソッドはコピーしない
+				continue;
+			if (it->second.get()->type() == CMETHOD && it->second.get()->toInt())	// _thisを持つCメソッドもコピーしない
+				continue;
+			// 実際はthisを差し替えるのが理想なのだがちょっと改造箇所が…(全部Variableを渡してくる様にしなければならない)
+			// そもそもvBaseを先に作ってからVariableを作ることもあるので…
+			// ここでやるよりは、メソッドのthis差し替え関数を新たに作るべき
+			// 但し、メソッドの単独コピーをどう扱うかの問題は残る
 			member[it->first].copy(it->second);
+		}
 		if (v->_class)	_class = v->_class->ref();
 		else			_class = NULL;
 		if (v->code)	code = v->code->inc();
@@ -483,6 +493,11 @@ public:
 		for (size_t i = 0; i < size; ++i)
 		{
 			string s = k->index(i)->toString();
+			Variable *c = v->child(s);
+			if (c->type() == METHOD)	// メソッドはコピーしない
+				continue;
+			if (c->type() == CMETHOD && c->toInt())	// _thisを持つCメソッドもコピーしない
+				continue;
 			member[s].get()->substitution(v->child(s));
 		}
 		k->ref()->finalize();
@@ -583,7 +598,7 @@ public:
 				Variable *z = new Variable(new vMethod(it->second.get(), x));
 				o->member[it->first].set(z);
 			}
-			else if (it->second.get()->type() == CMETHOD)
+			else if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
 			{
 				Variable *z = it->second.get()->clone();
 				z->push(x);
@@ -672,8 +687,6 @@ public:
 		return env.pop();
 	}
 
-	Code *getcode()			{return function->getcode();}
-
 	virtual void dump(){std::printf("vMethod:\n");}
 private:
 	Variable *function;
@@ -715,6 +728,7 @@ public:
 	vBase *clone()	{return new vCMethod(f, _this);}
 
 	bool toBool()		const {return true;}
+	int toInt()			const {return _this ? 1 : 0;}
 	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)
