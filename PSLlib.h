@@ -20,6 +20,7 @@ public:
 		v["ref"] = ref;
 		v["pointer"] = pointer;
 		v["thread"] = thread;
+		v["object"];
 
 		v["print"] = Print;
 		#ifdef PSL_DEBUG
@@ -43,8 +44,6 @@ private:
 		case HEX:		std::printf("%X", (int)v);break;
 		case FLOAT:		std::printf("%f", (double)v);break;
 //		case RARRAY:	std::printf("[list:%d]", v.length());break;
-		case METHOD:	std::printf("[method]");break;
-		case CFUNCTION:	std::printf("[cfunc]");break;
 		case THREAD:	std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
 		default:
 			{
