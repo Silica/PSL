@@ -106,9 +106,8 @@ private:
 		}
 		static variable getChar(variable &v)
 		{
-			using namespace std;
-			char c = getchar();
-			::string s = c;
+			char c = std::getchar();
+			string s = c;
 			variable ch = s;
 			return ch;
 		}
@@ -262,17 +261,16 @@ private:
 		}
 		static variable Read(variable &_this, variable &v)
 		{
-			using namespace std;
-			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			std::FILE *fp = (std::FILE*)(void*)_this["$$__FILE*fp__$$"];
 			if (!fp)
 				return "";
 			int size = v;
 			if (!size)
 				return "";
 			char *buf = new char[size+1];
-			size = fread(buf, 1, size, fp);
+			size = std::fread(buf, 1, size, fp);
 			buf[size] = 0;
-			::string s = buf;
+			string s = buf;
 			delete[] buf;
 			return s;
 		}
