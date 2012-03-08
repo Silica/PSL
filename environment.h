@@ -284,7 +284,8 @@ public:
 			}
 			std::printf("exec: ");
 			code[line]->dump(1);
-			code[line++]->Execute(env);
+			if (code[line++]->Execute(env) == OpCode::RC::YIELD)	// スタック不整合を防ぐ為に、ひとまずyield用にNULLを渡すことにする
+				env.push(rsv());
 		}
 		else
 		{
