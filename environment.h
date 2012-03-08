@@ -222,7 +222,8 @@ public:
 		int size = stack.size();
 		rsv v = stack[size-1];
 		#ifdef PSL_POPSTACK_NULL
-		stack[size-1] = rsv();
+		const static rsv null;
+		stack[size-1] = null;
 		#endif
 		stack.resize(size-1);
 #endif
