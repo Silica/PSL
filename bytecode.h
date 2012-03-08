@@ -13,18 +13,6 @@ public:
 		code.resize(size + l);
 		std::memcpy(&code[size], p, l);
 	}
-	#ifdef PSL_DEBUG
-	void dump()
-	{
-		int size = code.size();
-		for (int i = 0; i < size; i++)
-		{
-			byte x = code[i];
-			PSL_PRINTF(("%.2X:%c ", x, (x >= 0x80 || x <= 0x20) ? 64 : x));
-		}
-		PSL_PRINTF(("\n"));
-	}
-	#endif
 private:
 	vector<byte> code;
 };
