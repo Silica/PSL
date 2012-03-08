@@ -128,9 +128,7 @@ public:
 	virtual void set(int s){}
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
 	virtual void write(bytecode &b)	{};
-	#ifdef PSL_DEBUG
 	virtual void dump(int d = 0){};
-	#endif
 private:
 };
 
@@ -324,17 +322,14 @@ public:
 	}
 	size_t length()	{return code.size();}
 	Code *inc()	{++rc;return this;}
-	#ifdef PSL_DEBUG
-	void dump()
-	{
+	PSL_DUMP((){
 		for (size_t i = 0; i < code.size(); ++i)
 			code[i]->dump();
 //		for (std::map<string,int>::iterator it = label.begin(); it != label.end(); ++it)
 //			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second));
 		for (table::iterator it = label.begin(); it != label.end(); ++it)
 			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second.get()->toInt()));
-	}
-	#endif
+	})
 	void write(bytecode &b)
 	{
 		int size = code.size();

@@ -7,6 +7,8 @@
 #include <vector>
 //#include <map>
 //#include <stack>
+
+// ê›íËçÄñ⁄
 //#define PSL_USE_STL_VECTOR
 //#define PSL_USE_STL_STACK
 //#define PSL_USE_STL_MAP
@@ -36,6 +38,8 @@
 #define PSL_USE_TOKENIZER_DEFINE
 
 #define PSL_USE_CONSOLE
+// Ç±Ç±Ç‹Ç≈
+
 
 
 #ifdef PSL_USE_CONSOLE
@@ -43,10 +47,16 @@
 #else
 	#define PSL_PRINTF(x)
 #endif
-
+#ifdef PSL_DEBUG
+	#define PSL_DUMP(x) void dump x
+#else
+	#define PSL_DUMP(x)
+#endif
 #ifdef _DEBUG
 	#include <new>
 #endif
+
+
 
 class variable
 {
@@ -335,9 +345,7 @@ private:
 			virtual void pushlabel(const string &s){}
 			virtual void write(const string &s, bytecode &b){}
 
-		#ifdef PSL_DEBUG
 			virtual void dump(){PSL_PRINTF(("vBase\n"));}
-		#endif
 		} *x;
 	private:
 		int rc;
@@ -346,9 +354,7 @@ private:
 		Variable(vBase *v)	{rc = 1;x = v;x->method_this(this);}
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
-	#ifdef PSL_DEBUG
-		void dump()		{PSL_PRINTF(("rc:%4d, ", rc));x->dump();}
-	#endif
+		PSL_DUMP((){PSL_PRINTF(("rc:%4d, ", rc));x->dump();})
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		#include "memory.h"
 		static void *operator new(size_t t)		{return VMemoryManager::Next();}
@@ -401,9 +407,7 @@ public:
 	#undef ap
 	#undef CALL
 
-	#ifdef PSL_DEBUG
-	void dump()	{x->dump();}
-	#endif
+	PSL_DUMP((){x->dump();})
 
 #ifdef __GNUC__
 public:

@@ -44,7 +44,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	virtual void dump(){PSL_PRINTF(("vInt:%d\n", x));}
+	PSL_DUMP((){PSL_PRINTF(("vInt:%d\n", x));})
 private:
 	int x;
 };
@@ -92,7 +92,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	virtual void dump(){PSL_PRINTF(("vHex:%d\n", x));}
+	PSL_DUMP((){PSL_PRINTF(("vHex:%d\n", x));})
 private:
 	hex x;
 };
@@ -129,7 +129,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	virtual void dump(){PSL_PRINTF(("vFloat:%f\n", x));}
+	PSL_DUMP((){PSL_PRINTF(("vFloat:%f\n", x));})
 private:
 	double x;
 };
@@ -169,7 +169,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	virtual void dump(){PSL_PRINTF(("vString:%s\n", (const char*)x));}
+	PSL_DUMP((){PSL_PRINTF(("vString:%s\n", (const char*)x));})
 private:
 	string x;
 };
@@ -203,9 +203,7 @@ public:
 	string toString()	const {return x ? "[pointer]" : "NULL";}
 
 	size_t length()		const {return x ? 1 : 0;}
-	#ifdef PSL_DEBUG
-	virtual void dump(){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();}
-	#endif
+	PSL_DUMP((){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();})
 private:
 	Variable *x;
 };
@@ -269,9 +267,7 @@ public:
 	size_t codelength()			{return x->codelength();}
 	Code *getcode()				{return x->getcode();}
 	void pushcode(OpCode *c)	{x->pushcode(c);}
-	#ifdef PSL_DEBUG
-	void dump(){PSL_PRINTF(("vReference:\n"));x->dump();}
-	#endif
+	PSL_DUMP((){PSL_PRINTF(("vReference:\n"));x->dump();})
 private:
 	Variable *x;
 };
@@ -294,7 +290,7 @@ public:
 		return new vReference(v);
 	}
 
-	virtual void dump(){PSL_PRINTF(("vNReference\n"));}
+	PSL_DUMP((){PSL_PRINTF(("vNReference\n"));})
 };
 
 class vRArray : public vBase
@@ -418,9 +414,7 @@ public:
 		return variable(NIL);
 	}
 
-	#ifdef PSL_DEBUG
-	virtual void dump(){PSL_PRINTF(("vRArray:%d\n", x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();}
-	#endif
+	PSL_DUMP((){PSL_PRINTF(("vRArray:%d\n", x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();})
 private:
 	mutable rlist x;
 };
@@ -626,13 +620,11 @@ public:
 		code->write(b);
 	}
 
-	#ifdef PSL_DEBUG
-	virtual void dump(){PSL_PRINTF(("vObject:%d,%d,%d\n", array.size(), member.size(), codelength()));
+	PSL_DUMP((){PSL_PRINTF(("vObject:%d,%d,%d\n", array.size(), member.size(), codelength()));
 		for (size_t i = 0; i < array.size(); ++i)array[i].get()->dump();
 		for (table::iterator it = member.begin(); it != member.end(); ++it){PSL_PRINTF(("[%s]:\n", it->first.c_str()));it->second.get()->dump();}
 		if(code){PSL_PRINTF(("--CODE--\n"));code->dump();}
-	}
-	#endif
+	})
 private:
 	rlist array;
 	table member;
@@ -686,7 +678,7 @@ public:
 		return env.pop();
 	}
 
-	virtual void dump(){PSL_PRINTF(("vMethod:\n"));}
+	PSL_DUMP((){PSL_PRINTF(("vMethod:\n"));})
 private:
 	Variable *function;
 	Variable *_this;
@@ -714,7 +706,7 @@ public:
 		env.push(r);
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)	{return f(arg);}
-	virtual void dump(){PSL_PRINTF(("vCFunction:\n"));}
+	PSL_DUMP((){PSL_PRINTF(("vCFunction:\n"));})
 private:
 	function f;
 };
@@ -762,7 +754,7 @@ public:
 			return f(z, arg);
 		}
 	}
-	virtual void dump(){PSL_PRINTF(("vCMethod:\n"));}
+	PSL_DUMP((){PSL_PRINTF(("vCMethod:\n"));})
 private:
 	method f;
 	Variable *_this;
@@ -787,7 +779,7 @@ public:
 
 	size_t length()		const {return x ? 1 : 0;}
 
-	virtual void dump(){PSL_PRINTF(("vCPointer:%X\n", x));}
+	PSL_DUMP((){PSL_PRINTF(("vCPointer:%X\n", x));})
 private:
 	void *x;
 };
@@ -840,9 +832,7 @@ public:
 		env.push(r);
 	}
 
-	#ifdef PSL_DEBUG
-	virtual void dump(){PSL_PRINTF(("vThread:%X\n", e));if(x)x->dump();}
-	#endif
+	PSL_DUMP((){PSL_PRINTF(("vThread:%X\n", e));if(x)x->dump();})
 private:
 	Variable *x;
 	Environment *e;
