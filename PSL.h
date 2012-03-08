@@ -79,12 +79,16 @@ public:
 	{
 		if (!Runable())
 			return variable();
+		#ifdef PSL_DEBUG
+		if (!init)
+		#endif
 		push(arg);
 		variable::Variable::Environment::Run();
 //		std::printf("stack:%d\n", stack.size());
 		return pop();
 	}
 	#ifdef PSL_DEBUG
+	PSL()	{init = false;}
 	variable::rsv StepExec()
 	{
 		if (!Runable())
@@ -92,6 +96,11 @@ public:
 			if (stack.size())
 				return pop();
 			return variable(1);
+		}
+		if (!init)
+		{
+			init = true;
+			push(variable::rsv());
 		}
 		variable::Variable::Environment::StepExec();
 		return variable::rsv();
@@ -122,6 +131,9 @@ private:
 		global.get()->prepare(*this);
 		return false;
 	}
+	#ifdef PSL_DEBUG
+	bool init;
+	#endif
 };
 
 #endif
