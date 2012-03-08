@@ -285,7 +285,7 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (v->x == this)
+		if (v->type() == REFERENCE)
 		{
 			delete this;
 			return new vObject();
