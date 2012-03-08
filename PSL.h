@@ -8,13 +8,15 @@ class PSL : private variable::environment
 public:
 	enum error
 	{
-		NONE,
+		NONE = 0,
 		FOPEN_ERROR,
 		PARSE_ERROR,
 		NOT_COMPILED_CODE,
 	};
 	error LoadScript(const char *filename)
 	{
+		if (!LoadCompiledCode(filename))
+			return NONE;
 		variable::Tokenizer *t = variable::Tokenizer::New(filename);
 		if (!t)
 			return FOPEN_ERROR;
