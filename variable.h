@@ -35,6 +35,15 @@
 
 #define PSL_USE_TOKENIZER_DEFINE
 
+#define PSL_USE_CONSOLE
+
+
+#ifdef PSL_USE_CONSOLE
+	#define PSL_PRINTF(x) std::printf x
+#else
+	#define PSL_PRINTF(x)
+#endif
+
 #ifdef _DEBUG
 	#include <new>
 #endif
@@ -327,7 +336,7 @@ private:
 			virtual void write(const string &s, bytecode &b){}
 
 		#ifdef PSL_DEBUG
-			virtual void dump(){std::printf("vBase\n");}
+			virtual void dump(){PSL_PRINTF(("vBase\n"));}
 		#endif
 		} *x;
 	private:
@@ -338,7 +347,7 @@ private:
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
 	#ifdef PSL_DEBUG
-		void dump()		{std::printf("rc:%4d, ", rc);x->dump();}
+		void dump()		{PSL_PRINTF(("rc:%4d, ", rc));x->dump();}
 	#endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		#include "memory.h"

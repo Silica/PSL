@@ -15,8 +15,8 @@ public:
 		while (t->checkNext())
 			ParseStatement(v, v);
 		if (error)
-			std::printf("%d error in compile %s\n", error, t->getFile().c_str());
-//			std::printf("%d error%s in compile %s\n", error, error == 1 ? "" : "s", t->getFile().c_str());
+			PSL_PRINTF(("%d error in compile %s\n", error, t->getFile().c_str()));
+//			PSL_PRINTF(("%d error%s in compile %s\n", error, error == 1 ? "" : "s", t->getFile().c_str()));
 	}
 	int getErrorNum()	{return error;}
 private:
@@ -42,25 +42,25 @@ private:
 		if (n < WARNING)
 		{
 			++error;
-			std::printf("error %s %d: ", t->getFile().c_str(), line);
+			PSL_PRINTF(("error %s %d: ", t->getFile().c_str(), line));
 		}
 		else
 		{
-			std::printf("warning %s %d: ", t->getFile().c_str(), line);
+			PSL_PRINTF(("warning %s %d: ", t->getFile().c_str(), line));
 		}
 		switch (n)
 		{
-		case TINA:	std::printf("There is no %c after %s\n", op, str);break;
-		case TINSC:	std::printf("There is no %s-statement condition\n", str);break;
-		case TINLAG:std::printf("There is no label after goto\n");break;
-		case NOTT:	std::printf("not term : %c\n", op);break;
-		case UKT:	std::printf("unknown token\n");break;
-		case TINIA:	std::printf("There is no identifier after %s\n", str);break;
-		case TINCOT:std::printf("There is no : on ternary operation\n");break;
-		case TINAE:	std::printf("There is no %c at expression end\n", op);break;
-		case IIAE:	std::printf("'%s' is already exsit\n", str);break;
-		case BINC:	std::printf("block not closed from %d\n", op);break;
-		default:	std::printf("unknown error\n");
+		case TINA:	PSL_PRINTF(("There is no %c after %s\n", op, str));break;
+		case TINSC:	PSL_PRINTF(("There is no %s-statement condition\n", str));break;
+		case TINLAG:PSL_PRINTF(("There is no label after goto\n"));break;
+		case NOTT:	PSL_PRINTF(("not term : %c\n", op));break;
+		case UKT:	PSL_PRINTF(("unknown token\n"));break;
+		case TINIA:	PSL_PRINTF(("There is no identifier after %s\n", str));break;
+		case TINCOT:PSL_PRINTF(("There is no : on ternary operation\n"));break;
+		case TINAE:	PSL_PRINTF(("There is no %c at expression end\n", op));break;
+		case IIAE:	PSL_PRINTF(("'%s' is already exsit\n", str));break;
+		case BINC:	PSL_PRINTF(("block not closed from %d\n", op));break;
+		default:	PSL_PRINTF(("unknown error\n"));
 		}
 	}
 	void ParseDangling(variable &g, variable &c)
