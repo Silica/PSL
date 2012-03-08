@@ -78,7 +78,7 @@ public:
 	variable::rsv Run(const variable &arg = 0)
 	{
 		if (!Runable())
-			return variable();
+			return variable::rsv();
 		#ifdef PSL_DEBUG
 		if (!init)
 		#endif

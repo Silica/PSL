@@ -30,6 +30,7 @@
 // ジャンプ条件が定数の場合(パーサの都合で楽じゃなかった…関数完成後にやるならいいんだが)
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
+// ()は,と絡まない場合は無視して構わない
 #define PSL_POPSTACK_NULL	// Envスタックがvectorの時、POPしたスタックを即空にする(変数の生存期間に影響)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用俺俺メモリマネージャ
