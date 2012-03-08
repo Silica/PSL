@@ -3,8 +3,7 @@
 
 #include "pstring.h"
 
-#include <cstring>
-#include <vector>
+//#include <vector>
 //#include <map>
 //#include <stack>
 
