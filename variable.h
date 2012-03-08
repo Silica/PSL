@@ -14,7 +14,7 @@
 //#define PSL_USE_STL_MAP
 //#define PSL_NULL_RSV		// rsvはNULLを許容する、STL_VECTORを使う場合は必須
 
-//#define PSL_DEBUG
+//#define PSL_DEBUG		// 行番号の埋め込みとステップ実行のサポート
 
 #define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
 #define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
@@ -28,16 +28,20 @@
 #define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
 #define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない
 // その他簡単に可能な最適化は
-// ジャンプ条件が定数の場合
+// ジャンプ条件が定数の場合(パーサの都合で楽じゃなかった…関数完成後にやるならいいんだが)
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 #define PSL_POPSTACK_NULL	// Envスタックがvecorの時、POPしたスタックを即空にする(変数の生存期間に影響)
 
-#define PSL_USE_VARIABLE_MEMORY_MANAGER
+#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用俺俺メモリマネージャ
+/*	速度は未知数
+	安全性は怪しい
+	循環参照を起こしたVariableの持つvBase派生をアプリケーション終了時には開放出来る
+	→PSLクラスのデストラクタを確実に呼べる	*/
 
-#define PSL_USE_TOKENIZER_DEFINE
+#define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
 
-#define PSL_USE_CONSOLE
+#define PSL_USE_CONSOLE						// std::printfを使う
 // ここまで
 
 
