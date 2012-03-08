@@ -20,9 +20,9 @@ public:
 		for (int i = 0; i < size; i++)
 		{
 			byte x = code[i];
-			std::printf("%.2X:%c ", x, (x >= 0x80 || x <= 0x20) ? 64 : x);
+			PSL_PRINTF(("%.2X:%c ", x, (x >= 0x80 || x <= 0x20) ? 64 : x));
 		}
-		std::printf("\n");
+		PSL_PRINTF(("\n"));
 	}
 	#endif
 private:

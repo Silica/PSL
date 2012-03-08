@@ -84,7 +84,7 @@ public:
 		#endif
 		push(arg);
 		variable::Variable::Environment::Run();
-//		std::printf("stack:%d\n", stack.size());
+//		PSL_PRINTF(("stack:%d\n", stack.size()));
 		return pop();
 	}
 	#ifdef PSL_DEBUG
@@ -125,7 +125,7 @@ private:
 		if (p.getErrorNum())
 			return true;
 
-//		std::printf("stack:%d\n", stack.size());
+//		PSL_PRINTF(("stack:%d\n", stack.size()));
 //		g.dump();
 
 		global.get()->prepare(*this);

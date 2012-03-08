@@ -170,7 +170,7 @@ private:
 				return;
 			}
 		}
-		std::printf("error %s %d: comment not closed from %d\n", filename.c_str(), line, l);
+		PSL_PRINTF(("error %s %d: comment not closed from %d\n", filename.c_str(), line, l));
 		++i;
 	}
 	void string_literal(char end = '"')
@@ -231,7 +231,7 @@ private:
 			return 0;
 		if (!getIdentifier())
 		{
-			std::printf("warning %s %d: tokenizer directive syntax error\n", filename.c_str(), line);
+			PSL_PRINTF(("warning %s %d: tokenizer directive syntax error\n", filename.c_str(), line));
 			lcomment();
 			return doNext();
 		}
@@ -251,7 +251,7 @@ private:
 						++i;
 						including = New(name, definelist);
 						if (!including)
-							std::printf("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str());
+							PSL_PRINTF(("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str()));
 						break;
 					}
 				}
@@ -262,7 +262,7 @@ private:
 		else if (directive == "define")
 		{
 			if (!getIdentifier())
-				std::printf("warning %s %d: define syntax error\n", filename.c_str(), line);
+				PSL_PRINTF(("warning %s %d: define syntax error\n", filename.c_str(), line));
 			else
 			{
 				if (whitespace())
@@ -281,7 +281,7 @@ private:
 		else if (directive == "undef")
 		{
 			if (!getIdentifier())
-				std::printf("warning %s %d: undef syntax error\n", filename.c_str(), line);
+				PSL_PRINTF(("warning %s %d: undef syntax error\n", filename.c_str(), line));
 			else
 			{
 				definelist->erase(nstr);
@@ -290,7 +290,7 @@ private:
 #endif
 		else
 		{
-			std::printf("tokenizer %s %d: unknown tokenizer directive #%s\n", filename.c_str(), line, directive.c_str());
+			PSL_PRINTF(("tokenizer %s %d: unknown tokenizer directive #%s\n", filename.c_str(), line, directive.c_str()));
 		}
 		lcomment();
 		return doNext();

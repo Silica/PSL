@@ -28,7 +28,7 @@ private:
 				}
 			}
 			delete next;
-//			std::printf("end,%d,%d", count(), current());
+//			PSL_PRINTF(("end,%d,%d", count(), current()));
 		}
 		int *nextptr()
 		{
@@ -57,7 +57,7 @@ private:
 				}
 			}
 			#ifdef _DEBUG
-			std::printf("throw,%d,%d\n", count, current);
+			PSL_PRINTF(("throw,%d,%d\n", count, current));
 			throw std::bad_alloc();
 			#else
 			return NULL;
@@ -130,7 +130,7 @@ public:
 				}
 			}
 			#ifdef _DEBUG
-			std::printf("throw,%d,%d\n", count, current);
+			PSL_PRINTF(("throw,%d,%d\n", count, current));
 			throw std::bad_alloc();
 			#else
 			return NULL;

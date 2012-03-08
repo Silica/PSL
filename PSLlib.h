@@ -40,15 +40,15 @@ private:
 	{
 		switch (v.type())
 		{
-		case NIL:		std::printf("nil");break;
-		case INT:		std::printf("%d", (int)v);break;
-		case HEX:		std::printf("%X", (int)v);break;
-		case FLOAT:		std::printf("%f", (double)v);break;
-//		case RARRAY:	std::printf("[list:%d]", v.length());break;
-		case THREAD:	std::printf("[thread:%s]", (bool)v ? "alive" : "dead");break;
+		case NIL:		PSL_PRINTF(("nil"));break;
+		case INT:		PSL_PRINTF(("%d", (int)v));break;
+		case HEX:		PSL_PRINTF(("%X", (int)v));break;
+		case FLOAT:		PSL_PRINTF(("%f", (double)v));break;
+//		case RARRAY:	PSL_PRINTF(("[list:%d]", v.length()));break;
+		case THREAD:	PSL_PRINTF(("[thread:%s]", (bool)v ? "alive" : "dead"));break;
 		default:
 			{
-				std::printf("%s", v.toString().c_str());
+				PSL_PRINTF(("%s", v.toString().c_str()));
 				break;
 			}
 		}

@@ -166,10 +166,10 @@ class Environment
 		{
 			switch (n)
 			{
-			case 0:std::printf("runtime warning : %s stack remained when deleting env\n", s.c_str());break;
-			case 1:std::printf("runtime warning : undeclared identidier %s\n", s.c_str());break;
-			case 2:std::printf("runtime error : pop empty stack\n");break;
-			case 3:std::printf("runtime warning : declared identidier %s already exist, over write\n", s.c_str());break;
+			case 0:PSL_PRINTF(("runtime warning : %s stack remained when deleting env\n", s.c_str()));break;
+			case 1:PSL_PRINTF(("runtime warning : undeclared identidier %s\n", s.c_str()));break;
+			case 2:PSL_PRINTF(("runtime error : pop empty stack\n"));break;
+			case 3:PSL_PRINTF(("runtime warning : declared identidier %s already exist, over write\n", s.c_str()));break;
 			}
 		}
 	}
@@ -280,16 +280,16 @@ public:
 			for (table::iterator it = label.begin(); it != label.end(); ++it)
 			{
 				if ((unsigned)it->second.get()->toInt() == line)
-					std::printf("%s:\n", it->first.c_str());
+					PSL_PRINTF(("%s:\n", it->first.c_str()));
 			}
-			std::printf("exec: ");
+			PSL_PRINTF(("exec: "));
 			code[line]->dump(1);
 			if (code[line++]->Execute(env) == OpCode::RC::YIELD)	// スタック不整合を防ぐ為に、ひとまずyield用にNULLを渡すことにする
 				env.push(rsv());
 		}
 		else
 		{
-			std::printf("exec: END\n");
+			PSL_PRINTF(("exec: END\n"));
 			env.endScope();
 		}
 	}
@@ -330,9 +330,9 @@ public:
 		for (size_t i = 0; i < code.size(); ++i)
 			code[i]->dump();
 //		for (std::map<string,int>::iterator it = label.begin(); it != label.end(); ++it)
-//			std::printf("%s:%d\n", it->first.c_str(), it->second);
+//			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second));
 		for (table::iterator it = label.begin(); it != label.end(); ++it)
-			std::printf("%s:%d\n", it->first.c_str(), it->second.get()->toInt());
+			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second.get()->toInt()));
 	}
 	#endif
 	void write(bytecode &b)

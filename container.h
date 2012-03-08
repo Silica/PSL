@@ -218,7 +218,7 @@ private:
 		for (size_t i = 0; i < t; ++i)
 			if (!d[i])
 				return i;
-		std::printf("table error:\n");
+		PSL_PRINTF(("table error:\n"));
 		return 0;
 	}
 	void resize() const
