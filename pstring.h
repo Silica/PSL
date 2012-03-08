@@ -3,6 +3,7 @@
 
 #define PSTRING_USE_DOUBLE
 
+#include <cstring>
 #include <cstdio>
 #include <cstdarg>
 #ifdef PSTRING_USE_DOUBLE
@@ -13,22 +14,13 @@ class string
 {
 	typedef unsigned int size_t;
 public:
-	static size_t slen(const char *s)
-	{
-		int i = 0;
-		for (; s[i] ; ++i);
-		return i;
-	}
-	static int min(int x, int y)
-	{
-		return (x < y) ? x : y;
-	}
+	static int min(int x, int y)	{return (x < y) ? x : y;}
 private:
 	class SharedBuffer
 	{
 	public:
 		SharedBuffer(size_t t)	{Init(t);}
-		SharedBuffer(const char *s)				{size_t t = slen(s);Init(t, t);fcopy(s, t);}
+		SharedBuffer(const char *s)				{size_t t = std::strlen(s);Init(t, t);fcopy(s, t);}
 		SharedBuffer(const char *s, size_t t)	{Init(t, t);copy(s);}
 		void finalize()	{if(!--rc)delete this;}
 		SharedBuffer *inc()		{++rc;return this;}
@@ -51,9 +43,13 @@ private:
 		}
 		void fcopy(const char *s, size_t m, size_t b = 0)
 		{
-			for (size_t t = 0; t < m; ++t)
-				buf[t+b] = s[t];
+			std::memcpy(buf+b, s, m);
 			len = m+b;
+		}
+		void fmove(const char *s, size_t m)
+		{
+			std::memmove(buf, s, m);
+			len = m;
 		}
 		const char *c_str()	{buf[len] = 0;return buf;}
 	private:
@@ -137,7 +133,7 @@ public:
 		}
 		else
 		{
-			size_t l = slen(s);
+			size_t l = std::strlen(s);
 			only_and_extend(l);
 			buf->fcopy(s, l);
 		}
@@ -151,7 +147,7 @@ public:
 		}
 		else
 		{
-			size_t l = slen(s);
+			size_t l = std::strlen(s);
 			size_t c = buf->length();
 			only_and_extend(c + l);
 			buf->fcopy(s, l, c);
@@ -161,7 +157,7 @@ public:
 	string operator+(const char *s) const
 	{
 		if (!buf)	return new SharedBuffer(s);
-		size_t l = slen(s);
+		size_t l = std::strlen(s);
 		SharedBuffer *n = new SharedBuffer(buf->length() + l);
 		n->fcopy(buf->buffer(), buf->length());
 		n->fcopy(s, l, buf->length());
@@ -204,16 +200,14 @@ public:
 	}
 	string &operator=(char c)
 	{
-		string s(c);
-		*this = s;
-/*		if (!buf)	buf = new SharedBuffer(SPARE);
+		if (!buf)	buf = new SharedBuffer(SPARE);
 		else if (buf->shared())
 		{
 			buf->finalize();
 			buf = new SharedBuffer(SPARE);
 		}
 		buf->buffer()[0] = c;
-		buf->setlen(1);*/
+		buf->setlen(1);
 		return *this;
 	}
 	string &operator+=(char c)
@@ -507,8 +501,10 @@ public:
 			}
 			else
 			{
-				if (i <= c)
-					buf->fcopy(buf->buffer()+i, c-i);
+				if (i < c)
+					buf->fmove(buf->buffer()+i, c-i);
+				else
+					buf->setlen(0);
 			}
 		}
 		return *this;

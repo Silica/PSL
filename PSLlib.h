@@ -106,8 +106,10 @@ private:
 		}
 		static variable getChar(variable &v)
 		{
-			char c = std::getchar();
-			string s = c;
+			string s;
+			using namespace std;
+			char c = getchar();
+			s = c;
 			variable ch = s;
 			return ch;
 		}

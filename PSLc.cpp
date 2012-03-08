@@ -2,6 +2,7 @@
 // インタプリタ(これ自身)の後ろにバイトコードを埋め込む
 #include "PSL.h"
 
+#include <vector>
 #include <stdio.h>
 #include <conio.h>
 
