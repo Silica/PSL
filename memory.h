@@ -60,7 +60,7 @@ protected:
 	} ptr[poolsize];
 	MemoryPool *next;
 	const static int psize = poolsize;
-private:
+//private:
 	int current;
 	int count;
 };
@@ -68,19 +68,88 @@ private:
 class VMemoryPool : public MemoryPool<8>
 {
 public:
-	~VMemoryPool()	{
-		// これでメモリリークを回避出来る
-		// が、開放されないまま終了するのを回避出来るだけで
-		// 開放されるのが終了時では結局意味がないかと
-		// vBase派生のデストラクタで何らかのIO処理等を行うなら話は別だが
+	void GarbageCollection()
+	{
+		Mark(this);
+
 		for (int i = 0; i < psize; ++i)
 		{
 			if (ptr[i].x)
 			{
 				Variable *v = (Variable*)(ptr+i);
-				v->safedelete();
+				v->deleteunmark_destructor();	// デストラクタ持ちを優先的に処理する
 			}
 		}
+		for (int i = 0; i < psize; ++i)
+		{
+			if (ptr[i].x)
+			{
+				Variable *v = (Variable*)(ptr+i);
+				v->deleteunmark();
+			}
+		}
+
+		UnMark();
+	}
+private:
+	void searchcount(Variable *v, int &c)
+	{
+		for (int i = 0; i < psize; ++i)
+		{
+			if (ptr[i].x)
+			{
+				Variable *x = (Variable*)(ptr+i);
+				if (v == x)
+					continue;
+				x->searchcount(v, c);
+			}
+		}
+		if (next)
+			((VMemoryPool*)next)->searchcount(v, c);
+	}
+	void Mark(VMemoryPool *m)
+	{
+		for (int i = 0; i < psize; ++i)
+		{
+			if (ptr[i].x)
+			{
+				Variable *v = (Variable*)(ptr+i);
+				int count = 0;
+				if (v->searchcount(v, count))
+					continue;
+				m->searchcount(v, count);
+				v->markstart(count);
+				m->Mark2();
+			}
+		}
+		if (next)
+			((VMemoryPool*)next)->Mark(m);
+	}
+	void Mark2()
+	{
+		for (int i = 0; i < psize; ++i)
+		{
+			if (ptr[i].x)
+			{
+				Variable *v = (Variable*)(ptr+i);
+				v->unmark(0x7FFFFFFF);
+			}
+		}
+		if (next)
+			((VMemoryPool*)next)->Mark2();
+	}
+	void UnMark()
+	{
+		for (int i = 0; i < psize; ++i)
+		{
+			if (ptr[i].x)
+			{
+				Variable *v = (Variable*)(ptr+i);
+				v->unmark(0x3FFFFFFF);
+			}
+		}
+		if (next)
+			((VMemoryPool*)next)->UnMark();
 	}
 };
 
@@ -99,6 +168,7 @@ class StaticObject
 		}
 		~sobj()
 		{
+			vpool->GarbageCollection();
 			delete optimizer_p();
 			delete rsvnull_p();
 			delete vpool;

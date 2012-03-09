@@ -186,6 +186,8 @@ public:
 	~vPointer()	{if (x)x->finalize();}
 	Type type()	const	{return POINTER;}
 	vBase *clone()	{return new vPointer(x);}
+	void searchcount(Variable *v, int &c){if (x)x->searchcount(v, c);}
+	void mark(){if (x)x->mark();}
 
 	vBase *substitution(Variable *v)
 	{
@@ -220,6 +222,8 @@ public:
 	Type type()	const	{return x->type();}
 	vBase *clone()	{return x->x->clone();}
 	Variable *referenceTo()	{return x;}
+	void searchcount(Variable *v, int &c){x->searchcount(v, c);}
+	void mark(){x->mark();}
 
 	vBase *substitution(Variable *v)	{x->substitution(v);return this;}
 	vBase *assignment(Variable *v)		{x->assignment(v);return this;}
@@ -299,6 +303,18 @@ public:
 	vRArray():x(2){}
 	vRArray(int i):x(i){}
 	Type type()	const	{return RARRAY;}
+	void searchcount(Variable *v, int &c)
+	{
+		int size = x.size();
+		for (int i = 0; i < size; ++i)
+			x[i].get()->searchcount(v, c);
+	}
+	void mark()
+	{
+		int size = x.size();
+		for (int i = 0; i < size; ++i)
+			x[i].get()->mark();
+	}
 	vBase *clone()
 	{
 		int size = x.size();
@@ -458,6 +474,26 @@ public:
 		if (v->code)	code = v->code->inc();
 		else			code = NULL;
 	}
+	void searchcount(Variable *v, int &c)
+	{
+		int size = array.size();
+		for (int i = 0; i < size; ++i)
+			array[i].get()->searchcount(v, c);
+		for (table::iterator it = member.begin(); it != member.end(); ++it)
+			member[it->first].get()->searchcount(v, c);
+		if (_class)
+			_class->searchcount(v, c);
+	}
+	void mark()
+	{
+		int size = array.size();
+		for (int i = 0; i < size; ++i)
+			array[0].get()->mark();
+		for (table::iterator it = member.begin(); it != member.end(); ++it)
+			member[it->first].get()->mark();
+		if (_class)
+			_class->mark();
+	}
 
 	vBase *substitution(Variable *v)
 	{
@@ -497,10 +533,10 @@ public:
 	// +=で連結とかどう？って=と同じかそれ、ARRAYだな
 	// あ、memberに対しては同じだがarrayに対しては違うな
 
-	bool toBool()		const {return !array.empty() || !member.empty();}
+	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return array.size();}
 	double toDouble()	const {return array.size();}
-	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : "nil";}
+	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : code ? "[function]" : "nil";}
 
 	size_t length()				const {return array.size();}
 	bool exist(const string &s)	const {return member.count(s);}
@@ -654,6 +690,8 @@ public:
 	}
 	Type type()	const	{return METHOD;}
 	vBase *clone()	{return new vMethod(function, _this);}
+	void searchcount(Variable *v, int &c){function->searchcount(v, c);}
+	void mark(){function->mark();}
 
 	bool toBool()		const {return true;}
 	string toString()	const {return "[Method]";}
@@ -792,6 +830,8 @@ public:
 	~vThread()	{if (x)x->finalize();delete e;}
 	Type type()	const	{return THREAD;}
 	vBase *clone()	{return new vThread(x);}
+	void searchcount(Variable *v, int &c){if (x)x->searchcount(v, c);}
+	void mark(){if (x)x->mark();}
 
 	vBase *substitution(Variable *v)
 	{

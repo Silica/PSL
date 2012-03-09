@@ -28,6 +28,7 @@ public:
 		#endif
 		v["foreach"] = Foreach;
 		v["eval"] = Eval;
+		v["GarbageCollection"] = GarbageCollection;
 
 		Strlib::set(v["strlib"]);
 		Array::set(v["array"]);
@@ -79,6 +80,11 @@ private:
 		Parser p(&t);
 		p.Parse(g);
 		return g;
+	}
+	static variable GarbageCollection(variable &v)
+	{
+		Variable::StaticObject::vpool().GarbageCollection();
+		return variable();
 	}
 	class Strlib
 	{
