@@ -13,32 +13,35 @@ private:
 	class mpool
 	{
 	public:
-		mpool()		{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*sizeof(int));}
+		mpool()		{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*2*sizeof(int));}
 		~mpool()	{
 			// これでメモリリークを回避出来る
 			// が、開放されないまま終了するのを回避出来るだけで
 			// 開放されるのが終了時では結局意味がないかと
 			// vBase派生のデストラクタで何らかのIO処理等を行うなら話は別だが
-			for (int i = 0; i < poolsize; i += 2)
+			for (int i = 0; i < poolsize*2; i += 2)
 			{
 				if (ptr[i])
 				{
 					Variable *v = (Variable*)(ptr+i);
 					v->safedelete();
+					// グローバルオブジェクトの開放順序は不明…つまり
+					// こっちより先に下の汎用が死んでる可能性がある
+					// それどころか幾つかstatic rsvとかあるよね
 				}
 			}
 			delete next;
-//			PSL_PRINTF(("end,%d,%d", count(), current()));
 		}
 		int *nextptr()
 		{
-			if (count == poolsize/2)
+			if (count == poolsize)
 			{
+				std::printf("extend\n");
 				if (!next)
 					next = new mpool;
 				return next->nextptr();
 			}
-			for (int i = current; i < poolsize; i += 2)
+			for (int i = current; i < poolsize*2; i += 2)
 			{
 				if (!ptr[i])
 				{
@@ -65,7 +68,7 @@ private:
 		}
 		void release(int *p)
 		{
-			if (p < ptr || p >= ptr+poolsize)
+			if (p < ptr || p >= ptr+poolsize*2)
 			{
 				#ifdef _DEBUG
 				if (next)
@@ -78,7 +81,7 @@ private:
 			ptr[current] = 0;
 		}
 	private:
-		int ptr[poolsize];
+		int ptr[poolsize*2];
 		mpool *next;
 		int current;
 		int count;
@@ -97,7 +100,7 @@ template<size_t S, int poolsize = 256> class MemoryManager
 {
 public:
 	static void *Next()				{return MemoryPool().nextptr();}
-	static void Release(void *ptr)	{MemoryPool().release((char*)ptr);}
+	static void Release(void *ptr)	{MemoryPool().release(ptr);}
 	class mpool
 	{
 	public:
@@ -111,21 +114,21 @@ public:
 					next = new mpool;
 				return next->nextptr();
 			}
-			for (int i = current; i < poolsize*S; i += S)
+			for (int i = current; i < poolsize; ++i)
 			{
-				if (!ptr[i])
+				if (!ptr[i].x)
 				{
-					current = i+S;
-					count += 1;
+					current = i+1;
+					++count;
 					return ptr + i;
 				}
 			}
-			for (int i = 0; i < current; i += S)
+			for (int i = 0; i < current; ++i)
 			{
-				if (!ptr[i])
+				if (!ptr[i].x)
 				{
-					current = i+S;
-					count += 1;
+					current = i+1;
+					++count;
 					return ptr + i;
 				}
 			}
@@ -136,9 +139,10 @@ public:
 			return NULL;
 			#endif
 		}
-		void release(char *p)
+		void release(void *x)
 		{
-			if (p < ptr || p >= ptr+poolsize*S)
+			DATA *p = static_cast<DATA*>(x);
+			if (p < ptr || p >= ptr + poolsize)
 			{
 				#ifdef _DEBUG
 				if (next)
@@ -148,10 +152,14 @@ public:
 			}
 			current = p - ptr;
 			count--;
-			*(int*)(ptr+current) = 0;
+			ptr[current].x = 0;
 		}
 	private:
-		char ptr[poolsize*S];
+		union DATA
+		{
+			char s[S];
+			int x;
+		} ptr[poolsize];
 		int current;
 		int count;
 		mpool *next;
