@@ -25,12 +25,12 @@
 #define PSL_OPTIMIZE_IMMEDIATELY_POP		// PUSHして即POPするコードの最適化(a;の様な文)
 #define PSL_OPTIMIZE_CONSTANT_CALCULATION	// 定数計算の最適化(簡易)
 #define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
-#define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない
+#define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない(短絡評価)
+#define PSL_OPTIMIZE_PARENTHESES			// 計算順序を変える為だけの()を演算子にしない
 // その他簡単に可能な最適化は
 // ジャンプ条件が定数の場合(パーサの都合で楽じゃなかった…関数完成後にやるならいいんだが)
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
-// ()は,と絡まない場合は無視して構わない
 #define PSL_POPSTACK_NULL	// Envスタックがvectorの時、POPしたスタックを即空にする(変数の生存期間に影響)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用俺俺メモリマネージャ

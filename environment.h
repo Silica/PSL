@@ -358,6 +358,21 @@ private:
 	{
 		static Environment optimizer;
 		OpCode::MNEMONIC::mnemonic cn = c->get();
+		#ifdef PSL_OPTIMIZE_PARENTHESES
+		if (cn != OpCode::MNEMONIC::LIST)
+		{
+			int s = code.size();
+			if (s >= 1)
+			{
+				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
+				if (n == OpCode::MNEMONIC::PARENTHESES)
+				{
+					delete code[s-1];
+					code.resize(s-1);
+				}
+			}
+		}
+		#endif
 		if (cn == OpCode::MNEMONIC::PLUS)
 		{
 			delete c;
