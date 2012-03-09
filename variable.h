@@ -227,7 +227,51 @@ private:
 			default:		x = new vObject();break;
 		}}
 		void finalize()		{if (!--rc)	delete this;}
-		void safedelete()	{vBase *v = x;x = NULL;delete v;}
+		void safedelete()	{vBase *v = x;x = new vInt(0);delete v;}
+		bool searchcount(Variable *v, int &c)
+		{
+			if (rc & 0x40000000)
+				return true;
+			if (rc & 0x80000000)
+			{
+				if (v == this)
+					++c;
+				return false;
+			}
+			rc |= 0x80000000;
+			x->searchcount(v, c);
+			return false;
+		}
+		void markstart(int c)
+		{
+			if ((rc & 0xFFFFFF) != c)
+				mark();
+		}
+		void mark()
+		{
+			if (rc & 0x40000000)
+				return;
+			rc |= 0x40000000;
+			x->mark();
+		}
+		void unmark(unsigned long m)
+		{
+			rc &= m;
+		}
+		void deleteunmark_destructor()
+		{
+			if (rc & 0x40000000)
+				return;
+//			if (x->type() == OBJECT && !x->getcode())	// ‹C‚ªŒü‚¢‚½‚ç‚¿‚á‚ñ‚Æ‚·‚é
+			if (x->exist("destructor") && !x->getcode())
+				safedelete();
+		}
+		void deleteunmark()
+		{
+			if (rc & 0x40000000)
+				return;
+			safedelete();
+		}
 		Type type()	const	{return x->type();}
 
 		void substitution(Variable *v)	{x = x->substitution(v);x->method_this(this);}
@@ -296,6 +340,8 @@ private:
 			virtual Type type()	const	{return NIL;}
 			virtual vBase *clone()	{return new vBase();}
 			virtual Variable *referenceTo()	{return NULL;}
+			virtual void searchcount(Variable *v, int &c){}
+			virtual void mark(){}
 
 			virtual vBase *substitution(Variable *v)	{delete this;return v->x->clone();}
 			virtual vBase *assignment(Variable *v)		{delete this;return v->x->clone();}
