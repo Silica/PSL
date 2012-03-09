@@ -222,8 +222,12 @@ public:
 		int size = stack.size();
 		rsv v = stack[size-1];
 		#ifdef PSL_POPSTACK_NULL
+			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+		stack[size-1] = StaticObject::rsvnull();
+			#else
 		const static rsv null;
 		stack[size-1] = null;
+			#endif
 		#endif
 		stack.resize(size-1);
 #endif
@@ -356,7 +360,11 @@ private:
 	int rc;
 	bool optimize(OpCode *c)
 	{
+		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+		Environment &optimizer = StaticObject::optimizer();
+		#else
 		static Environment optimizer;
+		#endif
 		OpCode::MNEMONIC::mnemonic cn = c->get();
 		#ifdef PSL_OPTIMIZE_PARENTHESES
 		if (cn != OpCode::MNEMONIC::LIST)
