@@ -60,7 +60,7 @@ protected:
 	} ptr[poolsize];
 	MemoryPool *next;
 	const static int psize = poolsize;
-//private:
+private:
 	int current;
 	int count;
 };
