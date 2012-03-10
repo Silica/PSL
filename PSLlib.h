@@ -190,8 +190,10 @@ private:
 		{
 			variable v = r;
 			variable exist = Exist;
+			variable del = Delete;
 			variable keys = Keys;
 			v["exist"] = exist;
+			v["delete"] = del;
 			v["keys"] = keys;
 		}
 	private:
@@ -207,6 +209,20 @@ private:
 			{
 				return _this.exist(v);
 			}
+		}
+		static variable Delete(variable &_this, variable &v)
+		{
+			if (!_this)
+			{
+				variable table = v[0];
+				variable key = v[1];
+				table.del(key);
+			}
+			else
+			{
+				_this.del(v);
+			}
+			return variable();	// æ‚èœ‚¢‚½•Ï”‚ğ•Ô‚·‚Æ‚¢‚¤‚Ì‚àèH
 		}
 		static variable Keys(variable &_this, variable &v)
 		{

@@ -195,6 +195,8 @@ public:
 	bool exist(const string &s)			{return x->exist(s);}
 	void push(const variable &v)		{return x->push(v.x);}
 	variable keys()	{return x->keys();}
+	bool set(const string &s, const variable &v)	{return x->set(s, v);}
+	void del(const string &s)						{return x->del(s);}
 private:
 	#include "PSLlib.h"
 	#include "tokenizer.h"
@@ -313,6 +315,7 @@ private:
 		Variable *child(const string &s)	{Variable *v = x->child(s);return v ? v : this;}
 		Variable *keys()	{Variable *v = x->keys();v->rc = 0;return v;}
 		bool set(const string &s, const variable &v)	{return x->set(s, v);}
+		void del(const string &s)						{x->del(s);}
 
 	private:
 		#include "bytecode.h"
@@ -382,6 +385,7 @@ private:
 			virtual void push(Variable *v){}
 			virtual Variable *keys()	{return new Variable();}
 			virtual bool set(const string &s, const variable &v)	{return false;}
+			virtual void del(const string &s)	{}
 			virtual void method_this(Variable *v)	{}
 
 			virtual void prepare(Environment &env, Variable *v)	{}

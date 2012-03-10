@@ -255,6 +255,7 @@ public:
 	int toInt()			const {return x->toInt();}
 	double toDouble()	const {return x->toDouble();}
 	string toString()	const {return x->toString();}
+	void *toPointer()	const {return x->toPointer();;}
 
 	size_t length()				const {return x->length();}
 	bool exist(const string &s)	const {return x->exist(s);}
@@ -263,14 +264,19 @@ public:
 	void push(Variable *v)				{return x->push(v);}
 	Variable *keys()					{return x->keys();}
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
+	void del(const string &s)	{x->del(s);}
 
 	void prepare(Environment &env, Variable *v)			{x->prepare(env);}
 	void prepareInstance(Environment &env, Variable *v)	{x->prepareInstance(env);}
+	Variable *instance(Variable *v)	{return x->instance();}
 	rsv call(Environment &env, variable &arg, Variable *v)	{return x->call(env, arg);}
 
+	// ライブラリ関数で使うかもしれないので一応
 	size_t codelength()			{return x->codelength();}
 	Code *getcode()				{return x->getcode();}
 	void pushcode(OpCode *c)	{x->pushcode(c);}
+	void pushlabel(const string &s){x->pushlabel(s);}
+	void write(const string &s, bytecode &b){x->write(s, b);}
 	PSL_DUMP((){PSL_PRINTF(("vReference:\n"));x->dump();})
 private:
 	Variable *x;
@@ -562,6 +568,7 @@ public:
 		member[s] = v;
 		return r;
 	}
+	void del(const string &s)	{member.erase(s);}
 	void method_this(Variable *v)	// メソッドのthisを差し替える
 	{
 		int size = array.size();
@@ -666,12 +673,6 @@ private:
 	table member;
 	Variable *_class;
 	Code *code;
-
-	bool set(const string &s, Variable *v)
-	{
-		member[s] = v;
-		return true;
-	}
 };
 
 class vMethod : public vBase
