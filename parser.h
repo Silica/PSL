@@ -63,6 +63,13 @@ private:
 		default:	PSL_PRINTF(("unknown error\n"));
 		}
 	}
+	enum Declare
+	{
+		DECLARE_NONE = 0,
+		DECLARE_GLOBAL,
+		DECLARE_STATIC,
+		DECLARE_LOCAL,
+	};
 	void ParseDangling(variable &g, variable &c)
 	{
 		if (t->checkNext() == '{'/*'}'*/)
@@ -384,8 +391,9 @@ private:
 			Error(BINC, line);
 		t->getNext();
 	}
-	void getSuffOp(variable &c)
+	bool getSuffOp(variable &c, Declare d = DECLARE_NONE)
 	{
+		bool declared = false;
 		while (int n = t->checkNext())
 		{
 			if (n == Tokenizer::INC)
@@ -431,13 +439,25 @@ private:
 					Error(TINIA, 0, "member access (.)");
 				}
 			}
+			else if (n == Tokenizer::IDENTIFIER)
+			{
+				t->getNext();
+				c.pushcode(new Variable::INSTANCE);
+				if (d == DECLARE_GLOBAL)		c.pushcode(new Variable::GLOBAL(t->nstr));
+				else if (d == DECLARE_STATIC)	c.pushcode(new Variable::STATIC(t->nstr));
+				else if (d == DECLARE_LOCAL)	c.pushcode(new Variable::LOCAL(t->nstr));
+				else							c.pushcode(new Variable::DECLARATION(t->nstr));
+				d = DECLARE_NONE;
+				declared = true;
+			}
 			else
 				break;
 		}
+		return declared;
 	}
-	#define PRE_OP(m,o) if(n==m){t->getNext();getTerm(c);c.pushcode(new Variable::o);}
-	#define TERM(m,o) if(n==m){t->getNext();c.pushcode(new Variable::o);getSuffOp(c);}
-	void getTerm(variable &c)
+	#define PRE_OP(m,o) if(n==m){t->getNext();bool b = getTerm(c);c.pushcode(new Variable::o);return b;}
+	#define TERM(m,o) if(n==m){t->getNext();c.pushcode(new Variable::o);return getSuffOp(c, d);}
+	bool getTerm(variable &c, Declare d = DECLARE_NONE)
 	{
 		int n = t->checkNext();
 		if (n == '('/*')'*/)
@@ -492,8 +512,9 @@ private:
 			if (n < 0)	Error(UKT);
 			else		Error(NOTT, n);
 			t->getNext();
-			return;
+			return false;
 		}
+		return false;
 	}
 	#undef PRE_OP
 	#undef TERM
@@ -640,67 +661,42 @@ private:
 	{
 		if (!l && t->checkNext() == Tokenizer::IDENTIFIER)
 		{
-			bool _global = false;
-			bool _static = false;
-			bool _local = false;
+			Declare d = DECLARE_NONE;
 			if (t->nstr == "global")
-				_global = true;
+				d = DECLARE_GLOBAL;
 			else if (t->nstr == "static")
-				_static = true;
+				d = DECLARE_STATIC;
 			else if (t->nstr == "local")
-				_local = true;
-			if (_global || _static || _local)
+				d = DECLARE_LOCAL;
+			if (d)
 			{
+				l = true;
 				string scope = t->nstr;
 				t->getNext();
 				if (t->checkNext() == Tokenizer::IDENTIFIER)
 				{
 					t->getNext();
 					string name = t->nstr;
-					if (t->checkNext() == Tokenizer::IDENTIFIER)
+					variable temp;
+					if (getSuffOp(temp, d))
 					{
-						t->getNext();
-						l = true;
 						c.pushcode(new Variable::VARIABLE(name));
-						c.pushcode(new Variable::INSTANCE);
-						if (_global)		c.pushcode(new Variable::GLOBAL(t->nstr));
-						else if (_static)	c.pushcode(new Variable::STATIC(t->nstr));
-						else if (_local)	c.pushcode(new Variable::LOCAL(t->nstr));
 					}
 					else
 					{
-						l = true;
 						c.pushcode(new Variable::PUSH_NULL());
-						if (_global)		c.pushcode(new Variable::GLOBAL(name));
-						else if (_static)	c.pushcode(new Variable::STATIC(name));
-						else if (_local)	c.pushcode(new Variable::LOCAL(name));
+						if (d == DECLARE_GLOBAL)		c.pushcode(new Variable::GLOBAL(name));
+						else if (d == DECLARE_STATIC)	c.pushcode(new Variable::STATIC(name));
+						else if (d == DECLARE_LOCAL)	c.pushcode(new Variable::LOCAL(name));
 					}
+					c.getcode()->push(temp.getcode());
 				}
 				else
 				{
-					Error(TINIA, 0, scope);
+					if (!getTerm(c, d))
+						Error(TINIA, 0, scope);
 				}
 			}
-			else
-			{
-				t->getNext();
-				string name = t->nstr;
-				if (t->checkNext() == Tokenizer::IDENTIFIER)
-				{
-					t->getNext();
-					l = true;
-					c.pushcode(new Variable::VARIABLE(name));
-					c.pushcode(new Variable::INSTANCE);
-					c.pushcode(new Variable::DECLARATION(t->nstr));
-				}
-				else
-				{
-					l = true;
-					c.pushcode(new Variable::VARIABLE(name));
-				}
-			}
-			if (l)
-				getSuffOp(c);
 		}
 		getexp10(c, l);
 		if (t->checkNext() == '?')
