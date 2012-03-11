@@ -529,7 +529,7 @@ public:
 				unsigned short s;
 			};
 			unsigned long l;
-		} u = {buf->at(0) , buf->at(buf->length()-1), buf->length()};
+		} u = {{{buf->at(0), buf->at(buf->length()-1)}, buf->length()}};
 		return u.l;
 	}
 private:
