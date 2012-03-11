@@ -360,11 +360,6 @@ private:
 	int rc;
 	bool optimize(OpCode *c)
 	{
-		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-		Environment &optimizer = StaticObject::optimizer();
-		#else
-		static Environment optimizer;
-		#endif
 		OpCode::MNEMONIC::mnemonic cn = c->get();
 		#ifdef PSL_OPTIMIZE_PARENTHESES
 		if (cn != OpCode::MNEMONIC::LIST)
@@ -430,6 +425,7 @@ private:
 				{
 					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 					{
+						Environment optimizer;
 						code[s-1]->Execute(optimizer);
 						variable v = optimizer.pop();
 						optimizer.push(v);
@@ -451,6 +447,7 @@ private:
 				{
 					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
 					{
+						Environment optimizer;
 						code[s-2]->Execute(optimizer);
 						code[s-1]->Execute(optimizer);
 						variable r = optimizer.pop();
