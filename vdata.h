@@ -1,10 +1,7 @@
 class vInt : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vInt)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vInt)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vInt)
 	vInt(int i)	{x = i;}
 	Type type()	const	{return INT;}
 	vBase *clone()	{return new vInt(x);}
@@ -52,10 +49,7 @@ private:
 class vHex : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vHex)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vHex)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vHex)
 	vHex(hex i)	{x = i;}
 	Type type()	const	{return HEX;}
 	vBase *clone()	{return new vHex(x);}
@@ -137,10 +131,7 @@ private:
 class vString : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vString)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vString)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vString)
 	vString(const string &s)	{x = s;}
 	Type type()	const	{return STRING;}
 	vBase *clone()	{return new vString(x);}
@@ -177,10 +168,7 @@ private:
 class vPointer : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vPointer)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vPointer)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vPointer)
 	vPointer()	{x = NULL;}
 	vPointer(Variable *v)	{x = v ? v->ref() : NULL;}
 	~vPointer()	{if (x)x->finalize();}
@@ -215,10 +203,7 @@ private:
 class vReference : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vReference)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vReference)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vReference)
 	vReference(Variable *v)	{Variable *z = v->x->referenceTo();x = (z ? z : v)->ref();}
 	~vReference()			{x->finalize();}
 	Type type()	const	{return x->type();}
@@ -456,10 +441,7 @@ private:
 class vObject : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vObject)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vObject)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vObject)
 	vObject()				{_class = NULL;code = NULL;}
 	vObject(Variable *v)	{_class = v->ref();code = NULL;}
 	vObject(Code *c)		{_class = NULL;code = c->inc();}
@@ -535,14 +517,7 @@ public:
 			array[i].get()->substitution(v->index(i));
 
 		kcopy(v);
-
-		if (Code *c = v->getcode())
-		{
-			if (code)
-				code->finalize();
-			code = c->inc();
-		}
-
+		ccopy(v);
 		return this;
 	}
 	vBase *assignment(Variable *v)
@@ -567,13 +542,7 @@ public:
 		}
 		k->ref()->finalize();
 
-		if (Code *c = v->getcode())
-		{
-			if (code)
-				code->finalize();
-			code = c->inc();
-		}
-
+		ccopy(v);
 		return this;
 	}
 
@@ -586,13 +555,7 @@ public:
 			array[i+c].get()->substitution(v->index(i));
 
 		kcopy(v);
-
-		if (Code *c = v->getcode())
-		{
-			if (code)
-				code->finalize();
-			code = c->inc();
-		}
+		ccopy(v);
 	}
 	bool eq(Variable *v)	{return toBool() == v->toBool();}
 	bool ne(Variable *v)	{return toBool() != v->toBool();}
@@ -683,7 +646,7 @@ public:
 		int size = array.size();
 		o->array.resize(size);
 		for (int i = 0; i < size; ++i)
-			o->array[i].get()->assignment(array[i].get());
+			o->array[i].copy(array[i]);
 
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
@@ -700,7 +663,7 @@ public:
 			}
 			else
 			{
-				o->member[it->first].get()->assignment(it->second.get());
+				o->member[it->first].copy(it->second);
 			}
 		}
 		return x;
@@ -741,6 +704,15 @@ private:
 			member[s].get()->substitution(v->child(s));
 		}
 		k->ref()->finalize();
+	}
+	void ccopy(Variable *v)
+	{
+		if (Code *c = v->getcode())
+		{
+			if (code)
+				code->finalize();
+			code = c->inc();
+		}
 	}
 };
 
@@ -798,10 +770,7 @@ private:
 class vCFunction : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vCFunction)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vCFunction)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vCFunction)
 	vCFunction(function _f)	{f = _f;}
 	Type type()	const	{return CFUNCTION;}
 	vBase *clone()	{return new vCFunction(f);}
@@ -879,10 +848,7 @@ private:
 class vCPointer : public vBase
 {
 public:
-#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-	static void *operator new(size_t t)		{return MemoryManager<sizeof(vCPointer)>::Next();}
-	static void operator delete(void *ptr)	{MemoryManager<sizeof(vCPointer)>::Release(ptr);}
-#endif
+	PSL_MEMORY_MANAGER(vCPointer)
 	vCPointer(void *p)	{x = p;}
 	Type type()	const	{return CPOINTER;}
 	vBase *clone()	{return new vCPointer(x);}

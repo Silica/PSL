@@ -11,11 +11,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %d\n", x.get()->toInt()));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_INT);int w = x.get()->toInt();b.push(&w, sizeof(w));}
 private:
-	rsv x;	// 一応、定数に対して計算出来てしまうという問題が生じているが？
-	// for (int i = 0; i < ++4; i++)
-	// これは以前ならi < 5と等価だったが
-	// 今の実装だと無限ループ突入である
-	// 定数計算の最適化をするかしないかで結果が変わる
+	rsv x;
 };
 class PUSH_HEX : public OpCode
 {
