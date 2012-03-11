@@ -172,6 +172,7 @@ class Environment
 		}
 	}
 public:
+	Environment(int i)	{scope = NULL;}
 	Environment()	{scope = NULL;PSLlib::Basic(global);}
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
 	~Environment()	{delete scope;if (int ss=stack.size())warning(0, ss);}
@@ -425,7 +426,7 @@ private:
 				{
 					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 					{
-						Environment optimizer;
+						Environment optimizer(0);
 						code[s-1]->Execute(optimizer);
 						variable v = optimizer.pop();
 						optimizer.push(v);
@@ -447,7 +448,7 @@ private:
 				{
 					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
 					{
-						Environment optimizer;
+						Environment optimizer(0);
 						code[s-2]->Execute(optimizer);
 						code[s-1]->Execute(optimizer);
 						variable r = optimizer.pop();
