@@ -464,6 +464,15 @@ public:
 	~vObject()	{
 		if (_class)
 		{
+			destructor();
+			_class->finalize();
+		}
+		if (code)	code->finalize();
+	}
+	void destructor()
+	{
+		if (_class)
+		{
 			const static string destructor = "destructor";
 			if (member.count(destructor))
 			{
@@ -471,9 +480,8 @@ public:
 				variable arg;
 				member[destructor].get()->call(env, arg);
 			}
-			_class->finalize();
+			member.erase(destructor);
 		}
-		if (code)	code->finalize();
 	}
 	Type type()	const	{return OBJECT;}
 	vBase *clone()	{return new vObject(this);}

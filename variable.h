@@ -260,15 +260,13 @@ private:
 		{
 			rc &= m;
 		}
-		void deleteunmark_destructor()
+		void destructor_unmark()
 		{
 			if (rc & 0x40000000)
 				return;
-//			if (x->type() == OBJECT && !x->getcode())	// ‹C‚ªŒü‚¢‚½‚ç‚¿‚á‚ñ‚Æ‚·‚é
-			if (x->exist("destructor") && !x->getcode())
-				safedelete();
+			x->destructor();
 		}
-		void deleteunmark()
+		void delete_unmark()
 		{
 			if (rc & 0x40000000)
 				return;
@@ -345,6 +343,7 @@ private:
 			virtual Variable *referenceTo()	{return NULL;}
 			virtual void searchcount(Variable *v, int &c){}
 			virtual void mark(){}
+			virtual void destructor(){}
 
 			virtual vBase *substitution(Variable *v)	{delete this;return v->x->clone();}
 			virtual vBase *assignment(Variable *v)		{delete this;return v->x->clone();}

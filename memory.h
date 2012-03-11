@@ -52,17 +52,17 @@ public:
 		count--;
 		ptr[current].x = 0;
 	}
+private:
+	int current;
+	int count;
 protected:
+	const static int psize = poolsize;
+	MemoryPool *next;
 	union DATA
 	{
 		char s[S];
 		int x;
 	} ptr[poolsize];
-	MemoryPool *next;
-	const static int psize = poolsize;
-private:
-	int current;
-	int count;
 };
 
 class VMemoryPool : public MemoryPool<8>
@@ -77,7 +77,7 @@ public:
 			if (ptr[i].x)
 			{
 				Variable *v = (Variable*)(ptr+i);
-				v->deleteunmark_destructor();	// デストラクタ持ちを優先的に処理する
+				v->destructor_unmark();	// デストラクタだけ先に実行する
 			}
 		}
 		for (int i = 0; i < psize; ++i)
@@ -85,7 +85,7 @@ public:
 			if (ptr[i].x)
 			{
 				Variable *v = (Variable*)(ptr+i);
-				v->deleteunmark();
+				v->delete_unmark();
 			}
 		}
 
