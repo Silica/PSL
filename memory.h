@@ -175,7 +175,6 @@ class StaticObject
 		~sobj()
 		{
 			vpool.GarbageCollection();
-			delete optimizer_p();
 			delete rsvnull_p();
 		}
 	};
@@ -190,14 +189,8 @@ class StaticObject
 		static rsv *null = new rsv;
 		return null;
 	}
-	static Environment *optimizer_p()
-	{
-		static Environment *optimizer = new Environment;
-		return optimizer;
-	}
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
-	static Environment &optimizer()	{return *optimizer_p();}
 	static MemoryPool<8> &pool(OverLoad<8> x)	{return so().pool8;};
 	static MemoryPool<44> &pool(OverLoad<44> x)	{return so().pool44;};
 	static VMemoryPool &vpool()		{return so().vpool;}
