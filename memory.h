@@ -54,8 +54,8 @@ public:
 	}
 private:
 	int current;
-	int count;
 protected:
+	int count;
 	const static int psize = poolsize;
 	MemoryPool *next;
 	union DATA
@@ -94,14 +94,17 @@ public:
 private:
 	void searchcount(Variable *v, int &c)
 	{
-		for (int i = 0; i < psize; ++i)
+		if (count)
 		{
-			if (ptr[i].x)
+			for (int i = 0; i < psize; ++i)
 			{
-				Variable *x = (Variable*)(ptr+i);
-				if (v == x)
-					continue;
-				x->searchcount(v, c);
+				if (ptr[i].x)
+				{
+					Variable *x = (Variable*)(ptr+i);
+					if (v == x)
+						continue;
+					x->searchcount(v, c);
+				}
 			}
 		}
 		if (next)
@@ -109,17 +112,20 @@ private:
 	}
 	void Mark(VMemoryPool *m)
 	{
-		for (int i = 0; i < psize; ++i)
+		if (count)
 		{
-			if (ptr[i].x)
+			for (int i = 0; i < psize; ++i)
 			{
-				Variable *v = (Variable*)(ptr+i);
-				int count = 0;
-				if (v->searchcount(v, count))
-					continue;
-				m->searchcount(v, count);
-				v->markstart(count);
-				m->Mark2();
+				if (ptr[i].x)
+				{
+					Variable *v = (Variable*)(ptr+i);
+					int count = 0;
+					if (v->searchcount(v, count))
+						continue;
+					m->searchcount(v, count);
+					v->markstart(count);
+					m->Mark2();
+				}
 			}
 		}
 		if (next)
@@ -127,12 +133,15 @@ private:
 	}
 	void Mark2()
 	{
-		for (int i = 0; i < psize; ++i)
+		if (count)
 		{
-			if (ptr[i].x)
+			for (int i = 0; i < psize; ++i)
 			{
-				Variable *v = (Variable*)(ptr+i);
-				v->unmark(0x7FFFFFFF);
+				if (ptr[i].x)
+				{
+					Variable *v = (Variable*)(ptr+i);
+					v->unmark(0x7FFFFFFF);
+				}
 			}
 		}
 		if (next)
@@ -140,12 +149,15 @@ private:
 	}
 	void UnMark()
 	{
-		for (int i = 0; i < psize; ++i)
+		if (count)
 		{
-			if (ptr[i].x)
+			for (int i = 0; i < psize; ++i)
 			{
-				Variable *v = (Variable*)(ptr+i);
-				v->unmark(0x3FFFFFFF);
+				if (ptr[i].x)
+				{
+					Variable *v = (Variable*)(ptr+i);
+					v->unmark(0x3FFFFFFF);
+				}
 			}
 		}
 		if (next)
