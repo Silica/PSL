@@ -428,14 +428,17 @@ private:
 			{
 				if (code[s-1]->get() == OpCode::MNEMONIC::CONSTANT)
 				{
-					code[s-1]->Execute(optimizer);
-					variable v = optimizer.pop();
-					optimizer.push(v);
-					c->Execute(optimizer);
-					variable a = optimizer.pop();
-					v = a;
-					delete c;
-					return false;
+					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
+					{
+						code[s-1]->Execute(optimizer);
+						variable v = optimizer.pop();
+						optimizer.push(v);
+						c->Execute(optimizer);
+						variable a = optimizer.pop();
+						v = a;
+						delete c;
+						return false;
+					}
 				}
 			}
 		}
@@ -446,19 +449,22 @@ private:
 			{
 				if ((code[s-1]->get() == OpCode::MNEMONIC::CONSTANT) && (code[s-2]->get() == OpCode::MNEMONIC::CONSTANT))
 				{
-					code[s-2]->Execute(optimizer);
-					code[s-1]->Execute(optimizer);
-					variable r = optimizer.pop();
-					variable l = optimizer.pop();
-					optimizer.push(l);
-					optimizer.push(r);
-					c->Execute(optimizer);
-					variable a = optimizer.pop();
-					l = a;
-					delete c;
-					delete code[s-1];
-					code.resize(s-1);
-					return false;
+					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
+					{
+						code[s-2]->Execute(optimizer);
+						code[s-1]->Execute(optimizer);
+						variable r = optimizer.pop();
+						variable l = optimizer.pop();
+						optimizer.push(l);
+						optimizer.push(r);
+						c->Execute(optimizer);
+						variable a = optimizer.pop();
+						l = a;
+						delete c;
+						delete code[s-1];
+						code.resize(s-1);
+						return false;
+					}
 				}
 			}
 		}
