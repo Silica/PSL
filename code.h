@@ -104,8 +104,8 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable r = env.pop();
-		variable l = env.pop();
-		env.push(l.substitution(r));
+		variable l = env.top();
+		l.substitution(r);
 		return RC::NONE;
 	}
 	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
@@ -118,8 +118,8 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable r = env.pop();
-		variable l = env.pop();
-		env.push(l.assignment(r));
+		variable l = env.top();
+		l.assignment(r);
 		return RC::NONE;
 	}
 	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
@@ -213,8 +213,8 @@ class PINC : public OpCode	// 前置
 public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
-		variable v = env.pop();
-		env.push(v += 1);
+		variable v = env.top();
+		v += 1;
 		return RC::NONE;
 	}
 	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
@@ -241,8 +241,8 @@ class PDEC : public OpCode	// 前置
 public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
-		variable v = env.pop();
-		env.push(v -= 1);
+		variable v = env.top();
+		v -= 1;
 		return RC::NONE;
 	}
 	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
@@ -275,7 +275,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("REF\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::REF);}
 };
-#define OOC(n,o) class n:public OpCode{public:RC::RETURNCODE Execute(Environment&env){variable r=env.pop();variable l=env.pop();env.push(l o r);return RC::NONE;}MNEMONIC::mnemonic get(){return MNEMONIC::BINARY;}PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
+#define OOC(n,o) class n:public OpCode{public:RC::RETURNCODE Execute(Environment&env){variable r=env.pop();variable l=env.top();l o r;return RC::NONE;}MNEMONIC::mnemonic get(){return MNEMONIC::BINARY;}PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
 OOC(SADD,+=);
 OOC(SSUB,-=);
 OOC(SMUL,*=);

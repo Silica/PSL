@@ -234,6 +234,15 @@ public:
 #endif
 		return v;
 	}
+	rsv top()
+	{
+		if (stack.empty())
+		{
+			warning(2);
+			stack.push_back(rsv());
+		}
+		return stack[stack.size()-1];
+	}
 	bool Runable()	{return scope;}
 protected:
 	rsv global;
@@ -263,15 +272,12 @@ public:
 	{
 		while (line < code.size())
 		{
-			switch (code[line++]->Execute(env))
-			{
-			case OpCode::RC::YIELD:
+			OpCode::RC::RETURNCODE r = code[line++]->Execute(env);
+			if (!r)
+				continue;
+			if (r == OpCode::RC::YIELD)
 				return false;
-			case OpCode::RC::NONE:
-				break;
-			default:
-				return true;
-			}
+			return true;
 		}
 		env.endScope();
 		return true;
@@ -310,7 +316,6 @@ public:
 		line = label[s].get()->toInt();
 		return true;
 	}
-//	void pushlabel(const string &s)			{label[s] = code.size();}
 	void pushlabel(const string &s)			{variable v = (int)code.size();label[s] = v;}
 	void pushlabel(const string &s, int l)	{variable v = l;label[s] = v;}
 	void push(OpCode *c)
@@ -331,8 +336,6 @@ public:
 	PSL_DUMP((){
 		for (size_t i = 0; i < code.size(); ++i)
 			code[i]->dump();
-//		for (std::map<string,int>::iterator it = label.begin(); it != label.end(); ++it)
-//			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second));
 		for (table::iterator it = label.begin(); it != label.end(); ++it)
 			PSL_PRINTF(("%s:%d\n", it->first.c_str(), it->second.get()->toInt()));
 	})
@@ -356,7 +359,6 @@ public:
 	};
 private:
 	PSL_VECTOR<OpCode*> code;
-//	std::map<string,int> label;	// ‚±‚ê‚â‚é‚Æ—e—Ê‚Æ‚Ä‚à‘‚¦‚é‚ñ‚¾
 	table label;
 	int rc;
 	bool optimize(OpCode *c)
@@ -489,7 +491,7 @@ public:
 	virtual Variable *getVariable(const string &name)
 	{
 		if (local.get()->exist(name))	return local.get()->child(name);
-		else						return owner->getVariable(name);
+		else							return owner->getVariable(name);
 	}
 	void set(Scope *s)
 	{
@@ -498,11 +500,11 @@ public:
 	}
 	void Jump(int l)					{line = l;}
 	void RJump(int l)					{line += l;}
-	virtual bool Run(Environment &env)	{return code->Run(env, line);}
+	bool Run(Environment &env)	{return code->Run(env, line);}
 	#ifdef PSL_DEBUG
-	virtual void StepExec(Environment &env)	{return code->StepExec(env, line);}
+	void StepExec(Environment &env)	{return code->StepExec(env, line);}
 	#endif
-	virtual OpCode::MNEMONIC::mnemonic getNext()	{return code->get(line);}
+	OpCode::MNEMONIC::mnemonic getNext()	{return code->get(line);}
 	virtual Scope *Return() = 0;
 	virtual Scope *Break() = 0;
 	virtual Scope *Continue() = 0;
