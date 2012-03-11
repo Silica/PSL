@@ -62,8 +62,12 @@
 #endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	#define PSL_MEMORY_MANAGER(x) static void *operator new(size_t t){return MemoryManager<sizeof(x)>::Next();}static void operator delete(void *ptr){MemoryManager<sizeof(x)>::Release(ptr);}
+	#define PSL_TEMPORARY_ENV(x) Variable::Environment &x = Variable::StaticObject::envtemp()
+	#define PSL_TEMPORARY_ENV0(x) Variable::Environment &x = Variable::StaticObject::envtemp()
 #else
 	#define PSL_MEMORY_MANAGER(x)
+	#define PSL_TEMPORARY_ENV(x) Variable::Environment x
+	#define PSL_TEMPORARY_ENV0(x) Variable::Environment x(0)
 #endif
 
 
@@ -449,8 +453,8 @@ public:
 	rsv ref()		{return x;}
 	rsv pointer()	{return variable(POINTER, x);}
 
-	rsv operator()()											{Variable::Environment env;variable v;return x->call(env, v);}
-	rsv operator()(variable &arg)								{Variable::Environment env;return x->call(env, arg);}
+	rsv operator()()											{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
+	rsv operator()(variable &arg)								{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
 	rsv instance()												{return rsv(x->instance(), 0);}
 	#define cva(n) const variable &arg##n
