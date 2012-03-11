@@ -419,7 +419,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		if (!(bool)v)
+		if (!v)
 			env.Jump(j);
 		return RC::NONE;
 	}
@@ -469,7 +469,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		if (!(bool)v)
+		if (!v)
 			env.RJump(j);
 		return RC::NONE;
 	}
