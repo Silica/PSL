@@ -204,11 +204,7 @@ public:
 	void Yield()		{scope = scope->Yield();}
 	void Goto(const string &label)	{Scope *s = scope->Goto(label);if (s)scope = s;}
 	OpCode::MNEMONIC::mnemonic getNext()		{return scope->getNext();}
-#ifdef PSL_USE_STL_STACK
 	void push(const rsv &v)	{stack.push(v);}
-#else
-	void push(const rsv &v)	{stack.push_back(v);}
-#endif
 	rsv pop()
 	{
 		if (stack.empty())
@@ -216,41 +212,27 @@ public:
 			warning(2);
 			return rsv();
 		}
-#ifdef PSL_USE_STL_STACK
+	#ifdef PSL_USE_STL_STACK
 		rsv v = stack.top();
 		stack.pop();
-#else
-		int size = stack.size();
-		rsv v = stack[size-1];
-		#ifdef PSL_POPSTACK_NULL
-			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-		stack[size-1] = StaticObject::rsvnull();
-			#else
-		const static rsv null;
-		stack[size-1] = null;
-			#endif
-		#endif
-		stack.resize(size-1);
-#endif
 		return v;
+	#else
+		return stack.pop();
+	#endif
 	}
 	rsv top()
 	{
 		if (stack.empty())
 		{
 			warning(2);
-			stack.push_back(rsv());
+			stack.push(rsv());
 		}
-		return stack[stack.size()-1];
+		return stack.top();
 	}
 	bool Runable()	{return scope;}
 protected:
 	rsv global;
-#ifdef PSL_USE_STL_STACK
-	std::stack<rsv> stack;
-#else
-	rlist stack;
-#endif
+	rstack stack;
 	Scope *scope;
 };
 

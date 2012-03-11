@@ -103,7 +103,7 @@ public:
 	}
 	size_t size() const	{return len;}
 	bool empty() const	{return !len;}
-private:
+protected:
 	T *x;
 	size_t reserve;
 	size_t len;
@@ -262,4 +262,30 @@ private:
 typedef std::vector<rsv> rlist;
 #else
 typedef vector<rsv> rlist;
+#endif
+
+#ifdef PSL_USE_STL_STACK
+typedef std::stack<rsv> rstack;
+#else
+class rstack : public rlist
+{
+public:
+	void push(const rsv &v)	{push_back(v);}
+	rsv &top()	{return x[len-1];}
+	rsv pop()
+	{
+	#ifdef PSL_POPSTACK_NULL
+		rsv v = x[--len];
+		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+		x[len] = Variable::StaticObject::rsvnull();
+		#else
+		const static rsv null;
+		x[len] = null;
+		#endif
+		return v;
+	#else
+		return x[--len];
+	#endif
+	}
+};
 #endif
