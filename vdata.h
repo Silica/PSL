@@ -413,6 +413,7 @@ public:
 	CMP(lt)
 	CMP(gt)
 	#undef CMP
+	void neg()	{}
 	Variable *deref()	{if (x.size() == 1)return x[0].get()->deref();return NULL;}
 
 	bool toBool()		const {if (x.size() == 1)return x[0].get()->toBool();return x.size();}
@@ -421,20 +422,29 @@ public:
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
 	void *toPointer()	const {if (x.size() == 1)return x[0].get()->toPointer();return NULL;}
 
-	size_t length()		const {if (x.size() == 1)return x[0].get()->length();return x.size();}
+	size_t length()				const {if (x.size() == 1)return x[0].get()->length();return x.size();}
+	bool exist(const string &s)	const {if (x.size() == 1)return x[0].get()->exist(s);return false;}
 	Variable *index(size_t t)	{
 		if (x.size() == 1)return x[0].get()->index(t);
 		if (t>=x.size())x.resize(t+1);return x[t].get();
 	}
-	Variable *child(const string &s)	{if (x.size() == 1)return x[0].get()->child(s);return NULL;}
-	void push(Variable *v)	{x.push_back(v);}
+	Variable *child(const string &s)				{if (x.size() == 1)return x[0].get()->child(s);return NULL;}
+	void push(Variable *v)							{x.push_back(v);}
+	Variable *keys()								{if (x.size() == 1)return x[0].get()->keys();return new Variable();}
+	bool set(const string &s, const variable &v)	{if (x.size() == 1)return x[0].get()->set(s, v);return false;}
+	void del(const string &s)						{if (x.size() == 1)return x[0].get()->del(s);}
 
-	void prepare(Environment &env, Variable *v)	{if (x.size() == 1)x[0].get()->prepare(env);}
-	rsv call(Environment &env, variable &arg, Variable *v)	{
-		if (x.size() == 1)
-			x[0].get()->call(env, arg);
-		return variable(NIL);
-	}
+	void prepare(Environment &env, Variable *v)				{if (x.size() == 1)x[0].get()->prepare(env);}
+	void prepareInstance(Environment &env, Variable *v)		{if (x.size() == 1)x[0].get()->prepareInstance(env);}
+	Variable *instance(Variable *v)							{if (x.size() == 1)return x[0].get()->instance();return v->clone();}
+	rsv call(Environment &env, variable &arg, Variable *v)	{if (x.size() == 1)return x[0].get()->call(env, arg);return variable(NIL);}
+
+	// これもまず使わないと思うんだが、将来的にライブラリ関数が要求する可能性はあるので
+	size_t codelength()							{if (x.size() == 1)return x[0].get()->codelength();return 0;}
+	Code *getcode()								{if (x.size() == 1)return x[0].get()->getcode();return NULL;}
+	void pushcode(OpCode *c)					{if (x.size() == 1)x[0].get()->pushcode(c);}
+	void pushlabel(const string &s)				{if (x.size() == 1)x[0].get()->pushlabel(s);}
+	void write(const string &s, bytecode &b)	{if (x.size() == 1)x[0].get()->write(s, b);}
 
 	PSL_DUMP((){PSL_PRINTF(("vRArray:%d\n", x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();})
 private:
@@ -514,14 +524,7 @@ public:
 		for (size_t i = 0; i < size; ++i)
 			array[i].get()->substitution(v->index(i));
 
-		Variable *k = v->keys();
-		size = k->length();
-		for (size_t i = 0; i < size; ++i)
-		{
-			string s = k->index(i)->toString();
-			member[s].get()->substitution(v->child(s));
-		}
-		k->ref()->finalize();
+		kcopy(v);
 
 		if (Code *c = v->getcode())
 		{
@@ -535,9 +538,23 @@ public:
 //	vBase *assignment(Variable *v)	{delete this;return v->x->clone();}
 	//	個別にassignmentを繰り返す案もある(ARRAYと同じ様な)
 
-	// 演算子系は比較ぐらいはあってもいいが
-	// +=で連結とかどう？って=と同じかそれ、ARRAYだな
-	// あ、memberに対しては同じだがarrayに対しては違うな
+	void add(Variable *v)
+	{
+		size_t size = v->length();
+		size_t c = array.size();
+		array.resize(c + size);
+		for (size_t i = 0; i < size; ++i)
+			array[i+c].get()->substitution(v->index(i));
+
+		kcopy(v);
+
+		if (Code *c = v->getcode())
+		{
+			if (code)
+				code->finalize();
+			code = c->inc();
+		}
+	}
 
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return array.size();}
@@ -673,6 +690,17 @@ private:
 	table member;
 	Variable *_class;
 	Code *code;
+	void kcopy(Variable *v)
+	{
+		Variable *k = v->keys();
+		size_t size = k->length();
+		for (size_t i = 0; i < size; ++i)
+		{
+			string s = k->index(i)->toString();
+			member[s].get()->substitution(v->child(s));
+		}
+		k->ref()->finalize();
+	}
 };
 
 class vMethod : public vBase
