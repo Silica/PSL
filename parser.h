@@ -432,18 +432,14 @@ private:
 			t->getNext();
 			variable v;
 			if (t->getNextIf(/*'('*/')'))	// ‘¦•Â‚¶‚ÍŠmŽÀ‚É–³–¼ŠÖ”
-			{
 				v.pushcode(new Variable::PUSH_NULL);
-			}
 			else
-			{
 				ParseExpression(v, /*'('*/')');
-			}
 			if (t->getNextIf('{'/*'}'*/))
 			{
 				v.pushcode(new Variable::ARGUMENT);
 				ParseBlock(v, v);
-				if (v.codelength())
+				if (c.codelength())
 					c.pushcode(new Variable::PUSH_CODE(v.getcode()));
 			}
 			else	// Ž®“à‚ÌŠ‡ŒÊ
