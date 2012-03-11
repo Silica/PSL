@@ -730,6 +730,8 @@ public:
 	void searchcount(Variable *v, int &c){function->searchcount(v, c);}
 	void mark(){function->mark();}
 
+	vBase *substitution(Variable *v)	{return this;}
+
 	bool toBool()		const {return true;}
 	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
@@ -770,6 +772,8 @@ public:
 	Type type()	const	{return CFUNCTION;}
 	vBase *clone()	{return new vCFunction(f);}
 
+	vBase *substitution(Variable *v)	{return this;}
+
 	bool toBool()		const {return true;}
 	string toString()	const {return "[CFunction]";}
 	size_t length()		const {return 1;}
@@ -792,6 +796,8 @@ public:
 	vCMethod(method _f, Variable *x)	{f = _f;_this = x;}
 	Type type()	const	{return CMETHOD;}
 	vBase *clone()	{return new vCMethod(f, _this);}
+
+	vBase *substitution(Variable *v)	{return this;}
 
 	bool toBool()		const {return true;}
 	int toInt()			const {return _this ? 1 : 0;}
@@ -873,7 +879,11 @@ public:
 	vBase *substitution(Variable *v)
 	{
 		if (x)
+		{
 			x->finalize();
+			delete e;
+			e = NULL;
+		}
 		x = v->ref();
 		return this;
 	}
