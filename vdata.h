@@ -197,6 +197,8 @@ public:
 		return this;
 	}
 
+	bool eq(Variable *v)	{return x == v;}
+	bool ne(Variable *v)	{return x != v;}
 	Variable *deref()	{return x;}
 
 	bool toBool()		const {return x ? true : false;}
@@ -523,12 +525,12 @@ public:
 	{
 		if (array.empty() && member.empty())
 		{
-			vBase *x = v->x->clone();
 			delete this;
-			return x;
+			return v->x->clone();
 		}
 		size_t size = v->length();
-		array.resize(size);
+		if (size > array.size())
+			array.resize(size);
 		for (size_t i = 0; i < size; ++i)
 			array[i].get()->substitution(v->index(i));
 
@@ -543,8 +545,37 @@ public:
 
 		return this;
 	}
-//	vBase *assignment(Variable *v)	{delete this;return v->x->clone();}
-	//	ŒÂ•Ê‚Éassignment‚ðŒJ‚è•Ô‚·ˆÄ‚à‚ ‚é(ARRAY‚Æ“¯‚¶—l‚È)
+	vBase *assignment(Variable *v)
+	{
+		if ((array.empty() && member.empty()) || (v->type() != OBJECT || v->type() != RARRAY))
+		{
+			delete this;
+			return v->x->clone();
+		}
+		size_t size = v->length();
+		if (size > array.size())
+			array.resize(size);
+		for (size_t i = 0; i < size; ++i)
+			array[i].get()->assignment(v->index(i));
+
+		Variable *k = v->keys();
+		size = k->length();
+		for (size_t i = 0; i < size; ++i)
+		{
+			string s = k->index(i)->toString();
+			member[s].get()->assignment(v->child(s));
+		}
+		k->ref()->finalize();
+
+		if (Code *c = v->getcode())
+		{
+			if (code)
+				code->finalize();
+			code = c->inc();
+		}
+
+		return this;
+	}
 
 	void add(Variable *v)
 	{
@@ -563,6 +594,8 @@ public:
 			code = c->inc();
 		}
 	}
+	bool eq(Variable *v)	{return toBool() == v->toBool();}
+	bool ne(Variable *v)	{return toBool() != v->toBool();}
 
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return array.size();}
@@ -733,6 +766,7 @@ public:
 	vBase *substitution(Variable *v)	{return this;}
 
 	bool toBool()		const {return true;}
+	int toInt()			const {return 1;}
 	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{_this = v;}
@@ -775,6 +809,7 @@ public:
 	vBase *substitution(Variable *v)	{return this;}
 
 	bool toBool()		const {return true;}
+	int toInt()			const {return 1;}
 	string toString()	const {return "[CFunction]";}
 	size_t length()		const {return 1;}
 
@@ -854,7 +889,17 @@ public:
 
 	vBase *substitution(Variable *v)	{x = v->toPointer();return this;}
 
+	#define CMP(n,o) bool n(Variable *v)	{return x o v->toPointer();}
+	CMP(eq,==)
+	CMP(ne,!=)
+	CMP(le,<=)
+	CMP(ge,>=)
+	CMP(lt,<)
+	CMP(gt,>)
+	#undef CMP
+
 	bool toBool()		const {return x ? true : false;}
+	int toInt()			const {return x ? 1 : 0;}
 	string toString()	const {return x ? "[cpointer]" : "NULL";}
 	void *toPointer()	const {return x;}
 
@@ -896,6 +941,7 @@ public:
 			return x->getcode();
 		return e->Runable();
 	}
+	int toInt()			const {return x ? 1 : 0;}
 	string toString()	const {return "[Thread]";}
 
 	size_t length()		const {return x ? 1 : 0;}
