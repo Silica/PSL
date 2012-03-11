@@ -98,8 +98,6 @@ public:
 	T &operator[](size_t t)
 	{
 //			if (t >= len)
-//				len = t+1;
-		// ‚Ç‚¤‚¹‚â‚é‚È‚ç
 //				resize(t+1);
 		return x[t];
 	}
