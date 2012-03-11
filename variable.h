@@ -188,6 +188,7 @@ public:
 	variable operator[](const string &s)	{return x->child(s);}
 	variable operator[](const variable &v)	{
 		if (v.type(STRING) || v.type(FLOAT))	return x->child(v);
+		else if ((int)v < 0)					return x;
 		else									return x->index(v);
 	}
 	size_t length() const				{return x->length();}
