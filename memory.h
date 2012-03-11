@@ -157,23 +157,14 @@ class StaticObject
 {
 	struct sobj
 	{
-		MemoryPool<8> *pool8;
-		MemoryPool<44> *pool44;
-		VMemoryPool *vpool;
-		sobj()
-		{
-			pool8 = new MemoryPool<8>;
-			pool44 = new MemoryPool<44>;
-			vpool = new VMemoryPool;
-		}
+		MemoryPool<8> pool8;
+		MemoryPool<44> pool44;
+		VMemoryPool vpool;
 		~sobj()
 		{
-			vpool->GarbageCollection();
+			vpool.GarbageCollection();
 			delete optimizer_p();
 			delete rsvnull_p();
-			delete vpool;
-			delete pool44;
-			delete pool8;
 		}
 	};
 	friend class sobj;
@@ -195,9 +186,9 @@ class StaticObject
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	static Environment &optimizer()	{return *optimizer_p();}
-	static MemoryPool<8> &pool(OverLoad<8> x)	{return *so().pool8;};
-	static MemoryPool<44> &pool(OverLoad<44> x)	{return *so().pool44;};
-	static VMemoryPool &vpool()		{return *so().vpool;}
+	static MemoryPool<8> &pool(OverLoad<8> x)	{return so().pool8;};
+	static MemoryPool<44> &pool(OverLoad<44> x)	{return so().pool44;};
+	static VMemoryPool &vpool()		{return so().vpool;}
 };
 
 
