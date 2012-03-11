@@ -289,10 +289,8 @@ private:
 		static variable Read(variable &_this, variable &v)
 		{
 			std::FILE *fp = (std::FILE*)(void*)_this["$$__FILE*fp__$$"];
-			if (!fp)
-				return "";
 			int size = v;
-			if (!size)
+			if (!fp || !size)
 				return "";
 			char *buf = new char[size+1];
 			size = std::fread(buf, 1, size, fp);
@@ -361,11 +359,9 @@ private:
 		{
 			using namespace std;
 			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
-			variable r;
-			if (!fp)
-				return r;
 			int size = v;
-			if (!size)
+			variable r;
+			if (!fp || !size)
 				return r;
 			for (int i = 0; i < size; i++)
 			{
@@ -385,11 +381,9 @@ private:
 		{
 			using namespace std;
 			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
-			variable r;
-			if (!fp)
-				return r;
 			int size = v;
-			if (!size)
+			variable r;
+			if (!fp || !size)
 				return r;
 			for (int i = 0; i < size; i++)
 			{

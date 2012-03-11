@@ -93,6 +93,15 @@ public:
 			return next = doNext();
 		return 0;
 	}
+	bool getNextIf(int t)
+	{
+		if (checkNext() == t)
+		{
+			next = UNSET;
+			return true;
+		}
+		return false;
+	}
 private:
 	void Init(const string &fn, int l, table *dl)
 	{

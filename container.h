@@ -63,7 +63,6 @@ public:
 #endif
 private:
 	mutable Variable *x;
-//	friend variable::variable(const rsv &v);
 };
 
 #ifdef PSL_USE_STL_VECTOR
