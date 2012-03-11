@@ -36,6 +36,7 @@
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用俺俺メモリマネージャ
 /*	速度は未知数
 	安全性は怪しい
+	PSLライブラリ関数GarbageCollectionを利用可能になる
 	循環参照を起こしたVariableの持つvBase派生をアプリケーション終了時には開放出来る
 	→PSLクラスのデストラクタを確実に呼べる、様な気がする	*/
 
@@ -59,7 +60,11 @@
 #ifdef _DEBUG
 	#include <new>
 #endif
-
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	#define PSL_MEMORY_MANAGER(x) static void *operator new(size_t t){return MemoryManager<sizeof(x)>::Next();}static void operator delete(void *ptr){MemoryManager<sizeof(x)>::Release(ptr);}
+#else
+	#define PSL_MEMORY_MANAGER(x)
+#endif
 
 
 class variable
