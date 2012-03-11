@@ -460,7 +460,7 @@ public:
 			const static string destructor = "destructor";
 			if (member.count(destructor))
 			{
-				Environment env;
+				PSL_TEMPORARY_ENV(env);
 				variable arg;
 				member[destructor].get()->call(env, arg);
 			}

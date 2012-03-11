@@ -426,7 +426,7 @@ private:
 				{
 					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 					{
-						Environment optimizer(0);
+						PSL_TEMPORARY_ENV0(optimizer);
 						code[s-1]->Execute(optimizer);
 						variable v = optimizer.pop();
 						optimizer.push(v);
@@ -448,7 +448,7 @@ private:
 				{
 					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
 					{
-						Environment optimizer(0);
+						PSL_TEMPORARY_ENV0(optimizer);
 						code[s-2]->Execute(optimizer);
 						code[s-1]->Execute(optimizer);
 						variable r = optimizer.pop();
