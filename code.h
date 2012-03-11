@@ -638,15 +638,9 @@ class IF : public SCOPE
 {
 public:
 	IF(Code *c):SCOPE(c){}
-	RC::RETURNCODE Execute(Environment &env)
-	{
-		Scope *s = new AnonymousScope(statement);
-		env.addScope(s);
-		return RC::IF;
-	}
 	PSL_DUMP((int d){PSL_PRINTF(("IF\n"));if (!d){statement->dump();PSL_PRINTF(("IF END\n"));}})
 	void write(bytecode &b){b.push(MNEMONIC::IF);statement->write(b);}
-};	// これSCOPEと同じじゃん、dumpした時にif文であることが明確になるぐらい、デバッグ用にはあってもいいかも
+};
 #endif
 
 class LOCAL : public OpCode
@@ -724,6 +718,7 @@ public:
 	void write(bytecode &b){b.push(MNEMONIC::INSTANCE);}
 };
 /*
+labelをコード中に埋め込むという案もあった
 class LABEL : public OpCode
 {
 public:

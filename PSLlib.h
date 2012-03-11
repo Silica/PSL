@@ -28,8 +28,9 @@ public:
 		#endif
 		v["foreach"] = Foreach;
 		v["eval"] = Eval;
+		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		v["GarbageCollection"] = GarbageCollection;
-
+		#endif
 		Strlib::set(v["strlib"]);
 		Array::set(v["array"]);
 		Table::set(v["table"]);
@@ -81,11 +82,13 @@ private:
 		p.Parse(g);
 		return g;
 	}
+	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	static variable GarbageCollection(variable &v)
 	{
 		Variable::StaticObject::vpool().GarbageCollection();
 		return variable();
 	}
+	#endif
 	class Strlib
 	{
 	public:
