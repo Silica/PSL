@@ -65,13 +65,6 @@
 class variable
 {
 	typedef unsigned int size_t;
-	class rsv;
-	class Variable;
-public:
-	variable(const rsv &v)	{x = v.get()->ref();}
-private:
-	#include "container.h"
-	friend class rsv;
 public:
 	typedef variable(*function)(variable&);
 	typedef variable(*method)(variable&,variable&);
@@ -94,6 +87,11 @@ public:
 		THREAD,
 	};
 
+private:
+	class Variable;
+	#include "container.h"
+	friend class rsv;
+public:
 
 	variable()					{x = new Variable();}
 	variable(bool b)			{x = new Variable((int)b);}
@@ -108,6 +106,7 @@ public:
 	variable(void *p)			{x = new Variable(p);}
 	variable(const variable &v)	{x = v.x->clone();}
 	variable(Type t)			{x = new Variable(t);}
+	variable(const rsv &v)		{x = v.get()->ref();}
 	~variable()					{x->finalize();}
 
 	Type type()			const	{return x->type();}
