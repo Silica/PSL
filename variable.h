@@ -59,15 +59,11 @@
 #else
 	#define PSL_DUMP(x)
 #endif
-#ifdef _DEBUG
-	#include <new>
-#endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	#define PSL_MEMORY_MANAGER(x) static void *operator new(size_t t){return MemoryManager<sizeof(x)>::Next();}static void operator delete(void *ptr){MemoryManager<sizeof(x)>::Release(ptr);}
 #else
 	#define PSL_MEMORY_MANAGER(x)
 #endif
-
 #if defined(PSL_USE_VARIABLE_MEMORY_MANAGER) && !defined(PSL_SHARED_GLOBAL)
 	#define PSL_TEMPORARY_ENV(x) Variable::Environment &x = Variable::StaticObject::envtemp()
 	#define PSL_TEMPORARY_ENV0(x) Variable::Environment &x = Variable::StaticObject::envtemp()
@@ -461,11 +457,13 @@ public:
 
 	rsv operator()()											{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
 	rsv operator()(variable &arg)								{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	#ifndef PSL_SHARED_GLOBAL
 	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
+	#endif
 	rsv instance()												{return rsv(x->instance(), 0);}
 	#define cva(n) const variable &arg##n
 	#define ap(n) arg.push(arg##n);
-	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y Variable::Environment env;return x->call(env, arg);}
+	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	CALL((cva(1),cva(2)),								ap(1)ap(2))
 	CALL((cva(1),cva(2),cva(3)),						ap(1)ap(2)ap(3))
 	CALL((cva(1),cva(2),cva(3),cva(4)),					ap(1)ap(2)ap(3)ap(4))

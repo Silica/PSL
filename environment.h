@@ -172,7 +172,7 @@ class Environment
 		}
 	}
 public:
-	#ifdef PSL_SHARED_GLOBAL
+	#if defined(PSL_SHARED_GLOBAL) && defined(PSL_USE_VARIABLE_MEMORY_MANAGER)
 	Environment(int i = 0):global(StaticObject::global())	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
 	#else
 	Environment(int i)	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
