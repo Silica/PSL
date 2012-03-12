@@ -342,7 +342,11 @@ class StaticObject
 		~sobj()
 		{
 			vpool.GarbageCollection();
+			#ifdef PSL_SHARED_GLOBAL
+			delete global_p();
+			#else
 			delete envtemp_p();
+			#endif
 			delete rsvnull_p();
 		}
 	};
@@ -357,14 +361,24 @@ class StaticObject
 		static rsv *null = new rsv;
 		return null;
 	}
+	#ifdef PSL_SHARED_GLOBAL
+	static rsv *global_p()
+	{
+		static rsv *global = new rsv;
+		return global;
+	}
+public:
+	static rsv &global()			{return *global_p();}
+	#else
 	static Environment *envtemp_p()
 	{
 		static Environment *envtemp = new Environment;
 		return envtemp;
 	}
+	static Environment &envtemp()	{return *envtemp_p();}
+	#endif
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
-	static Environment &envtemp()	{return *envtemp_p();}
 	static MemoryPool<8> &pool(OverLoad<8> x)	{return so().pool8;};
 	static MemoryPool<44> &pool(OverLoad<44> x)	{return so().pool44;};
 	static VMemoryPool &vpool()		{return so().vpool;}

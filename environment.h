@@ -172,8 +172,12 @@ class Environment
 		}
 	}
 public:
+	#ifdef PSL_SHARED_GLOBAL
+	Environment(int i = 0):global(StaticObject::global())	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
+	#else
 	Environment(int i)	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
-	Environment()	{scope = NULL;PSLlib::Basic(global);}
+	Environment()		{scope = NULL;PSLlib::Basic(global);}
+	#endif
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
 	~Environment()	{delete scope;if (int ss=stack.size())warning(0, ss);}
 	rsv getVariable(const string &name)
