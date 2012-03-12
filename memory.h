@@ -1,6 +1,6 @@
 template<size_t S> class OverLoad{};
-#ifdef PSL_MEMORY_MANAGER_SLIM
 template<size_t S, int poolsize = 256> class MemoryPool
+#ifdef PSL_MEMORY_MANAGER_SLIM
 {
 public:
 	MemoryPool()	{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*S);}
@@ -65,7 +65,6 @@ protected:
 		int x;
 	} ptr[poolsize];
 };
-
 class VMemoryPool : public MemoryPool<8>
 {
 public:
@@ -166,7 +165,7 @@ private:
 	}
 };
 #else
-template<size_t S, int poolsize = 256> class MemoryPool
+#ifndef PSL_MEMORY_MANAGER_LARGE
 {
 public:
 	MemoryPool()	{next = NULL;current = 0;
@@ -286,6 +285,92 @@ private:
 			((VMemoryPool*)next)->UnMark();
 	}
 };
+#else
+{
+public:
+	MemoryPool()	{used = NULL;current = p.ptr;}
+	void *nextptr()
+	{
+		if (current == NULL)
+			current = p.add();
+		DATA *c = current;
+		current = c->next;
+		c->next = used;
+		if (used != NULL)	used->prev = c;
+		used = c;
+		c->prev = NULL;
+		return c;
+	}
+	void release(void *x)
+	{
+		DATA *p = static_cast<DATA*>(x);
+		if (p->prev == NULL)	used = p->next;
+		else					p->prev->next = p->next;
+		if (p->next != NULL)	p->next->prev = p->prev;
+		p->next = current;
+		current = p;
+	}
+protected:
+	struct DATA
+	{
+		char s[S];
+		DATA *prev;
+		DATA *next;
+	};
+	DATA *current;
+	const static int psize = poolsize;
+	DATA *used;
+	struct pool
+	{
+		DATA ptr[poolsize];
+		pool *next;
+		pool()	{next = NULL;
+			for (int i = 0; i < poolsize; i++)
+				ptr[i].next = ptr+i+1;
+			ptr[poolsize-1].next = NULL;
+		}
+		~pool()	{delete next;}
+		DATA *add()
+		{
+			pool *n = new pool;
+			if (next)
+				n->next = next;
+			next = n;
+			return next->ptr;
+		}
+	} p;
+};
+class VMemoryPool : public MemoryPool<8>
+{
+public:
+	void GarbageCollection()
+	{
+		for (DATA *d = used; d != NULL; d = d->next)
+		{
+			Variable *v = (Variable*)d;
+			int count = 0;
+			if (v->searchcount(v, count))
+				continue;
+			for (DATA *d = used; d != NULL; d = d->next)
+			{
+				Variable *x = (Variable*)d;
+				if (v == x)
+					continue;
+				x->searchcount(v, count);
+			}
+			v->markstart(count);
+			for (DATA *d = used; d != NULL; d = d->next)
+				((Variable*)d)->unmark(0x7FFFFFFF);
+		}
+		for (DATA *d = used; d != NULL; d = d->next)
+			((Variable*)d)->destructor_unmark();	// デストラクタだけ先に実行する
+		for (DATA *d = used; d != NULL; d = d->next)
+			((Variable*)d)->delete_unmark();
+		for (DATA *d = used; d != NULL; d = d->next)
+			((Variable*)d)->unmark(0x3FFFFFFF);
+	}
+};
+#endif
 #endif
 
 class StaticObject

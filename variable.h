@@ -33,13 +33,14 @@
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 #define PSL_POPSTACK_NULL	// Envスタックがvectorの時、POPしたスタックを即空にする(変数の生存期間に影響)
 
-#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用俺俺メモリマネージャ
+#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ
 /*	速度は未知数
-	安全性は怪しい
 	PSLライブラリ関数GarbageCollectionを利用可能になる
 	循環参照を起こしたVariableの持つvBase派生をアプリケーション終了時には開放出来る
 	→PSLクラスのデストラクタを確実に呼べる、様な気がする	*/
 //#define PSL_MEMORY_MANAGER_SLIM				// 事前プール分以外に無駄な容量を消費しないバージョンを使用する(限定状況では速度が劣る可能性がある
+//#define PSL_MEMORY_MANAGER_LARGE				// 余計な容量は増えるが大量確保時でも速度が落ちない
+// どちらもOFFなら少し容量は増えるが大量確保しない限りは速度が変わらないバージョン
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
 
