@@ -6,7 +6,9 @@
 class PSL : private variable::environment
 {
 public:
+	#ifndef PSL_DEBUG
 	PSL() : variable::Variable::Environment(1){}
+	#endif
 	enum error
 	{
 		NONE = 0,
@@ -89,7 +91,7 @@ public:
 		return pop();
 	}
 	#ifdef PSL_DEBUG
-	PSL()	{init = false;}
+	PSL() : variable::Variable::Environment(1){init = false;}
 	variable::rsv StepExec()
 	{
 		if (!Runable())

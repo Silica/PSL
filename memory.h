@@ -62,10 +62,8 @@ public:
 		Mark(this);
 
 		for (int i = 0; i < psize; ++i)
-		{
 			if (ptr[i].x)
 				((Variable*)(ptr+i))->destructor_unmark();	// デストラクタだけ先に実行する
-		}
 		for (int i = 0; i < psize; ++i)
 			if (ptr[i].x)
 				((Variable*)(ptr+i))->delete_unmark();
@@ -123,8 +121,7 @@ private:
 			((VMemoryPool*)next)->UnMark();
 	}
 };
-#else
-#ifndef PSL_MEMORY_MANAGER_LARGE
+#elif !defined(PSL_MEMORY_MANAGER_LARGE)
 {
 public:
 	MemoryPool()	{next = NULL;current = 0;
@@ -147,7 +144,6 @@ public:
 		}
 		int c = current;
 		current = ptr[c].next;
-//		if (current != -1)	ptr[current].prev = -1;
 		ptr[c].next = used;
 		if (used != -1)		ptr[used].prev = c;
 		used = c;
@@ -169,9 +165,7 @@ public:
 		if (ptr[c].prev == -1)	used = ptr[c].next;
 		else					ptr[ptr[c].prev].next = ptr[c].next;
 		if (ptr[c].next != -1)	ptr[ptr[c].next].prev = ptr[c].prev;
-//		if (current != -1)		ptr[current].prev = c;
 		ptr[c].next = current;
-//		ptr[c].prev = -1;
 		current = c;
 	}
 private:
@@ -330,7 +324,6 @@ public:
 	}
 };
 #endif
-#endif
 
 class StaticObject
 {
@@ -375,6 +368,7 @@ public:
 		static Environment *envtemp = new Environment;
 		return envtemp;
 	}
+public:
 	static Environment &envtemp()	{return *envtemp_p();}
 	#endif
 public:
