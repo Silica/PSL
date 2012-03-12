@@ -1,4 +1,5 @@
 template<size_t S> class OverLoad{};
+#ifdef PSL_MEMORY_MANAGER_SLIM
 template<size_t S, int poolsize = 256> class MemoryPool
 {
 public:
@@ -164,6 +165,128 @@ private:
 			((VMemoryPool*)next)->UnMark();
 	}
 };
+#else
+template<size_t S, int poolsize = 256> class MemoryPool
+{
+public:
+	MemoryPool()	{next = NULL;current = 0;
+		for (int i = 0; i < poolsize; i++)
+		{
+			ptr[i].prev = i-1;
+			ptr[i].next = i+1;
+		}
+		ptr[poolsize-1].next = -1;
+		used = -1;
+	}
+	~MemoryPool()	{delete next;}
+	void *nextptr()
+	{
+		if (current == -1)
+		{
+			if (!next)
+				next = new MemoryPool;
+			return next->nextptr();
+		}
+		int c = current;
+		current = ptr[c].next;
+//		if (current != -1)	ptr[current].prev = -1;
+		ptr[c].next = used;
+		if (used != -1)		ptr[used].prev = c;
+		used = c;
+		ptr[c].prev = -1;
+		return ptr + c;
+	}
+	void release(void *x)
+	{
+		DATA *p = static_cast<DATA*>(x);
+		if (p < ptr || p >= ptr + poolsize)
+		{
+			#ifdef _DEBUG
+			if (next)
+			#endif
+			next->release(p);
+			return;
+		}
+		int c = p - ptr;
+		if (ptr[c].prev == -1)	used = ptr[c].next;
+		else					ptr[ptr[c].prev].next = ptr[c].next;
+		if (ptr[c].next != -1)	ptr[ptr[c].next].prev = ptr[c].prev;
+//		if (current != -1)		ptr[current].prev = c;
+		ptr[c].next = current;
+//		ptr[c].prev = -1;
+		current = c;
+	}
+private:
+	int current;
+protected:
+	int used;
+	const static int psize = poolsize;
+	MemoryPool *next;
+	struct DATA
+	{
+		char s[S];
+		short prev;
+		short next;
+	} ptr[poolsize];
+};
+class VMemoryPool : public MemoryPool<8>
+{
+public:
+	void GarbageCollection()
+	{
+		Mark(this);
+
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->destructor_unmark();	// デストラクタだけ先に実行する
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->delete_unmark();
+
+		UnMark();
+	}
+private:
+	void searchcount(Variable *v, int &c)
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+		{
+				Variable *x = (Variable*)(ptr+i);
+				if (v == x)
+					continue;
+				x->searchcount(v, c);
+		}
+		if (next)
+			((VMemoryPool*)next)->searchcount(v, c);
+	}
+	void Mark(VMemoryPool *m)
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+		{
+			Variable *v = (Variable*)(ptr+i);
+			int count = 0;
+			if (v->searchcount(v, count))
+				continue;
+			m->searchcount(v, count);
+			v->markstart(count);
+			m->Mark2();
+		}
+		if (next)
+			((VMemoryPool*)next)->Mark(m);
+	}
+	void Mark2()
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->unmark(0x7FFFFFFF);
+		if (next)
+			((VMemoryPool*)next)->Mark2();
+	}
+	void UnMark()
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->unmark(0x3FFFFFFF);
+		if (next)
+			((VMemoryPool*)next)->UnMark();
+	}
+};
+#endif
 
 class StaticObject
 {
