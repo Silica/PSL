@@ -3,40 +3,26 @@ template<size_t S, int poolsize = 256> class MemoryPool
 #ifdef PSL_MEMORY_MANAGER_SLIM
 {
 public:
-	MemoryPool()	{next = NULL;current = count = 0;std::memset(ptr, 0, poolsize*S);}
+	MemoryPool()	{next = NULL;current = 0;
+		for (int i = 0; i < poolsize; ++i)
+		{
+			ptr[i].x = 0;
+			ptr[i].next = i+1;
+		}
+		ptr[poolsize-1].next = -1;
+	}
 	~MemoryPool()	{delete next;}
 	void *nextptr()
 	{
-		if (count == poolsize)
+		if (current == -1)
 		{
 			if (!next)
 				next = new MemoryPool;
 			return next->nextptr();
 		}
-		for (int i = current; i < poolsize; ++i)
-		{
-			if (!ptr[i].x)
-			{
-				current = i+1;
-				++count;
-				return ptr + i;
-			}
-		}
-		for (int i = 0; i < current; ++i)
-		{
-			if (!ptr[i].x)
-			{
-				current = i+1;
-				++count;
-				return ptr + i;
-			}
-		}
-		#ifdef _DEBUG
-		PSL_PRINTF(("throw,%d,%d\n", count, current));
-		throw std::bad_alloc();
-		#else
-		return NULL;
-		#endif
+		int c = current;
+		current = ptr[c].next;
+		return ptr + c;
 	}
 	void release(void *x)
 	{
@@ -49,20 +35,23 @@ public:
 			next->release(p);
 			return;
 		}
-		current = p - ptr;
-		count--;
-		ptr[current].x = 0;
+		int c = p - ptr;
+		ptr[c].x = 0;
+		ptr[c].next = current;
+		current = c;
 	}
-private:
-	int current;
 protected:
-	int count;
+	int current;
 	const static int psize = poolsize;
 	MemoryPool *next;
 	union DATA
 	{
 		char s[S];
-		int x;
+		struct
+		{
+			int x;
+			int next;
+		};
 	} ptr[poolsize];
 };
 class VMemoryPool : public MemoryPool<8>
@@ -94,17 +83,14 @@ public:
 private:
 	void searchcount(Variable *v, int &c)
 	{
-		if (count)
+		for (int i = 0; i < psize; ++i)
 		{
-			for (int i = 0; i < psize; ++i)
+			if (ptr[i].x)
 			{
-				if (ptr[i].x)
-				{
-					Variable *x = (Variable*)(ptr+i);
-					if (v == x)
-						continue;
-					x->searchcount(v, c);
-				}
+				Variable *x = (Variable*)(ptr+i);
+				if (v == x)
+					continue;
+				x->searchcount(v, c);
 			}
 		}
 		if (next)
@@ -112,20 +98,17 @@ private:
 	}
 	void Mark(VMemoryPool *m)
 	{
-		if (count)
+		for (int i = 0; i < psize; ++i)
 		{
-			for (int i = 0; i < psize; ++i)
+			if (ptr[i].x)
 			{
-				if (ptr[i].x)
-				{
-					Variable *v = (Variable*)(ptr+i);
-					int count = 0;
-					if (v->searchcount(v, count))
-						continue;
-					m->searchcount(v, count);
-					v->markstart(count);
-					m->Mark2();
-				}
+				Variable *v = (Variable*)(ptr+i);
+				int count = 0;
+				if (v->searchcount(v, count))
+					continue;
+				m->searchcount(v, count);
+				v->markstart(count);
+				m->Mark2();
 			}
 		}
 		if (next)
@@ -133,15 +116,12 @@ private:
 	}
 	void Mark2()
 	{
-		if (count)
+		for (int i = 0; i < psize; ++i)
 		{
-			for (int i = 0; i < psize; ++i)
+			if (ptr[i].x)
 			{
-				if (ptr[i].x)
-				{
-					Variable *v = (Variable*)(ptr+i);
-					v->unmark(0x7FFFFFFF);
-				}
+				Variable *v = (Variable*)(ptr+i);
+				v->unmark(0x7FFFFFFF);
 			}
 		}
 		if (next)
@@ -149,15 +129,12 @@ private:
 	}
 	void UnMark()
 	{
-		if (count)
+		for (int i = 0; i < psize; ++i)
 		{
-			for (int i = 0; i < psize; ++i)
+			if (ptr[i].x)
 			{
-				if (ptr[i].x)
-				{
-					Variable *v = (Variable*)(ptr+i);
-					v->unmark(0x3FFFFFFF);
-				}
+				Variable *v = (Variable*)(ptr+i);
+				v->unmark(0x3FFFFFFF);
 			}
 		}
 		if (next)
@@ -169,7 +146,7 @@ private:
 {
 public:
 	MemoryPool()	{next = NULL;current = 0;
-		for (int i = 0; i < poolsize; i++)
+		for (int i = 0; i < poolsize; ++i)
 		{
 			ptr[i].prev = i-1;
 			ptr[i].next = i+1;
@@ -325,7 +302,7 @@ protected:
 		DATA ptr[poolsize];
 		pool *next;
 		pool()	{next = NULL;
-			for (int i = 0; i < poolsize; i++)
+			for (int i = 0; i < poolsize; ++i)
 				ptr[i].next = ptr+i+1;
 			ptr[poolsize-1].next = NULL;
 		}
