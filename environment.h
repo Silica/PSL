@@ -172,7 +172,7 @@ class Environment
 		}
 	}
 public:
-	Environment(int i)	{scope = NULL;}
+	Environment(int i)	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
 	Environment()	{scope = NULL;PSLlib::Basic(global);}
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
 	~Environment()	{delete scope;if (int ss=stack.size())warning(0, ss);}

@@ -6,6 +6,7 @@
 class PSL : private variable::environment
 {
 public:
+	PSL() : variable::Variable::Environment(1){}
 	enum error
 	{
 		NONE = 0,

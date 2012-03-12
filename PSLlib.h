@@ -26,6 +26,10 @@ public:
 		#ifdef PSL_DEBUG
 		v["debug"] = Debug;
 		#endif
+	}
+	static void Standard(const rsv &r)
+	{
+		variable v = r;
 		v["foreach"] = Foreach;
 		v["eval"] = Eval;
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
@@ -229,7 +233,7 @@ private:
 		}
 		static variable Keys(variable &this_v, variable &v)
 		{
-			if (!this_v)	return v.keys();
+			if (!this_v)return v.keys();
 			else		return this_v.keys();	// “–‘R‚È‚ª‚çexist‚âkeys‚ªŠÜ‚Ü‚ê‚é‚±‚Æ‚É‚È‚éA‚Ü‚ ‚¢‚¢‚©
 		}
 	};
