@@ -41,9 +41,9 @@
 #define PSL_MEMORY_MANAGER_SLIM				// 事前プール分以外に無駄な容量を消費しないバージョンを使用する
 //#define PSL_MEMORY_MANAGER_LARGE				// 余計な容量は増えるが大量確保時でも速度が落ちない
 // どちらもOFFなら少し容量は増えるがGarbageCollectionが少しだけ速い
+#define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
-
 #define PSL_USE_CONSOLE						// std::printfを使う
 // ここまで
 
@@ -64,10 +64,14 @@
 #endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	#define PSL_MEMORY_MANAGER(x) static void *operator new(size_t t){return MemoryManager<sizeof(x)>::Next();}static void operator delete(void *ptr){MemoryManager<sizeof(x)>::Release(ptr);}
+#else
+	#define PSL_MEMORY_MANAGER(x)
+#endif
+
+#if defined(PSL_USE_VARIABLE_MEMORY_MANAGER) && !defined(PSL_SHARED_GLOBAL)
 	#define PSL_TEMPORARY_ENV(x) Variable::Environment &x = Variable::StaticObject::envtemp()
 	#define PSL_TEMPORARY_ENV0(x) Variable::Environment &x = Variable::StaticObject::envtemp()
 #else
-	#define PSL_MEMORY_MANAGER(x)
 	#define PSL_TEMPORARY_ENV(x) Variable::Environment x
 	#define PSL_TEMPORARY_ENV0(x) Variable::Environment x(0)
 #endif
