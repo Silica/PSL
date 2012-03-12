@@ -29,7 +29,7 @@ public:
 class LoopScope : public Scope
 {
 public:
-	LoopScope(Code *statement, int c) : Scope(statement)	{_continue = c;}
+	LoopScope(Code *statement, int c) : Scope(statement)	{cline = c;}
 	virtual Type getType()	{return LOOP;}
 	virtual Scope *Return()
 	{
@@ -47,33 +47,33 @@ public:
 	}
 	virtual Scope *Continue()
 	{
-		line = _continue;
+		line = cline;
 		return this;
 	}
 private:
-	int _continue;
+	int cline;
 };
 
 class FunctionScope : public Scope
 {
 public:
-	FunctionScope(Code *statement, Variable *v) : Scope(statement),_static(v)	{}
+	FunctionScope(Code *statement, Variable *v) : Scope(statement),static_v(v)	{}
 	virtual Type getType()	{return FUNCTION;}
 	virtual Variable *getVariable(const string &name)
 	{
 		if (local.get()->exist(name))	return local.get()->child(name);
-		if (_static.get()->exist(name))	return _static.get()->child(name);
+		if (static_v.get()->exist(name))return static_v.get()->child(name);
 		else							return NULL;
 	}
 	virtual bool addStatic(const string &name, variable &v, Environment *env)
 	{
-		if (_static.get()->exist(name))
+		if (static_v.get()->exist(name))
 		{
 			variable x;
 			if (env)	env->push(x);
 			return false;
 		}
-		bool r = _static.get()->set(name, v);
+		bool r = static_v.get()->set(name, v);
 		if (env)	env->push(v);
 		return r;
 	}
@@ -109,41 +109,40 @@ public:
 		return s;
 	}
 protected:
-	rsv _static;
+	rsv static_v;
 };
 
 class MethodScope : public FunctionScope
 {
 public:
-	MethodScope(Code *statement, Variable *s, Variable *t) : FunctionScope(statement, s),_this(t)	{}
+	MethodScope(Code *statement, Variable *s, Variable *t) : FunctionScope(statement, s),this_v(t)	{}
 	virtual Type getType()	{return METHOD;}
 	Variable *getVariable(const string &name)
 	{
 		if (local.get()->exist(name))	return local.get()->child(name);
-		if (_this.get()->exist(name))	return _this.get()->child(name);
-		if (_static.get()->exist(name))	return _static.get()->child(name);
+		if (this_v.get()->exist(name))	return this_v.get()->child(name);
+		if (static_v.get()->exist(name))return static_v.get()->child(name);
 		else							return NULL;
 	}
 	bool Declaration(const string &name, variable &v, Environment *env)
 	{
-		bool r = _this.get()->set(name, v);
+		bool r = this_v.get()->set(name, v);
 		if (env)	env->push(v);
 		return r;
 	}
 protected:
-	rsv _this;
+	rsv this_v;
 };
 class ConstructorScope : public MethodScope
 {
 public:
 	ConstructorScope(Code *statement, Variable *s, Variable *t) : MethodScope(statement, s, t)	{}
-	~ConstructorScope()	{}
 	virtual Type getType()	{return CONSTRUCTOR;}
 	Scope *End(Environment &env)
 	{
 		Scope *s = owner;
 		owner = NULL;
-		env.push(_this);
+		env.push(this_v);
 		delete this;
 		return s;
 	}

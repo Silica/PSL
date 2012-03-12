@@ -193,7 +193,7 @@ public:
 	void addScope(Scope *s)	{s->set(scope);scope = s;}
 	void Jump(int l)	{scope->Jump(l);}
 	void RJump(int l)	{scope->RJump(l);}
-	void endScope()		{scope = scope->End(*this);	}
+	void endScope()		{scope = scope->End(*this);}
 	void Run()			{while (scope && scope->Run(*this));}
 	#ifdef PSL_DEBUG
 	void StepExec()		{if (scope) scope->StepExec(*this);}

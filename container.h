@@ -132,7 +132,7 @@ public:
 		data *operator->()			{return ta->d[n];}
 		void operator++()
 		{
-			while (++n < (int)(ta->_reserve))
+			while (++n < (int)(ta->reserve))
 				if (ta->d[n])
 					return;
 			n = -1;
@@ -142,7 +142,7 @@ public:
 		int n;
 	};
 	friend class iterator;
-	table()		{_reserve = _size = 0;}
+	table()		{reserve = len = 0;}
 	~table()
 	{
 		int s = d.size();
@@ -151,30 +151,30 @@ public:
 	}
 	size_t count(const string &s) const
 	{
-		if (!_reserve)	return 0;
+		if (!reserve)	return 0;
 		if (search(s) < 0)
 			return 0;
 		return 1;
 	}
 	rsv &operator[](const string &s) const
 	{
-		if (_size)
+		if (len)
 		{
 			int i = search(s);
 			if (i >= 0)
 				return d[i]->second;
 		}
-		if (_size == _reserve)
+		if (len == reserve)
 			resize();
-		hash h = gethash(s, _reserve);
+		hash h = gethash(s, reserve);
 		int i = getnextnull(h);
 		d[i] = new data(s);
-		_size++;
+		len++;
 		return d[i]->second;
 	}
 	void erase(const string &s)
 	{
-		if (!_size)
+		if (!len)
 			return;
 		int i = search(s);
 		if (i < 0)
@@ -182,14 +182,14 @@ public:
 		delete d[i];
 		d[i] = NULL;
 	}
-	bool empty()	const{return !_size;}
-	size_t size()	const{return _size;}
+	bool empty()	const{return !len;}
+	size_t size()	const{return len;}
 	iterator begin()	{
-		if (!_size)
+		if (!len)
 			return iterator(this, -1);
 		else
 		{
-			for (size_t i = 0; i < _reserve; i++)
+			for (size_t i = 0; i < reserve; i++)
 				if (d[i])
 					return iterator(this, i);
 		}
@@ -199,8 +199,8 @@ public:
 private:
 	int search(const string &s) const
 	{
-		hash h = gethash(s, _reserve);
-		for (size_t i = h; i < _reserve; ++i)
+		hash h = gethash(s, reserve);
+		for (size_t i = h; i < reserve; ++i)
 			if (d[i] && d[i]->first == s)
 				return i;
 		for (size_t i = 0; i < h; ++i)
@@ -210,7 +210,7 @@ private:
 	}
 	size_t getnextnull(size_t t) const
 	{
-		for (size_t i = t; i < _reserve; ++i)
+		for (size_t i = t; i < reserve; ++i)
 			if (!d[i])
 				return i;
 		for (size_t i = 0; i < t; ++i)
@@ -222,23 +222,23 @@ private:
 	void resize() const
 	{
 #ifdef PSL_USE_STL_VECTOR
-		std::vector<data*> temp(_reserve, NULL);
+		std::vector<data*> temp(reserve, NULL);
 #else
-		vector<data*> temp(_reserve);
+		vector<data*> temp(reserve);
 #endif
-		int max = _reserve;
-		_reserve = _reserve*2 + 1;
+		int max = reserve;
+		reserve = reserve*2 + 1;
 #ifdef PSL_USE_STL_VECTOR
 		temp.swap(d);
-		d.resize(_reserve, NULL);
+		d.resize(reserve, NULL);
 #else
-		d.resize(_reserve);
+		d.resize(reserve);
 		for (int i = 0; i < max; i++)
 		{
 			temp[i] = d[i];
 			d[i] = NULL;
 		}
-		for (size_t i = max; i < _reserve; i++)
+		for (size_t i = max; i < reserve; i++)
 			d[i] = NULL;
 #endif
 
@@ -246,14 +246,14 @@ private:
 		{
 			if (temp[i])
 			{
-				hash h = gethash(temp[i]->first, _reserve);
+				hash h = gethash(temp[i]->first, reserve);
 				int n = getnextnull(h);
 				d[n] = temp[i];
 			}
 		}
 	}
-	mutable size_t _size;
-	mutable size_t _reserve;
+	mutable size_t len;
+	mutable size_t reserve;
 	mutable PSL_VECTOR<data*> d;
 };
 #endif
@@ -287,5 +287,25 @@ public:
 		return x[--len];
 	#endif
 	}
+	#ifndef PSL_POPSTACK_NULL
+	void clear()
+	{
+		for (int i = len; i < reserve; i++)
+		{
+			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+			x[i] = Variable::StaticObject::rsvnull();
+			#else
+			const static rsv null;
+			x[i] = null;
+			#endif
+		}
+	}
+	// 当然ながら、一々reserveまで回さなくても
+	// 最大値を記録しておきそこまで回せばいいのだが
+	// pushする度に最大値を記録するコストとどっちが高いか？
+
+	// 実行するのはどこか
+	// Environment::endScopeの中あたりかと思うが…保留
+	#endif
 };
 #endif
