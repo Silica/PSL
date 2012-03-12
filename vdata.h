@@ -442,20 +442,20 @@ class vObject : public vBase
 {
 public:
 	PSL_MEMORY_MANAGER(vObject)
-	vObject()				{_class = NULL;code = NULL;}
-	vObject(Variable *v)	{_class = v->ref();code = NULL;}
-	vObject(Code *c)		{_class = NULL;code = c->inc();}
+	vObject()				{class_v = NULL;code = NULL;}
+	vObject(Variable *v)	{class_v = v->ref();code = NULL;}
+	vObject(Code *c)		{class_v = NULL;code = c->inc();}
 	~vObject()	{
-		if (_class)
+		if (class_v)
 		{
 			destructor();
-			_class->finalize();
+			class_v->finalize();
 		}
 		if (code)	code->finalize();
 	}
 	void destructor()
 	{
-		if (_class)
+		if (class_v)
 		{
 			const static string destructor = "destructor";
 			if (member.count(destructor))
@@ -477,8 +477,8 @@ public:
 			array[i].copy(v->array[i]);
 		for (table::iterator it = v->member.begin(); it != v->member.end(); ++it)
 			member[it->first].copy(it->second);
-		if (v->_class)	_class = v->_class->ref();
-		else			_class = NULL;
+		if (v->class_v)	class_v = v->class_v->ref();
+		else			class_v = NULL;
 		if (v->code)	code = v->code->inc();
 		else			code = NULL;
 	}
@@ -489,8 +489,8 @@ public:
 			array[i].get()->searchcount(v, c);
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			member[it->first].get()->searchcount(v, c);
-		if (_class)
-			_class->searchcount(v, c);
+		if (class_v)
+			class_v->searchcount(v, c);
 	}
 	void mark()
 	{
@@ -499,8 +499,8 @@ public:
 			array[0].get()->mark();
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			member[it->first].get()->mark();
-		if (_class)
-			_class->mark();
+		if (class_v)
+			class_v->mark();
 	}
 
 	vBase *substitution(Variable *v)
@@ -609,7 +609,7 @@ public:
 	{
 		if (!code)
 			return;
-		Scope *scope = new FunctionScope(code, _class ? _class : v);
+		Scope *scope = new FunctionScope(code, class_v ? class_v : v);
 		env.addScope(scope);
 	}
 	void prepareInstance(Environment &env, Variable *v)
@@ -632,7 +632,7 @@ public:
 	{
 		if (!code)
 			return variable(NIL);
-		Scope *scope = new FunctionScope(code, _class ? _class : v);
+		Scope *scope = new FunctionScope(code, class_v ? class_v : v);
 		env.addScope(scope);
 		env.push(arg);
 		env.Run();
@@ -692,7 +692,7 @@ public:
 private:
 	rlist array;
 	table member;
-	Variable *_class;
+	Variable *class_v;
 	Code *code;
 	void kcopy(Variable *v)
 	{
@@ -722,16 +722,16 @@ public:
 	vMethod(Variable *v, Variable *x)
 	{
 		function = v->ref();
-//		_this = x->ref();	// zŠÂŽQÆ‚ÅŽ€‚Ê
-		_this = x;
+//		this_v = x->ref();	// zŠÂŽQÆ‚ÅŽ€‚Ê
+		this_v = x;
 	}
 	~vMethod()
 	{
 		function->finalize();
-//		_this->finalize();
+//		this_v->finalize();
 	}
 	Type type()	const	{return METHOD;}
-	vBase *clone()	{return new vMethod(function, _this);}
+	vBase *clone()	{return new vMethod(function, this_v);}
 	void searchcount(Variable *v, int &c){function->searchcount(v, c);}
 	void mark(){function->mark();}
 
@@ -741,20 +741,20 @@ public:
 	int toInt()			const {return 1;}
 	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
-	void push(Variable *v)	{_this = v;}
+	void push(Variable *v)	{this_v = v;}
 
 	void prepare(Environment &env, Variable *v)
 	{
 		if (!function->getcode())
 			return;
-		Scope *scope = new MethodScope(function->getcode(), function, _this);
+		Scope *scope = new MethodScope(function->getcode(), function, this_v);
 		env.addScope(scope);
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
 		if (!function->getcode())
 			return variable(NIL);
-		Scope *scope = new MethodScope(function->getcode(), function, _this);
+		Scope *scope = new MethodScope(function->getcode(), function, this_v);
 		env.addScope(scope);
 		env.push(arg);
 		env.Run();
@@ -764,14 +764,14 @@ public:
 	PSL_DUMP((){PSL_PRINTF(("vMethod:\n"));})
 private:
 	Variable *function;
-	Variable *_this;
+	Variable *this_v;
 };
 
 class vCFunction : public vBase
 {
 public:
 	PSL_MEMORY_MANAGER(vCFunction)
-	vCFunction(function _f)	{f = _f;}
+	vCFunction(function func)	{f = func;}
 	Type type()	const	{return CFUNCTION;}
 	vBase *clone()	{return new vCFunction(f);}
 
@@ -797,27 +797,27 @@ private:
 class vCMethod : public vBase
 {
 public:
-	vCMethod(method _f, Variable *x)	{f = _f;_this = x;}
+	vCMethod(method func, Variable *x)	{f = func;this_v = x;}
 	Type type()	const	{return CMETHOD;}
-	vBase *clone()	{return new vCMethod(f, _this);}
+	vBase *clone()	{return new vCMethod(f, this_v);}
 
 	vBase *substitution(Variable *v)	{return this;}
 
 	bool toBool()		const {return true;}
-	int toInt()			const {return _this ? 1 : 0;}
+	int toInt()			const {return this_v ? 1 : 0;}
 	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)
 	{
-		_this = v;
+		this_v = v;
 	}
 
 	void prepare(Environment &env, Variable *v)
 	{
 		variable x = env.pop();
-		if (_this)
+		if (this_v)
 		{
-			variable t = _this;
+			variable t = this_v;
 			env.push(f(t, x));
 		}
 		else
@@ -828,9 +828,9 @@ public:
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
-		if (_this)
+		if (this_v)
 		{
-			variable t = _this;
+			variable t = this_v;
 			return f(t, arg);
 		}
 		else
@@ -842,7 +842,7 @@ public:
 	PSL_DUMP((){PSL_PRINTF(("vCMethod:\n"));})
 private:
 	method f;
-	Variable *_this;
+	Variable *this_v;
 };
 
 class vCPointer : public vBase

@@ -142,14 +142,14 @@ private:
 			v["foreach"] = foreach;
 		}
 	private:
-		static variable Length(variable &_this, variable &v)
+		static variable Length(variable &this_v, variable &v)
 		{
-			if (!_this)	return v.length();
-			else		return _this.length();
+			if (!this_v)	return v.length();
+			else		return this_v.length();
 		}
-		static variable Push(variable &_this, variable &v)
+		static variable Push(variable &this_v, variable &v)
 		{
-			if (!_this)
+			if (!this_v)
 			{
 				variable array = v[0];
 				array.push(v[1]);
@@ -157,14 +157,14 @@ private:
 			}
 			else
 			{
-				_this.push(v);
-				return _this.length();
+				this_v.push(v);
+				return this_v.length();
 			}
 		}
-		static variable Foreach(variable &_this, variable &v)
+		static variable Foreach(variable &this_v, variable &v)
 		{
 			int size;
-			if (!_this)
+			if (!this_v)
 			{
 				variable array = v[0];
 				size = array.length();
@@ -176,10 +176,10 @@ private:
 			}
 			else
 			{
-				size = _this.length();
+				size = this_v.length();
 				for (int i = 0; i < size; i++)
 				{
-					variable a = _this[i];
+					variable a = this_v[i];
 					v(a);
 				}
 			}
@@ -200,9 +200,9 @@ private:
 			v["keys"] = keys;
 		}
 	private:
-		static variable Exist(variable &_this, variable &v)
+		static variable Exist(variable &this_v, variable &v)
 		{
-			if (!_this)
+			if (!this_v)
 			{
 				variable table = v[0];
 				variable key = v[1];
@@ -210,12 +210,12 @@ private:
 			}
 			else
 			{
-				return _this.exist(v);
+				return this_v.exist(v);
 			}
 		}
-		static variable Delete(variable &_this, variable &v)
+		static variable Delete(variable &this_v, variable &v)
 		{
-			if (!_this)
+			if (!this_v)
 			{
 				variable table = v[0];
 				variable key = v[1];
@@ -223,14 +223,14 @@ private:
 			}
 			else
 			{
-				_this.del(v);
+				this_v.del(v);
 			}
 			return variable();	// 取り除いた変数を返すというのも手？
 		}
-		static variable Keys(variable &_this, variable &v)
+		static variable Keys(variable &this_v, variable &v)
 		{
-			if (!_this)	return v.keys();
-			else		return _this.keys();	// 当然ながらexistやkeysが含まれることになる、まあいいか
+			if (!this_v)	return v.keys();
+			else		return this_v.keys();	// 当然ながらexistやkeysが含まれることになる、まあいいか
 		}
 	};
 	class File
@@ -248,10 +248,10 @@ private:
 			v["read"] = fr;
 		}
 	private:
-		static variable Open(variable &_this, variable &v)
+		static variable Open(variable &this_v, variable &v)
 		{
 			string name = v.toString();
-			if (!_this)
+			if (!this_v)
 			{
 				using namespace std;
 				FILE *fp = fopen(name, "r");
@@ -267,28 +267,28 @@ private:
 			else
 			{
 				using namespace std;
-				FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+				FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
-				_this["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
-				if (fp)	_this["name"] = name;
-				else	_this["name"] = "";
+				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				if (fp)	this_v["name"] = name;
+				else	this_v["name"] = "";
 				return 0;
 			}
 		}
-		static variable Close(variable &_this, variable &v)
+		static variable Close(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
-			_this["$$__FILE*fp__$$"] = NULL;
-			_this["name"] = "";
+			this_v["$$__FILE*fp__$$"] = NULL;
+			this_v["name"] = "";
 			return v;
 		}
-		static variable Read(variable &_this, variable &v)
+		static variable Read(variable &this_v, variable &v)
 		{
-			std::FILE *fp = (std::FILE*)(void*)_this["$$__FILE*fp__$$"];
+			std::FILE *fp = (std::FILE*)(void*)this_v["$$__FILE*fp__$$"];
 			int size = v;
 			if (!fp || !size)
 				return "";
@@ -317,10 +317,10 @@ private:
 			v["readdw"] = frd;
 		}
 	private:
-		static variable Open(variable &_this, variable &v)
+		static variable Open(variable &this_v, variable &v)
 		{
 			string name = v.toString();
-			if (!_this)
+			if (!this_v)
 			{
 				using namespace std;
 				FILE *fp = fopen(name, "rb");
@@ -336,29 +336,29 @@ private:
 			else
 			{
 				using namespace std;
-				FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+				FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
-				_this["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
-				if (fp)	_this["name"] = name;
-				else	_this["name"] = "";
+				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				if (fp)	this_v["name"] = name;
+				else	this_v["name"] = "";
 				return 0;
 			}
 		}
-		static variable Close(variable &_this, variable &v)
+		static variable Close(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
-			_this["$$__FILE*fp__$$"] = NULL;
-			_this["name"] = "";
+			this_v["$$__FILE*fp__$$"] = NULL;
+			this_v["name"] = "";
 			return v;
 		}
-		static variable Read(variable &_this, variable &v)
+		static variable Read(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 			int size = v;
 			variable r;
 			if (!fp || !size)
@@ -377,10 +377,10 @@ private:
 			r["length"] = size;
 			return r;
 		}
-		static variable ReadDW(variable &_this, variable &v)
+		static variable ReadDW(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)_this["$$__FILE*fp__$$"];
+			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
 			int size = v;
 			variable r;
 			if (!fp || !size)

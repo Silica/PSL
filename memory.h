@@ -64,19 +64,11 @@ public:
 		for (int i = 0; i < psize; ++i)
 		{
 			if (ptr[i].x)
-			{
-				Variable *v = (Variable*)(ptr+i);
-				v->destructor_unmark();	// デストラクタだけ先に実行する
-			}
+				((Variable*)(ptr+i))->destructor_unmark();	// デストラクタだけ先に実行する
 		}
 		for (int i = 0; i < psize; ++i)
-		{
 			if (ptr[i].x)
-			{
-				Variable *v = (Variable*)(ptr+i);
-				v->delete_unmark();
-			}
-		}
+				((Variable*)(ptr+i))->delete_unmark();
 
 		UnMark();
 	}
@@ -117,26 +109,16 @@ private:
 	void Mark2()
 	{
 		for (int i = 0; i < psize; ++i)
-		{
 			if (ptr[i].x)
-			{
-				Variable *v = (Variable*)(ptr+i);
-				v->unmark(0x7FFFFFFF);
-			}
-		}
+				((Variable*)(ptr+i))->unmark(0x7FFFFFFF);
 		if (next)
 			((VMemoryPool*)next)->Mark2();
 	}
 	void UnMark()
 	{
 		for (int i = 0; i < psize; ++i)
-		{
 			if (ptr[i].x)
-			{
-				Variable *v = (Variable*)(ptr+i);
-				v->unmark(0x3FFFFFFF);
-			}
-		}
+				((Variable*)(ptr+i))->unmark(0x3FFFFFFF);
 		if (next)
 			((VMemoryPool*)next)->UnMark();
 	}
@@ -224,10 +206,10 @@ private:
 	{
 		for (int i = used; i != -1; i = ptr[i].next)
 		{
-				Variable *x = (Variable*)(ptr+i);
-				if (v == x)
-					continue;
-				x->searchcount(v, c);
+			Variable *x = (Variable*)(ptr+i);
+			if (v == x)
+				continue;
+			x->searchcount(v, c);
 		}
 		if (next)
 			((VMemoryPool*)next)->searchcount(v, c);
