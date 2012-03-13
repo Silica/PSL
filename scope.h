@@ -108,6 +108,7 @@ public:
 		delete this;
 		return s;
 	}
+	virtual rsv getLocal()	{return local;}
 protected:
 	rsv static_v;
 };
