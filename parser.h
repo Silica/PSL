@@ -723,7 +723,7 @@ private:
 		getexp13(c, l);
 		while (int n = t->checkNext())
 		{
-			EXP('=', 13, SUBSTITUTION)
+			EXP('=', 14, SUBSTITUTION)
 			else EXP(Tokenizer::ASSIGN, 14, ASSIGNMENT)
 			else EXP(Tokenizer::SADD, 14, SADD)
 			else EXP(Tokenizer::SSUB, 14, SSUB)
