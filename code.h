@@ -365,6 +365,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = x;
+		v = env.getLocal();
 		env.push(v);
 		return RC::NONE;
 	}

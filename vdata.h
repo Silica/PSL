@@ -505,7 +505,7 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (array.empty() && member.empty())
+		if (!toBool())
 		{
 			delete this;
 			return v->x->clone();
@@ -522,7 +522,7 @@ public:
 	}
 	vBase *assignment(Variable *v)
 	{
-		if ((array.empty() && member.empty()) || (v->type() != OBJECT || v->type() != RARRAY))
+		if (!toBool() || (v->type() != OBJECT || v->type() != RARRAY))
 		{
 			delete this;
 			return v->x->clone();
