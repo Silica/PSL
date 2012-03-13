@@ -87,7 +87,6 @@ public:
 		#endif
 		push(arg);
 		variable::Variable::Environment::Run();
-//		PSL_PRINTF(("stack:%d\n", stack.size()));
 		return pop();
 	}
 	#ifdef PSL_DEBUG
@@ -109,14 +108,13 @@ public:
 		return variable::rsv();
 	}
 	#endif
-	variable::rsv get(const string &name)
-	{
-		return global.get()->child(name);
-	}
-	operator variable::Variable::Environment&()
-	{
-		return *this;
-	}
+	variable::rsv get(const string &name)				{return global.get()->child(name);}
+	void add(const string &name, const variable &v)		{global.get()->set(name, v);}
+	void add(const string &name, variable::function f)	{global.get()->set(name, variable(f));}
+	void add(const string &name, variable::method f)	{global.get()->set(name, variable(f));}
+	#ifndef PSL_SHARED_GLOBAL
+	operator variable::Variable::Environment&()			{return *this;}
+	#endif
 private:
 	bool parse(variable::Tokenizer *t)
 	{
@@ -128,7 +126,6 @@ private:
 		if (p.getErrorNum())
 			return true;
 
-//		PSL_PRINTF(("stack:%d\n", stack.size()));
 //		g.dump();
 
 		global.get()->prepare(*this);
