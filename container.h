@@ -72,27 +72,30 @@ private:
 template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
 {
 public:
-	vector()	{reserve = len = 0;x = NULL;}
-	vector(int i)	{len = 0;reserve = i;x = new T[i];}
+	vector()	{res = len = 0;x = NULL;}
+	vector(int i)	{len = 0;res = i;x = new T[i];}
 	~vector()	{delete[] x;}
-	void resize(size_t t, bool b = true)
+	void resize(size_t t)
 	{
-		if (t > reserve)
+		reserve(t);
+		len = t;
+	}
+	void reserve(size_t t)
+	{
+		if (t > res)
 		{
 			T *n = new T[t];
 			for (size_t i = 0; i < len; i++)
 				n[i] = x[i];
-			reserve = t;
+			res = t;
 			delete[] x;
 			x = n;
 		}
-		if (b)
-			len = t;
 	}
 	void push_back(const T &v)
 	{
-		if (len >= reserve)
-			resize(reserve*2+1, false);
+		if (len >= res)
+			reserve(res*2+1);
 		x[len++] = v;
 	}
 	T &operator[](size_t t)
@@ -105,7 +108,7 @@ public:
 	bool empty() const	{return !len;}
 protected:
 	T *x;
-	size_t reserve;
+	size_t res;
 	size_t len;
 };
 #endif
@@ -290,7 +293,7 @@ public:
 	#ifndef PSL_POPSTACK_NULL
 	void clear()
 	{
-		for (int i = len; i < reserve; i++)
+		for (int i = len; i < res; i++)
 		{
 			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 			x[i] = Variable::StaticObject::rsvnull();

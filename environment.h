@@ -173,13 +173,14 @@ class Environment
 	}
 public:
 	#if defined(PSL_SHARED_GLOBAL) && defined(PSL_USE_VARIABLE_MEMORY_MANAGER)
-	Environment(int i = 0):global(StaticObject::global())	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
+	Environment():global(StaticObject::global())		{scope = NULL;}
+	Environment(int i):global(StaticObject::global())	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
 	#else
 	Environment(int i)	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
 	Environment()		{scope = NULL;PSLlib::Basic(global);}
 	#endif
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
-	~Environment()	{delete scope;if (int ss=stack.size())warning(0, ss);}
+	~Environment()	{delete scope;if (stack.size())warning(0, (int)stack.size());}
 	rsv getVariable(const string &name)
 	{
 		Variable *v = scope->getVariable(name);
