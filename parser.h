@@ -431,7 +431,7 @@ private:
 		{
 			t->getNext();
 			variable v;
-			if (t->getNextIf(/*'('*/')'))	// ‘¦•Â‚¶‚ÍŠmŽÀ‚É–³–¼ŠÖ”
+			if (t->getNextIf(/*'('*/')'))
 				v.pushcode(new Variable::PUSH_NULL);
 			else
 				ParseExpression(v, /*'('*/')');
@@ -439,8 +439,7 @@ private:
 			{
 				v.pushcode(new Variable::ARGUMENT);
 				ParseBlock(v, v);
-				if (c.codelength())
-					c.pushcode(new Variable::PUSH_CODE(v.getcode()));
+				c.pushcode(new Variable::PUSH_CODE(v));
 			}
 			else	// Ž®“à‚ÌŠ‡ŒÊ
 			{

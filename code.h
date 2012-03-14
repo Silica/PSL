@@ -360,19 +360,19 @@ public:
 class PUSH_CODE : public OpCode
 {
 public:
-	PUSH_CODE(Code *c)	{x = c->inc();}
-	~PUSH_CODE()		{x->finalize();}
+	PUSH_CODE(rsv v):x(v){}
 	RC::RETURNCODE Execute(Environment &env)
 	{
-		variable v = x;
-		v = env.getLocal();
-		env.push(v);
+		variable v = x;		// 一旦受け取り
+		variable c = v;		// コピー作成
+		c = env.getLocal();	// ローカル変数受け取り
+		env.push(c);
 		return RC::NONE;
 	}
-	PSL_DUMP((int d){PSL_PRINTF(("PUSH CODE\n"));if (!d){x->dump();PSL_PRINTF(("CODE END\n"));}})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_CODE);x->write(b);}
+	PSL_DUMP((int d){PSL_PRINTF(("PUSH CODE\n"));if (!d){x.get()->dump();PSL_PRINTF(("CODE END\n"));}})
+	void write(bytecode &b){b.push(MNEMONIC::PUSH_CODE);x.get()->write("", b);}
 private:
-	Code *x;
+	rsv x;
 };
 
 
