@@ -508,7 +508,7 @@ public:
 		if (!toBool())
 		{
 			delete this;
-			return v->x->clone();
+			return v->bclone();
 		}
 		size_t size = v->length();
 		if (size > array.size())
@@ -525,7 +525,7 @@ public:
 		if (!toBool() || (v->type() != OBJECT || v->type() != RARRAY))
 		{
 			delete this;
-			return v->x->clone();
+			return v->bclone();
 		}
 		size_t size = v->length();
 		if (size > array.size())
@@ -750,11 +750,11 @@ public:
 /*		else if (v->type() == CFUNCTION)
 		{
 			delete this;
-			return v->x->clone();
+			return v->bclone();
 		}
 		else if (v->type() == CMETHOD)
 		{
-			vBase *x = v->x->clone();
+			vBase *x = v->bclone();
 			x->push(this_v);
 			delete this;
 			return x;
@@ -806,7 +806,14 @@ public:
 	Type type()	const	{return CFUNCTION;}
 	vBase *clone()	{return new vCFunction(f);}
 
-	vBase *substitution(Variable *v)	{return this;}
+	vBase *substitution(Variable *v)	{
+		if (v->type() == CFUNCTION)
+		{
+			delete this;
+			return v->bclone();
+		}
+		return this;
+	}
 
 	bool toBool()		const {return true;}
 	int toInt()			const {return 1;}
@@ -832,7 +839,16 @@ public:
 	Type type()	const	{return CMETHOD;}
 	vBase *clone()	{return new vCMethod(f, this_v);}
 
-	vBase *substitution(Variable *v)	{return this;}
+	vBase *substitution(Variable *v)	{
+		if (v->type() == CMETHOD)
+		{
+			vBase *x = v->bclone();
+			x->push(this_v);
+			delete this;
+			return x;
+		}
+		return this;
+	}
 
 	bool toBool()		const {return true;}
 	int toInt()			const {return this_v ? 1 : 0;}

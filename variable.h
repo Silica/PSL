@@ -356,8 +356,8 @@ private:
 			virtual void mark(){}
 			virtual void destructor(){}
 
-			virtual vBase *substitution(Variable *v)	{delete this;return v->x->clone();}
-			virtual vBase *assignment(Variable *v)		{delete this;return v->x->clone();}
+			virtual vBase *substitution(Variable *v)	{delete this;return v->bclone();}
+			virtual vBase *assignment(Variable *v)		{delete this;return v->bclone();}
 
 			#define OP(n) virtual void n(Variable *v)	{}
 			OP(add)
@@ -416,6 +416,7 @@ private:
 		~Variable()	{rc=0x80000000;delete x;}
 	public:
 		Variable(vBase *v)	{rc = 1;x = v;x->method_this(this);}
+		vBase *bclone()		{return x->clone();}
 		Variable *clone()	{return new Variable(x->clone());}
 		Variable *ref()		{++rc;return this;}
 		PSL_DUMP((){PSL_PRINTF(("rc:%4d, ", rc));x->dump();})
@@ -427,11 +428,8 @@ private:
 	private:
 		#include "vdata.h"
 		friend class PSL;
-		friend class vBase;
 		friend class vRArray;
-		friend class vObject;
 		friend class vReference;
-		friend class vNReference;
 	} *x;
 private:
 	variable(Variable *v)	{x = v->ref();}
