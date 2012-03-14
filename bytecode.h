@@ -133,8 +133,9 @@ class bcreader
 		case OpCode::MNEMONIC::PUSH_CODE:
 			{
 				variable x;
+				byte += 2;
 				readcode(byte, end, x);
-				v.pushcode(new PUSH_CODE(x.getcode()));
+				v.pushcode(new PUSH_CODE(x));
 			}
 			break;
 		case OpCode::MNEMONIC::SCOPE:

@@ -650,15 +650,15 @@ public:
 
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
-			if (it->second.get()->getcode())	// コード持ってれば
-			{
-				Variable *z = new Variable(new vMethod(it->second.get(), x));
-				o->member[it->first].set(z);
-			}
-			else if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
+			if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
 			{
 				Variable *z = it->second.get()->clone();
 				z->push(x);
+				o->member[it->first].set(z);
+			}
+			else if (it->second.get()->getcode())	// コード持ってれば
+			{
+				Variable *z = new Variable(new vMethod(it->second.get(), x));
 				o->member[it->first].set(z);
 			}
 			else
@@ -735,13 +735,43 @@ public:
 	void searchcount(Variable *v, int &c){function->searchcount(v, c);}
 	void mark(){function->mark();}
 
-	vBase *substitution(Variable *v)	{return this;}
+	vBase *substitution(Variable *v)
+	{
+		if (v->type() == METHOD)
+		{
+			function->finalize();
+			function = v->index(0)->ref();
+		}
+		else if (v->type() == OBJECT && v->getcode())
+		{
+			function->finalize();
+			function = v->ref();
+		}
+/*		else if (v->type() == CFUNCTION)
+		{
+			delete this;
+			return v->x->clone();
+		}
+		else if (v->type() == CMETHOD)
+		{
+			vBase *x = v->x->clone();
+			x->push(this_v);
+			delete this;
+			return x;
+		}*/	// この辺を代入可能にするかは今後の課題
+		return this;
+	}
 
 	bool toBool()		const {return true;}
 	int toInt()			const {return 1;}
 	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{this_v = v;}
+	Variable *index(size_t t)
+	{
+		if (t)	return this_v;
+		else	return function;
+	}
 
 	void prepare(Environment &env, Variable *v)
 	{
@@ -760,6 +790,7 @@ public:
 		env.Run();
 		return env.pop();
 	}
+	Code *getcode()			{return function->getcode();}
 
 	PSL_DUMP((){PSL_PRINTF(("vMethod:\n"));})
 private:
@@ -807,10 +838,7 @@ public:
 	int toInt()			const {return this_v ? 1 : 0;}
 	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
-	void push(Variable *v)
-	{
-		this_v = v;
-	}
+	void push(Variable *v)	{this_v = v;}
 
 	void prepare(Environment &env, Variable *v)
 	{
