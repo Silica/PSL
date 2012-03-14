@@ -3,123 +3,100 @@ template<size_t S, int poolsize = 256> class MemoryPool
 #ifdef PSL_MEMORY_MANAGER_SLIM
 {
 public:
-	MemoryPool()	{next = NULL;current = 0;
-		for (int i = 0; i < poolsize; ++i)
-		{
-			ptr[i].x = 0;
-			ptr[i].next = i+1;
-		}
-		ptr[poolsize-1].next = -1;
-	}
-	~MemoryPool()	{delete next;}
+	MemoryPool()	{current = p.ptr;}
 	void *nextptr()
 	{
-		if (current == -1)
-		{
-			if (!next)
-				next = new MemoryPool;
-			return next->nextptr();
-		}
-		int c = current;
-		current = ptr[c].next;
-		return ptr + c;
+		if (current == NULL)
+			current = p.add();
+		DATA *c = current;
+		current = c->next;
+		return c;
 	}
 	void release(void *x)
 	{
-		DATA *p = static_cast<DATA*>(x);
-		if (p < ptr || p >= ptr + poolsize)
-		{
-			#ifdef _DEBUG
-			if (next)
-			#endif
-			next->release(p);
-			return;
-		}
-		int c = p - ptr;
-		ptr[c].x = 0;
-		ptr[c].next = current;
+		DATA *c = static_cast<DATA*>(x);
+		c->x = 0;
+		c->next = current;
 		current = c;
 	}
 protected:
-	int current;
 	const static int psize = poolsize;
-	MemoryPool *next;
 	union DATA
 	{
 		char s[S];
 		struct
 		{
 			int x;
-			int next;
+			DATA *next;
 		};
-	} ptr[poolsize];
+	};
+	DATA *current;
+	struct pool
+	{
+		DATA ptr[poolsize];
+		pool *next;
+		pool()	{next = NULL;
+			for (int i = 0; i < poolsize; ++i)
+			{
+				ptr[i].x = 0;
+				ptr[i].next = ptr+i+1;
+			}
+			ptr[poolsize-1].next = NULL;
+		}
+		~pool()	{delete next;}
+		DATA *add()
+		{
+			pool *n = new pool;
+			if (next)
+				n->next = next;
+			next = n;
+			return next->ptr;
+		}
+	} p;
 };
 class VMemoryPool : public MemoryPool<8>
 {
 public:
 	void GarbageCollection()
 	{
-		Mark(this);
-
-		for (int i = 0; i < psize; ++i)
-			if (ptr[i].x)
-				((Variable*)(ptr+i))->destructor_unmark();	// デストラクタだけ先に実行する
-		for (int i = 0; i < psize; ++i)
-			if (ptr[i].x)
-				((Variable*)(ptr+i))->delete_unmark();
-
+		#ifdef PSL_SHARED_GLOBAL
+		StaticObject::global().get()->mark();
+		#endif
+		Mark();
+		Destructor();
+		Delete();
 		UnMark();
 	}
 private:
+	#define POOLOOP for (pool *pl = &p; pl != NULL; pl = pl->next)for (int i = 0; i < psize; ++i)if (pl->ptr[i].x)
 	void searchcount(Variable *v, int &c)
 	{
-		for (int i = 0; i < psize; ++i)
+		POOLOOP
 		{
-			if (ptr[i].x)
-			{
-				Variable *x = (Variable*)(ptr+i);
-				if (v == x)
-					continue;
-				x->searchcount(v, c);
-			}
+			Variable *x = (Variable*)(pl->ptr+i);
+			if (v == x)
+				continue;
+			x->searchcount(v, c);
 		}
-		if (next)
-			((VMemoryPool*)next)->searchcount(v, c);
 	}
-	void Mark(VMemoryPool *m)
+	void Mark()
 	{
-		for (int i = 0; i < psize; ++i)
+		POOLOOP
 		{
-			if (ptr[i].x)
-			{
-				Variable *v = (Variable*)(ptr+i);
-				int count = 0;
-				if (v->searchcount(v, count))
-					continue;
-				m->searchcount(v, count);
-				v->markstart(count);
-				m->Mark2();
-			}
+			Variable *v = (Variable*)(pl->ptr+i);
+			int count = 0;
+			if (v->searchcount(v, count))
+				continue;
+			searchcount(v, count);
+			v->markstart(count);
+			Mark2();
 		}
-		if (next)
-			((VMemoryPool*)next)->Mark(m);
 	}
-	void Mark2()
-	{
-		for (int i = 0; i < psize; ++i)
-			if (ptr[i].x)
-				((Variable*)(ptr+i))->unmark(0x7FFFFFFF);
-		if (next)
-			((VMemoryPool*)next)->Mark2();
-	}
-	void UnMark()
-	{
-		for (int i = 0; i < psize; ++i)
-			if (ptr[i].x)
-				((Variable*)(ptr+i))->unmark(0x3FFFFFFF);
-		if (next)
-			((VMemoryPool*)next)->UnMark();
-	}
+	void Mark2()		{POOLOOP{((Variable*)(pl->ptr+i))->unmark(0x7FFFFFFF);}}
+	void UnMark()		{POOLOOP{((Variable*)(pl->ptr+i))->unmark(0x3FFFFFFF);}}
+	void Destructor()	{POOLOOP{((Variable*)(pl->ptr+i))->destructor_unmark();}}
+	void Delete()		{POOLOOP{((Variable*)(pl->ptr+i))->delete_unmark();}}
+	#undef POOLOOP
 };
 #elif !defined(PSL_MEMORY_MANAGER_LARGE)
 {
@@ -186,16 +163,29 @@ class VMemoryPool : public MemoryPool<8>
 public:
 	void GarbageCollection()
 	{
+		#ifdef PSL_SHARED_GLOBAL
+		StaticObject::global().get()->mark();
+		#endif
 		Mark(this);
-
-		for (int i = used; i != -1; i = ptr[i].next)
-			((Variable*)(ptr+i))->destructor_unmark();	// デストラクタだけ先に実行する
-		for (int i = used; i != -1; i = ptr[i].next)
-			((Variable*)(ptr+i))->delete_unmark();
-
+		Destructor();
+		Delete();
 		UnMark();
 	}
 private:
+	void Destructor()
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->destructor_unmark();
+		if (next)
+			((VMemoryPool*)next)->Destructor();
+	}
+	void Delete()
+	{
+		for (int i = used; i != -1; i = ptr[i].next)
+			((Variable*)(ptr+i))->delete_unmark();
+		if (next)
+			((VMemoryPool*)next)->Delete();
+	}
 	void searchcount(Variable *v, int &c)
 	{
 		for (int i = used; i != -1; i = ptr[i].next)
@@ -298,6 +288,9 @@ class VMemoryPool : public MemoryPool<8>
 public:
 	void GarbageCollection()
 	{
+		#ifdef PSL_SHARED_GLOBAL
+		StaticObject::global().get()->mark();
+		#endif
 		for (DATA *d = used; d != NULL; d = d->next)
 		{
 			Variable *v = (Variable*)d;
