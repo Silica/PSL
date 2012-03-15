@@ -521,16 +521,10 @@ public:
 	{
 		if (!buf)
 			return 0;
-		union
-		{
-			struct
-			{
-				unsigned char c[2];
-				unsigned short s;
-			};
-			unsigned long l;
-		} u = {{{buf->at(0), buf->at(buf->length()-1)}, buf->length()}};
-		return u.l;
+		unsigned char a = buf->at(0);
+		unsigned long l = buf->length();
+		unsigned char b = buf->at(l-1);
+		return (a | (b<<8)) ^ (l<<4);
 	}
 private:
 	void setint(int i, int c = 0)
