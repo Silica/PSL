@@ -2,6 +2,7 @@
 // インタプリタ(これ自身)の後ろにバイトコードを埋め込む
 #define private public // どうせ専用プログラムなのだ、許せ、std::vector使うと容量増えるもので…
 #include "PSL.h"
+#undef private
 
 #include <stdio.h>
 #include <conio.h>

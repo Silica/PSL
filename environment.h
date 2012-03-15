@@ -277,7 +277,23 @@ public:
 	}
 	void add(Code *c)
 	{
-		push(new PUSH_NULL);
+		size_t s = code.size();
+		if (s > 0)
+		{
+			OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
+			if (n == OpCode::MNEMONIC::RETURN || n == OpCode::MNEMONIC::POP)
+			{
+				delete code[s-1];
+				code.resize(s-1);
+			}
+		}
+		if (s == code.size())
+		{
+			push(new PUSH_NULL);
+//			c->code[0]->get() == OpCode::MNEMONIC::POP;
+			// ŽŸ‚É‚½‚¾POP‚³‚ê‚éê‡‚Í‚»‚ê‚²‚ÆŽæ‚èœ‚¢‚½•û‚ª‚¢‚¢‚Ì‚Í“–‘R‚¾‚ªc
+			// push(Code *c)‚ªpush(OpCode *c)‚ð’Ê‚·‚±‚Æ‚É‚æ‚èoptimizer‚ð“­‚©‚¹‚é‚Æ‚¢‚¤Žè‚à‚ ‚é‚ªH
+		}
 		Code *cl = c->clone();
 		vObject o(cl);
 		cl->finalize();
