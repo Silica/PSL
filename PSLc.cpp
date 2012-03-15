@@ -1,8 +1,8 @@
 // 詐欺コンパイラ
 // インタプリタ(これ自身)の後ろにバイトコードを埋め込む
+#define private public // どうせ専用プログラムなのだ、許せ、std::vector使うと容量増えるもので…
 #include "PSL.h"
 
-#include <vector>
 #include <stdio.h>
 #include <conio.h>
 
@@ -24,7 +24,7 @@ void compile(FILE *exe, const char *filename)
 		return;
 	fseek(exe, 0, SEEK_END);
 	int end = ftell(exe);
-	std::vector<unsigned char> byte(end);
+	variable::vector<unsigned char> byte(end);
 	fseek(exe, 0, SEEK_SET);
 	fread(&byte[0], 1, end, exe);
 	fwrite(&byte[0], 1, end, fp);
