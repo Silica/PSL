@@ -313,7 +313,7 @@ public:
 		int size = x.size();
 		if (size == 1)
 			return x[0].get()->x->clone();
-		vObject *v = new vObject();
+		vObject *v = new vObject(size);
 		for (int i = 0; i < size; ++i)
 			v->push(x[i].get());
 		return v;
@@ -331,13 +331,10 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		bool ra = false;
 		Variable *o = v;
+		rsv temp(v);
 		if (v->type() == RARRAY)
-		{
-			v = v->clone();
-			ra = true;
-		}
+			temp = rsv(v = v->clone(), 0);
 
 		int size = x.size();
 		int vsize = v->length();
@@ -349,20 +346,14 @@ public:
 				x[i].get()->substitution(v->index(i));
 		}
 
-		if (ra)
-			v->finalize();
-
 		return this;
 	}
 	vBase *assignment(Variable *v)
 	{
-		bool ra = false;
 		Variable *o = v;
+		rsv temp(v);
 		if (v->type() == RARRAY)
-		{
-			v = v->clone();
-			ra = true;
-		}
+			temp = rsv(v = v->clone(), 0);
 
 		int size = x.size();
 		int vsize = v->length();
@@ -373,9 +364,6 @@ public:
 			else
 				x[i].get()->assignment(v->index(i));
 		}
-
-		if (ra)
-			v->finalize();
 
 		return this;
 	}
@@ -443,14 +431,11 @@ class vObject : public vBase
 public:
 	PSL_MEMORY_MANAGER(vObject)
 	vObject()				{class_v = NULL;code = NULL;}
+	vObject(int i):array(i)	{class_v = NULL;code = NULL;}
 	vObject(Variable *v)	{class_v = v->ref();code = NULL;}
 	vObject(Code *c)		{class_v = NULL;code = c->inc();}
 	~vObject()	{
-		if (class_v)
-		{
-			destructor();
-			class_v->finalize();
-		}
+		if (class_v)class_v->finalize();
 		if (code)	code->finalize();
 	}
 	void destructor()
@@ -522,7 +507,7 @@ public:
 	}
 	vBase *assignment(Variable *v)
 	{
-		if (!toBool() || (v->type() != OBJECT || v->type() != RARRAY))
+		if (!toBool() || (v->type() != OBJECT && v->type() != RARRAY))
 		{
 			delete this;
 			return v->bclone();
@@ -533,14 +518,13 @@ public:
 		for (size_t i = 0; i < size; ++i)
 			array[i].get()->assignment(v->index(i));
 
-		Variable *k = v->keys();
-		size = k->length();
+		rsv k(v->keys());
+		size = k.get()->length();
 		for (size_t i = 0; i < size; ++i)
 		{
-			string s = k->index(i)->toString();
+			string s = k.get()->index(i)->toString();
 			member[s].get()->assignment(v->child(s));
 		}
-		k->ref()->finalize();
 
 		ccopy(v);
 		return this;
@@ -555,7 +539,17 @@ public:
 			array[i+c].get()->substitution(v->index(i));
 
 		kcopy(v);
-		ccopy(v);
+
+		Code *co = v->getcode();
+		if (co && code)
+		{
+			code = code->only();
+			code->add(co);
+		}
+		else
+		{
+			ccopy(v);
+		}
 	}
 	bool eq(Variable *v)	{return toBool() == v->toBool();}
 	bool ne(Variable *v)	{return toBool() != v->toBool();}
@@ -569,17 +563,16 @@ public:
 	bool exist(const string &s)	const {return member.count(s);}
 	Variable *index(size_t t)			{if(t>=array.size())array.resize(t+1);return array[t].get();}
 	Variable *child(const string &s)	{return member[s].get();}
-	void push(Variable *v)	{Variable *x = v->clone();array.push_back(x);x->finalize();}
+	void push(Variable *v)	{rsv x(v->clone(),0);array.push_back(x);}
 	Variable *keys()
 	{
-		Variable *v = new Variable();
+		rsv v(new Variable(), 0);
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
-			Variable *x = new Variable(it->first);
-			v->push(x);
-			x->finalize();			// すっごい二度手間なんだけど
+			rsv x(new Variable(it->first), 0);
+			v.get()->push(x.get());
 		}
-		return v;
+		return v.get()->ref();
 	}
 	bool set(const string &s, const variable &v)
 	{
@@ -609,31 +602,27 @@ public:
 	{
 		if (!code)
 			return;
-		Scope *scope = new FunctionScope(code, class_v ? class_v : v);
-		env.addScope(scope);
+		env.addScope(new FunctionScope(code, class_v ? class_v : v));
 	}
 	void prepareInstance(Environment &env, Variable *v)
 	{
-		Variable *x = instance(v);
+		rsv x(instance(v), 0);
 		if (!code)
 		{
-			env.push(x);
+			env.push(x.get());
 		}
 		else
 		{
-			Scope *scope = new ConstructorScope(code, v, x);
-			env.addScope(scope);
+			env.addScope(new ConstructorScope(code, v, x.get()));
 			variable z;
 			env.push(z);
 		}
-		x->finalize();
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
 		if (!code)
 			return variable(NIL);
-		Scope *scope = new FunctionScope(code, class_v ? class_v : v);
-		env.addScope(scope);
+		env.addScope(new FunctionScope(code, class_v ? class_v : v));
 		env.push(arg);
 		env.Run();
 		return env.pop();
@@ -642,6 +631,7 @@ public:
 	{
 		vObject *o = new vObject(v);
 		Variable *x = new Variable(o);
+		rsv temp(x, 0);
 
 		int size = array.size();
 		o->array.resize(size);
@@ -652,21 +642,21 @@ public:
 		{
 			if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
 			{
-				Variable *z = it->second.get()->clone();
-				z->push(x);
-				o->member[it->first].set(z);
+				rsv z(it->second.get()->clone(), 0);
+				z.get()->push(x);
+				o->member[it->first].set(z.get()->ref());
 			}
 			else if (it->second.get()->getcode())	// コード持ってれば
 			{
-				Variable *z = new Variable(new vMethod(it->second.get(), x));
-				o->member[it->first].set(z);
+				rsv z(new Variable(new vMethod(it->second.get(), x)), 0);
+				o->member[it->first].set(z.get()->ref());
 			}
 			else
 			{
 				o->member[it->first].copy(it->second);
 			}
 		}
-		return x;
+		return x->ref();
 	}
 
 	size_t codelength()		{return code ? code->length() : 0;}
@@ -696,14 +686,13 @@ private:
 	Code *code;
 	void kcopy(Variable *v)
 	{
-		Variable *k = v->keys();
-		size_t size = k->length();
+		rsv k(v->keys());
+		size_t size = k.get()->length();
 		for (size_t i = 0; i < size; ++i)
 		{
-			string s = k->index(i)->toString();
+			string s = k.get()->index(i)->toString();
 			member[s].get()->substitution(v->child(s));
 		}
-		k->ref()->finalize();
 	}
 	void ccopy(Variable *v)
 	{
@@ -777,15 +766,13 @@ public:
 	{
 		if (!function->getcode())
 			return;
-		Scope *scope = new MethodScope(function->getcode(), function, this_v);
-		env.addScope(scope);
+		env.addScope(new MethodScope(function->getcode(), function, this_v));
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
 		if (!function->getcode())
 			return variable(NIL);
-		Scope *scope = new MethodScope(function->getcode(), function, this_v);
-		env.addScope(scope);
+		env.addScope(new MethodScope(function->getcode(), function, this_v));
 		env.push(arg);
 		env.Run();
 		return env.pop();

@@ -123,8 +123,9 @@ public:
 			LOOP,
 		};
 	};
-	virtual RC::RETURNCODE Execute(Environment &env) = 0;
 	virtual ~OpCode(){}
+	virtual RC::RETURNCODE Execute(Environment &env) = 0;
+	virtual OpCode *clone() = 0;
 	virtual void set(int s){}
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
 	virtual void write(bytecode &b)	{};
@@ -255,6 +256,31 @@ public:
 	{
 		if (!--rc)
 			delete this;
+	}
+	Code *clone()
+	{
+		variable v;
+		for (size_t i = 0; i < code.size(); ++i)
+			v.pushcode(code[i]->clone());
+		return v.getcode()->inc();
+	}
+	Code *only()
+	{
+		if (rc == 1)
+			return this;
+		else
+		{
+			finalize();
+			return clone();
+		}
+	}
+	void add(Code *c)
+	{
+		push(new PUSH_NULL);
+		Code *cl = c->clone();
+		vObject o(cl);
+		cl->finalize();
+		push(cl);
 	}
 	bool Run(Environment &env, size_t &line)
 	{
@@ -416,6 +442,7 @@ private:
 				{
 					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 					{
+						delete c;
 						PSL_TEMPORARY_ENV0(optimizer);
 						code[s-1]->Execute(optimizer);
 						variable v = optimizer.pop();
@@ -423,7 +450,6 @@ private:
 						c->Execute(optimizer);
 						variable a = optimizer.pop();
 						v = a;
-						delete c;
 						return false;
 					}
 				}
@@ -438,6 +464,7 @@ private:
 				{
 					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
 					{
+						delete c;
 						PSL_TEMPORARY_ENV0(optimizer);
 						code[s-2]->Execute(optimizer);
 						code[s-1]->Execute(optimizer);
@@ -448,7 +475,6 @@ private:
 						c->Execute(optimizer);
 						variable a = optimizer.pop();
 						l = a;
-						delete c;
 						delete code[s-1];
 						code.resize(s-1);
 						return false;
