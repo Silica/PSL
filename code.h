@@ -389,7 +389,6 @@ public:
 	{
 		variable v = x;		// 一旦受け取り
 		variable c = v;		// コピー作成
-		c = env.getLocal();	// ローカル変数受け取り
 		env.push(c);
 		return RC::NONE;
 	}
@@ -397,6 +396,19 @@ public:
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_CODE);x.get()->write("", b);}
 private:
 	rsv x;
+};
+class CLOSURE : public OpCode
+{
+public:
+	OpCode *clone()	{return new CLOSURE;}
+	RC::RETURNCODE Execute(Environment &env)
+	{
+		variable v = env.top();
+		v = env.getLocal();	// ローカル変数受け取り
+		return RC::NONE;
+	}
+	PSL_DUMP((int d){PSL_PRINTF(("CLOSURE\n"));})
+	void write(bytecode &b){b.push(MNEMONIC::CLOSURE);}
 };
 
 

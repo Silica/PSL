@@ -56,6 +56,7 @@ public:
 			DEC,
 			PINC,
 			PDEC,
+			CLOSURE,
 
 			BINARY,
 			ADD,
