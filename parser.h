@@ -460,6 +460,7 @@ private:
 		else PRE_OP('~', COMPL)
 		else PRE_OP('*', DEREF)
 		else PRE_OP('&', REF)
+		else PRE_OP('$', CLOSURE)
 		else PRE_OP(Tokenizer::INC, PINC)
 		else PRE_OP(Tokenizer::DEC, PDEC)
 		else TERM(Tokenizer::IDENTIFIER, VARIABLE(t->nstr))

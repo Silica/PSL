@@ -401,11 +401,11 @@ private:
 		case ':':	if (s[i] == '='){++i;return ASSIGN;}
 										return ':';
 		case '"':string_literal();		return STRING;	// "を見付けるまでスキップする
+		case '$':						return '$';
 
 //		case '\'':						return '\'';	// 保留
 			// 未使用予定
 /*		case '@':						return '@';
-		case '$':						return '$';
 		case '\\':						return '\\';
 		case '`':						return '`';*/
 

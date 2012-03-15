@@ -492,8 +492,9 @@ public:
 	{
 		if (!toBool())
 		{
+			vBase *x = v->bclone();
 			delete this;
-			return v->bclone();
+			return x;
 		}
 		size_t size = v->length();
 		if (size > array.size())
@@ -509,8 +510,9 @@ public:
 	{
 		if (!toBool() || (v->type() != OBJECT && v->type() != RARRAY))
 		{
+			vBase *x = v->bclone();
 			delete this;
-			return v->bclone();
+			return x;
 		}
 		size_t size = v->length();
 		if (size > array.size())
@@ -738,8 +740,9 @@ public:
 		}
 /*		else if (v->type() == CFUNCTION)
 		{
+			vBase *x = v->bclone();
 			delete this;
-			return v->bclone();
+			return x;
 		}
 		else if (v->type() == CMETHOD)
 		{
@@ -796,8 +799,9 @@ public:
 	vBase *substitution(Variable *v)	{
 		if (v->type() == CFUNCTION)
 		{
+			vBase *x = v->bclone();
 			delete this;
-			return v->bclone();
+			return x;
 		}
 		return this;
 	}
