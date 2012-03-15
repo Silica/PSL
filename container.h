@@ -66,9 +66,8 @@ private:
 };
 
 #ifdef PSL_USE_STL_VECTOR
-	#define PSL_VECTOR std::vector
+typedef std::vector vector;
 #else
-	#define PSL_VECTOR vector
 template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
 {
 public:
@@ -257,11 +256,12 @@ private:
 	}
 	mutable size_t len;
 	mutable size_t reserve;
-	mutable PSL_VECTOR<data*> d;
+	mutable vector<data*> d;
 };
 #endif
 
 #ifdef PSL_USE_STL_VECTOR
+	#define PSL_USE_STL_STACK
 typedef std::vector<rsv> rlist;
 #else
 typedef vector<rsv> rlist;

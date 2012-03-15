@@ -14,7 +14,7 @@ public:
 		std::memcpy(&code[size], p, l);
 	}
 private:
-	PSL_VECTOR<byte> code;
+	vector<byte> code;
 };
 
 class bcreader

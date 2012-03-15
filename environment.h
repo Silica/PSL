@@ -373,7 +373,7 @@ public:
 		b.push(OpCode::MNEMONIC::END);	// END‚ÍŠÖ”‚¾‚¯‚¶‚á‚È‚­ƒ‹[ƒv‚É‚à‚ ‚é‚Ì‚Å‚â‚Á‚Ï‚è‚±‚±‚É
 	};
 private:
-	PSL_VECTOR<OpCode*> code;
+	vector<OpCode*> code;
 	table label;
 	int rc;
 	bool optimize(OpCode *c)
