@@ -121,6 +121,7 @@ private:
 			definelist = new table();
 			dlnew = true;
 		}
+		ifdef = false;
 #endif
 	}
 	string filename;
@@ -135,6 +136,7 @@ private:
 #ifdef PSL_USE_TOKENIZER_DEFINE
 //	std::map<string,string> definelist;	// ‚±‚ê‚â‚é‚Æ‚Å‚©‚¢‚ñ‚¾c
 	bool dlnew;
+	bool ifdef;
 #endif
 	bool whitespace()
 	{
@@ -295,6 +297,40 @@ private:
 			{
 				definelist->erase(nstr);
 			}
+		}
+		else if (directive == "ifdef")
+		{
+			if (!getIdentifier())
+				PSL_PRINTF(("warning %s %d: ifdef syntax error\n", filename.c_str(), line));
+			else
+			{
+				if (!definelist->count(nstr))
+				{
+					ifdef = true;
+					int n;
+					do n = doNext(); while (ifdef && n);
+					return n;
+				}
+			}
+		}
+		else if (directive == "ifndef")
+		{
+			if (!getIdentifier())
+				PSL_PRINTF(("warning %s %d: ifndef syntax error\n", filename.c_str(), line));
+			else
+			{
+				if (definelist->count(nstr))
+				{
+					ifdef = true;
+					int n;
+					do n = doNext(); while (ifdef && n);
+					return n;
+				}
+			}
+		}
+		else if (directive == "endif")
+		{
+			ifdef = false;
 		}
 #endif
 		else
