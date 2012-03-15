@@ -239,8 +239,8 @@ private:
 			case THREAD:	x = new vThread();break;
 			default:		x = new vObject();break;
 		}}
-		void finalize()		{if (!--rc)	delete this;}
-		void safedelete()	{vBase *v = x;x = new vInt(0);delete v;}
+		void finalize()		{if (!--rc)	{rc=0x80000000;x->destructor();delete this;}}
+		void safedelete()	{vBase *v = x;x = new vInt(0);v->destructor();delete v;}
 		bool searchcount(Variable *v, int &c)
 		{
 			if (rc & 0x40000000)
@@ -413,7 +413,7 @@ private:
 		} *x;
 	private:
 		int rc;
-		~Variable()	{rc=0x80000000;delete x;}
+		~Variable()	{delete x;}
 	public:
 		Variable(vBase *v)	{rc = 1;x = v;x->method_this(this);}
 		vBase *bclone()		{return x->clone();}
@@ -448,6 +448,7 @@ private:
 	friend class Variable::CALL;
 	friend class Variable::INSTANCE;
 	friend class Variable::bcreader;
+	friend class Variable::Code;
 public:
 	variable(variable::Variable::Code *c)	{x = new Variable(c);}
 	rsv ref()		{return x;}
