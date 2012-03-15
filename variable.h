@@ -240,7 +240,7 @@ private:
 			default:		x = new vObject();break;
 		}}
 		void finalize()		{if (!--rc)	{rc=0x80000000;x->destructor();delete this;}}
-		void safedelete()	{vBase *v = x;x = new vInt(0);v->destructor();delete v;}
+		void safedelete()	{rsv v(new Variable(x), 0);x = new vInt(0);}
 		bool searchcount(Variable *v, int &c)
 		{
 			if (rc & 0x40000000)
@@ -356,8 +356,8 @@ private:
 			virtual void mark(){}
 			virtual void destructor(){}
 
-			virtual vBase *substitution(Variable *v)	{delete this;return v->bclone();}
-			virtual vBase *assignment(Variable *v)		{delete this;return v->bclone();}
+			virtual vBase *substitution(Variable *v)	{vBase *x = v->bclone();delete this;return x;}
+			virtual vBase *assignment(Variable *v)		{vBase *x = v->bclone();delete this;return x;}
 
 			#define OP(n) virtual void n(Variable *v)	{}
 			OP(add)
