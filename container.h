@@ -83,6 +83,8 @@ public:
 	{
 		if (t > res)
 		{
+			if (res*2 > t)
+				t = res * 2;
 			T *n = new T[t];
 			for (size_t i = 0; i < len; i++)
 				n[i] = x[i];
