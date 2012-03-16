@@ -121,7 +121,7 @@ private:
 			definelist = new table();
 			dlnew = true;
 		}
-		ifdef = false;
+		ifdefcount = ifdefstatus = 0;
 #endif
 	}
 	string filename;
@@ -136,7 +136,8 @@ private:
 #ifdef PSL_USE_TOKENIZER_DEFINE
 //	std::map<string,string> definelist;	// ‚±‚ê‚â‚é‚Æ‚Å‚©‚¢‚ñ‚¾c
 	bool dlnew;
-	bool ifdef;
+	int ifdefcount;
+	int ifdefstatus;
 #endif
 	bool whitespace()
 	{
@@ -304,11 +305,12 @@ private:
 				PSL_PRINTF(("warning %s %d: ifdef syntax error\n", filename.c_str(), line));
 			else
 			{
+				++ifdefcount;
 				if (!definelist->count(nstr))
 				{
-					ifdef = true;
+					ifdefstatus = ifdefcount;
 					int n;
-					do n = doNext(); while (ifdef && n);
+					do n = doNext(); while (ifdefstatus && n);
 					return n;
 				}
 			}
@@ -319,18 +321,40 @@ private:
 				PSL_PRINTF(("warning %s %d: ifndef syntax error\n", filename.c_str(), line));
 			else
 			{
+				++ifdefcount;
 				if (definelist->count(nstr))
 				{
-					ifdef = true;
+					ifdefstatus = ifdefcount;
 					int n;
-					do n = doNext(); while (ifdef && n);
+					do n = doNext(); while (ifdefstatus && n);
 					return n;
 				}
 			}
 		}
+		else if (directive == "else")
+		{
+			if (!ifdefstatus)
+			{
+				ifdefstatus = ifdefcount;
+				int n;
+				do n = doNext(); while (ifdefstatus && n);
+				return n;
+			}
+			else
+			{
+				ifdefstatus = 0;
+			}
+		}
 		else if (directive == "endif")
 		{
-			ifdef = false;
+			if (!ifdefcount)
+				PSL_PRINTF(("warning %s %d: endif syntax error\n", filename.c_str(), line));
+			else
+			{
+				if (ifdefstatus == ifdefcount)
+					ifdefstatus = 0;
+				--ifdefcount;
+			}
 		}
 #endif
 		else
