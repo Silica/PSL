@@ -15,6 +15,7 @@ class string
 	typedef unsigned int size_t;
 public:
 	static int min(int x, int y)	{return (x < y) ? x : y;}
+	static bool empty(const char *s){return s == NULL || s[0] == 0;}
 private:
 	class SharedBuffer
 	{
@@ -27,7 +28,7 @@ private:
 		SharedBuffer *clone(size_t t)
 		{
 			SharedBuffer *c = new SharedBuffer(t);
-			c->fcopy(buf, len);
+			c->fcopy(buf, min(len, t));
 			return c;
 		}
 		void copy(const char *s)
@@ -77,8 +78,8 @@ private:
 public:
 	string()	{buf = NULL;}
 	string(const string &s)			{buf = s.buf ? s.buf->inc() : NULL;}
-	string(const char *s)			{buf = (s[0]==0) ? NULL : new SharedBuffer(s);}
-	string(const char *s, size_t t)	{buf = (s[0]==0||t==0) ? NULL : new SharedBuffer(s, t);}
+	string(const char *s)			{buf = empty(s) ? NULL : new SharedBuffer(s);}
+	string(const char *s, size_t t)	{buf = (empty(s)||t==0) ? NULL : new SharedBuffer(s, t);}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
 #ifdef PSTRING_USE_DOUBLE
@@ -129,18 +130,35 @@ public:
 	{
 		if (!buf)
 		{
-			buf = new SharedBuffer(s);
+			if (!empty(s))
+				buf = new SharedBuffer(s);
 		}
 		else
 		{
-			size_t l = std::strlen(s);
-			only_and_extend(l);
-			buf->fcopy(s, l);
+			if (empty(s))
+			{
+				if (buf->shared())
+				{
+					buf->finalize();
+					buf = NULL;
+				}
+				else
+				{
+					buf->setlen(0);
+				}
+			}
+			else
+			{
+				size_t l = std::strlen(s);
+				only_and_extend(l);
+				buf->fcopy(s, l);
+			}
 		}
 		return *this;
 	}
 	string &operator+=(const char *s)
 	{
+		if (empty(s))	return *this;
 		if (!buf)
 		{
 			buf = new SharedBuffer(s);
@@ -156,7 +174,8 @@ public:
 	}
 	string operator+(const char *s) const
 	{
-		if (!buf)	return new SharedBuffer(s);
+		if (empty(s))	return *this;
+		if (!buf)		return new SharedBuffer(s);
 		size_t l = std::strlen(s);
 		SharedBuffer *n = new SharedBuffer(buf->length() + l);
 		n->fcopy(buf->buffer(), buf->length());
