@@ -52,6 +52,13 @@ protected:
 			next = n;
 			return next->ptr;
 		}
+		bool empty()
+		{
+			for (int i = 0; i < poolsize; ++i)
+				if (ptr[i].x)
+					return false;
+			return true;
+		}
 	} p;
 };
 class VMemoryPool : public MemoryPool<8>
@@ -66,6 +73,7 @@ public:
 		Destructor();
 		Delete();
 		UnMark();
+		ReleaseEmpty();
 	}
 private:
 	#define POOLOOP for (pool *pl = &p; pl != NULL; pl = pl->next)for (int i = 0; i < psize; ++i)if (pl->ptr[i].x)
@@ -97,6 +105,21 @@ private:
 	void Destructor()	{POOLOOP{((Variable*)(pl->ptr+i))->destructor_unmark();}}
 	void Delete()		{POOLOOP{((Variable*)(pl->ptr+i))->delete_unmark();}}
 	#undef POOLOOP
+	void ReleaseEmpty()
+	{
+		for (pool **pl = &p.next; *pl != NULL;)
+		{
+			if ((*pl)->empty())
+			{
+				pool *n = (*pl)->next;
+				(*pl)->next = NULL;
+				delete *pl;
+				*pl = n;
+				continue;
+			}
+			pl = &(*pl)->next;
+		}
+	}
 };
 #elif !defined(PSL_MEMORY_MANAGER_LARGE)
 {

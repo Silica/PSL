@@ -373,8 +373,7 @@ private:
 		pline = line;
 		if (including)
 		{
-			int r = including->doNext();
-			if (r)
+			if (int r = including->doNext())
 			{
 				nstr = including->nstr;
 				nint = including->nint;
