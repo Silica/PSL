@@ -104,7 +104,6 @@ private:
 	void UnMark()		{POOLOOP{((Variable*)(pl->ptr+i))->unmark(0x3FFFFFFF);}}
 	void Destructor()	{POOLOOP{((Variable*)(pl->ptr+i))->destructor_unmark();}}
 	void Delete()		{POOLOOP{((Variable*)(pl->ptr+i))->delete_unmark();}}
-	#undef POOLOOP
 	void ReleaseEmpty()
 	{
 		for (pool **pl = &p.next; *pl != NULL;)
@@ -119,7 +118,14 @@ private:
 			}
 			pl = &(*pl)->next;
 		}
+		DATA **ptr = &current;
+		POOLOOP;else{
+			*ptr = pl->ptr+i;
+			ptr = &pl->ptr[i].next;
+		}
+		*ptr = NULL;
 	}
+	#undef POOLOOP
 };
 #elif !defined(PSL_MEMORY_MANAGER_LARGE)
 {
