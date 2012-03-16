@@ -70,7 +70,7 @@ public:
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
-	#define CMP(n,o) virtual bool n(Variable *v)	{return x o (unsigned)v->toInt();}
+	#define CMP(n,o) bool n(Variable *v)	{return x o (unsigned)v->toInt();}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -107,7 +107,7 @@ public:
 //	OP(div,/=)
 	#undef OP
 	void div(Variable *v)	{int i = v->toDouble();if (i)x /= i;else x=0;}
-	#define CMP(n,o) virtual bool n(Variable *v)	{return x o v->toDouble();}
+	#define CMP(n,o) bool n(Variable *v)	{return x o v->toDouble();}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -144,7 +144,7 @@ public:
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
-	#define CMP(n,o) virtual bool n(Variable *v)	{return x o v->toString();}
+	#define CMP(n,o) bool n(Variable *v)	{return x o v->toString();}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -185,6 +185,8 @@ public:
 		return this;
 	}
 
+	// Žw‚µ‚Ä‚éæ‚ª“¯‚¶‚È‚çtrue‚È‚Ì‚Å
+	// v‚ªPointer‚Å‚ ‚éê‡‚É‚»‚Ìæ‚ð’m‚ç‚Ë‚Î‚È‚ç‚È‚¢
 	bool eq(Variable *v)	{return x == v;}
 	bool ne(Variable *v)	{return x != v;}
 	Variable *deref()	{return x;}
@@ -194,7 +196,17 @@ public:
 	double toDouble()	const {return x ? 1 : 0;}
 	string toString()	const {return x ? "[pointer]" : "NULL";}
 
-	size_t length()		const {return x ? 1 : 0;}
+	size_t length()		const {return x ? x->length() : 0;}
+	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
+	Variable *index(size_t t)			{return x ? x->index(t) : NULL;}
+	Variable *child(const string &s)	{return x ? x->child(s) : NULL;}
+	Variable *keys()					{return x ? x->keys() : new Variable();}
+	bool set(const string &s, const variable &v)	{return x ? x->set(s, v) : false;}
+	void del(const string &s)	{if(x)x->del(s);}
+
+	void prepare(Environment &env, Variable *v)	{if(x)x->prepare(env);}
+	rsv call(Environment &env, variable &arg, Variable *v)	{return x ? x->call(env, arg) : variable(NIL);}
+
 	PSL_DUMP((){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();})
 private:
 	Variable *x;
