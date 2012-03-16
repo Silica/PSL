@@ -185,10 +185,8 @@ public:
 		return this;
 	}
 
-	// w‚µ‚Ä‚éæ‚ª“¯‚¶‚È‚çtrue‚È‚Ì‚Å
-	// v‚ªPointer‚Å‚ ‚éê‡‚É‚»‚Ìæ‚ğ’m‚ç‚Ë‚Î‚È‚ç‚È‚¢
-	bool eq(Variable *v)	{return x == v;}
-	bool ne(Variable *v)	{return x != v;}
+	bool eq(Variable *v)	{return x == v->deref();}
+	bool ne(Variable *v)	{return x != v->deref();}
 	Variable *deref()	{return x;}
 
 	bool toBool()		const {return x ? true : false;}
