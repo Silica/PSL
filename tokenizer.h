@@ -254,16 +254,20 @@ private:
 		{
 			if (s[i] == '<' || s[i] == '"')
 			{
-				int h = ++i;
-				for (; i < len; ++i)
+				for (int h = ++i; i < len; ++i)
 				{
 					if (s[i] == '>' || s[i] == '"' || s[i] == '\r' || s[i] == '\n')
 					{
-						string name(s+h, i-h);
-						++i;
-						including = New(name, definelist);
-						if (!including)
-							PSL_PRINTF(("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str()));
+						#ifdef PSL_USE_TOKENIZER_DEFINE
+						if (!ifdefstatus)
+						#endif
+						{
+							string name(s+h, i-h);
+							++i;
+							including = New(name, definelist);
+							if (!including)
+								PSL_PRINTF(("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str()));
+						}
 						break;
 					}
 				}
