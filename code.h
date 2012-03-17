@@ -277,7 +277,6 @@ public:
 		env.push(*v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
 	PSL_DUMP((int d){PSL_PRINTF(("DEREF\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::DEREF);}
 };
@@ -291,7 +290,6 @@ public:
 		env.push(v.pointer());
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
 	PSL_DUMP((int d){PSL_PRINTF(("REF\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::REF);}
 };
