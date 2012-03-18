@@ -328,7 +328,7 @@ public:
 	#ifndef PSL_POPSTACK_NULL
 	void clear()
 	{
-		for (int i = len; i < res; ++i)
+		for (size_t i = len; i < res; ++i)
 		{
 			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 			x[i] = Variable::StaticObject::rsvnull();
