@@ -136,7 +136,8 @@ public:
 		data *operator->()			{return ta->d[n];}
 		void operator++()
 		{
-			while (++n < (int)(ta->reserve))
+			int max = ta->reserve * 2;
+			while (++n < max)
 				if (ta->d[n])
 					return;
 			n = -1;
@@ -149,7 +150,8 @@ public:
 	table()		{reserve = len = 0;d = NULL;}
 	~table()
 	{
-		for (size_t i = 0; i < reserve; ++i)
+		int max = reserve * 2;
+		for (int i = 0; i < max; ++i)
 			delete d[i];
 		delete[] d;
 	}
@@ -168,7 +170,7 @@ public:
 			if (i >= 0)
 				return d[i]->second;
 		}
-		if (len == reserve)
+		if (len >= reserve)
 			resize();
 		hash h = gethash(s, reserve);
 		int i = getnextnull(h);
@@ -184,7 +186,10 @@ public:
 		if (i < 0)
 			return;
 		delete d[i];
-		d[i] = NULL;
+		if (i < (int)reserve)
+			move(i);
+		else
+			d[i] = NULL;
 	}
 	bool empty()	const{return !len;}
 	size_t size()	const{return len;}
@@ -204,50 +209,57 @@ private:
 	int search(const string &s) const
 	{
 		hash h = gethash(s, reserve);
+		if (!d[h])
+			return -1;
+		else if (d[h]->first == s)
+			return h;
+
+		size_t max = reserve*2;
+		for (size_t i = reserve+h; i < max; ++i)
+			if (d[i] && d[i]->first == s)
+				return i;
 		// 頻繁にアクセスする値が奧に追いやられるのを防ぐ
 		// 交互にアクセスする様な値が衝突すると、毎回交換する為に非常に非効率
 		// カウント等をして、ある程度の閾値を設けておく方が正しいのだが
 		// そういうことをするコスト自体が？
-/*		if (d[h] && d[h]->first == s)
-			return h;
-		for (size_t i = h+1; i < reserve; ++i)
-			if (d[i] && d[i]->first == s)
-			{
-				data *temp = d[h];
-				d[h] = d[i];
-				d[i] = temp;
-				return h;
-			}
-		for (size_t i = 0; i < h; ++i)
-			if (d[i] && d[i]->first == s)
-			{
+/*			{
 				data *temp = d[h];
 				d[h] = d[i];
 				d[i] = temp;
 				return h;
 			}*/
-		for (size_t i = h; i < reserve; ++i)
+		max = reserve + h;
+		for (size_t i = reserve; i < max; ++i)
 			if (d[i] && d[i]->first == s)
 				return i;
-		for (size_t i = 0; i < h; ++i)
-			if (d[i] && d[i]->first == s)
-				return i;
-		// 存在しない場合、全探索が行われる事になる
-		// つまり、新たに値を追加する毎にそれが行われる
-		// eraseに細工することで効率化が可能か？
-		// 当然eraseは遅くなるが、insertとeraseの恐らく頻度の差を考えれば
 		return -1;
 	}
 	size_t getnextnull(size_t t) const
 	{
-		for (size_t i = t; i < reserve; ++i)
+		if (!d[t])
+			return t;
+		size_t max = reserve*2;
+		for (size_t i = reserve+t; i < max; ++i)
 			if (!d[i])
 				return i;
-		for (size_t i = 0; i < t; ++i)
+		max = reserve + t;
+		for (size_t i = reserve; i < max; ++i)
 			if (!d[i])
 				return i;
 		PSL_PRINTF(("table error:\n"));
 		return 0;
+	}
+	void move(hash h)
+	{
+		size_t max = reserve*2;
+		for (size_t i = reserve; i < max; ++i)
+			if (d[i] && h == gethash(d[i]->first, reserve))
+			{
+				d[h] = d[i];
+				d[i] = NULL;
+				return;
+			}
+		d[h] = NULL;
 	}
 	void resize() const
 	{
@@ -257,10 +269,9 @@ private:
 			Reserve();
 			return;
 		}
-		size_t max = reserve;
 		reserve = reserve * 2;
 		data **old = Reserve();
-		for (size_t i = 0; i < max; ++i)
+		for (size_t i = 0; i < reserve; ++i)
 		{
 			if (old[i])
 			{
@@ -274,8 +285,8 @@ private:
 	data **Reserve() const
 	{
 		data **old = d;
-		d = new data*[reserve];
-		std::memset(d, 0, sizeof(data*)*reserve);
+		d = new data*[reserve * 2];
+		std::memset(d, 0, sizeof(data*) * 2 * reserve);
 		return old;
 	}
 	mutable size_t len;
