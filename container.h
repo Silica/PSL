@@ -232,6 +232,10 @@ private:
 		for (size_t i = 0; i < h; ++i)
 			if (d[i] && d[i]->first == s)
 				return i;
+		// 存在しない場合、全探索が行われる事になる
+		// つまり、新たに値を追加する毎にそれが行われる
+		// eraseに細工することで効率化が可能か？
+		// 当然eraseは遅くなるが、insertとeraseの恐らく頻度の差を考えれば
 		return -1;
 	}
 	size_t getnextnull(size_t t) const
