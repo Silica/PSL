@@ -381,7 +381,7 @@ public:
 class PUSH_CODE : public OpCode
 {
 public:
-	PUSH_CODE(rsv v):x(v){}
+	PUSH_CODE(const rsv &v):x(v){}
 	OpCode *clone()	{return new PUSH_CODE(x);}
 	RC::RETURNCODE Execute(Environment &env)
 	{
