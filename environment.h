@@ -301,7 +301,8 @@ public:
 	}
 	bool Run(Environment &env, size_t &line)
 	{
-		while (line < code.size())
+		size_t size = code.size();
+		while (line < size)
 		{
 			OpCode::RC::RETURNCODE r = code[line++]->Execute(env);
 			if (!r)
@@ -358,7 +359,8 @@ public:
 	}
 	void push(Code *c)
 	{
-		for (size_t i = 0; i < c->code.size(); ++i)
+		size_t size = c->code.size();
+		for (size_t i = 0; i < size; ++i)
 			code.push_back(c->code[i]);
 		c->code.resize(0);
 	}
