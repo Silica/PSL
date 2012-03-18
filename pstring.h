@@ -315,10 +315,11 @@ public:
 #endif
 	bool operator==(const string &s) const
 	{
-		if (buf == s.buf)						return true;
-		if (!buf || !s.buf)						return false;
-		if (buf->length() != s.buf->length())	return false;
-		for (size_t t = 0; t < buf->length(); ++t)
+		if (buf == s.buf)					return true;
+		if (!buf || !s.buf)					return false;
+		size_t l = buf->length();
+		if (l != s.buf->length())			return false;
+		for (size_t t = 0; t < l; ++t)
 			if (buf->at(t) != s.buf->at(t))	return false;
 		return true;
 	}
@@ -333,12 +334,13 @@ public:
 			if (s[0] == 0)	return true;
 			else			return false;
 		}
-		for (size_t t = 0; t < buf->length(); ++t)
+		size_t l = buf->length();
+		for (size_t t = 0; t < l; ++t)
 		{
 			if (s[t] == 0)			return false;
 			if (buf->at(t) != s[t])	return false;
 		}
-		if (s[buf->length()] != 0)	return false;
+		if (s[l] != 0)				return false;
 		return true;
 	}
 	bool operator!=(const char *s) const

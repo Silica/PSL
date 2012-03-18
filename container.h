@@ -132,7 +132,7 @@ public:
 	{
 	public:
 		iterator(table *t, int i)	{ta = t;n = i;}
-		bool operator!=(const iterator &it)	{return n != it.n;}
+		bool operator!=(int i)		{return n != i;}
 		data *operator->()			{return ta->d[n];}
 		void operator++()
 		{
@@ -199,7 +199,7 @@ public:
 		}
 		return iterator(this, -1);
 	}
-	iterator end()		{return iterator(this, -1);}
+	int end()	{return -1;}
 private:
 	int search(const string &s) const
 	{
