@@ -73,7 +73,7 @@ private:
 		variable f = v[1];
 		variable k = l.keys();
 		int s = k.length();
-		for (int i = 0; i < s; i++)
+		for (int i = 0; i < s; ++i)
 			f(k[i], l[k[i]]);
 		return k;
 	}
@@ -172,7 +172,7 @@ private:
 			{
 				variable array = v[0];
 				size = array.length();
-				for (int i = 0; i < size; i++)
+				for (int i = 0; i < size; ++i)
 				{
 					variable a = array[i];
 					v[1](a);
@@ -181,7 +181,7 @@ private:
 			else
 			{
 				size = this_v.length();
-				for (int i = 0; i < size; i++)
+				for (int i = 0; i < size; ++i)
 				{
 					variable a = this_v[i];
 					v(a);
@@ -367,7 +367,7 @@ private:
 			variable r;
 			if (!fp || !size)
 				return r;
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; ++i)
 			{
 				int c = fgetc(fp);
 				if (c == EOF)
@@ -389,7 +389,7 @@ private:
 			variable r;
 			if (!fp || !size)
 				return r;
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; ++i)
 			{
 				hex h;
 				if (fread(&h, 1, sizeof(hex), fp) < sizeof(hex))
