@@ -20,7 +20,7 @@ public:
 	OP(shl,<<=)
 	OP(shr,>>=)
 	#undef OP
-	#define OP(n,o) void n(Variable *v)	{int i = v->toInt();if (i)x o i;else x=0;}
+	#define OP(n,o) void n(Variable *v)	{if (int i = v->toInt())x o i;else x=0;}
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
@@ -66,7 +66,7 @@ public:
 	OP(shl,<<=)
 	OP(shr,>>=)
 	#undef OP
-	#define OP(n,o) void n(Variable *v)	{int i = v->toInt();if (i)x o i;else x=0;}
+	#define OP(n,o) void n(Variable *v)	{if (int i = v->toInt())x o i;else x=0;}
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
@@ -106,7 +106,7 @@ public:
 	OP(mul,*=)
 //	OP(div,/=)
 	#undef OP
-	void div(Variable *v)	{int i = v->toDouble();if (i)x /= i;else x=0;}
+	void div(Variable *v)	{if (double d = v->toDouble())x /= d;else x=0;}
 	#define CMP(n,o) bool n(Variable *v)	{return x o v->toDouble();}
 	CMP(eq,==)
 	CMP(ne,!=)
@@ -179,7 +179,7 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (x)			x->finalize();
+		if (x)	x->finalize();
 		if (v->type() == POINTER)	x = v->deref()->ref();	// 一段階は考慮しよう
 		else						x = v->ref();			// v自体がポインタだったらどうする？
 		return this;
