@@ -1,3 +1,5 @@
+#define OBJECT_SIZE 32
+
 template<size_t S> class OverLoad{};
 template<size_t S, int poolsize = 256> class MemoryPool
 #ifdef PSL_MEMORY_MANAGER_SLIM
@@ -351,8 +353,10 @@ class StaticObject
 {
 	struct sobj
 	{
-		MemoryPool<8> pool8;
-		MemoryPool<36> pool36;
+		#define pool(s) MemoryPool<s> pool##s;
+		pool(8)
+		pool(OBJECT_SIZE)
+		#undef pool
 		VMemoryPool vpool;
 		~sobj()
 		{
@@ -395,8 +399,10 @@ public:
 	#endif
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
-	static MemoryPool<8> &pool(OverLoad<8> x)	{return so().pool8;};
-	static MemoryPool<36> &pool(OverLoad<36> x)	{return so().pool36;};
+	#define pool(s) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##s;}
+	pool(8)
+	pool(OBJECT_SIZE)
+	#undef pool
 	static VMemoryPool &vpool()		{return so().vpool;}
 };
 
@@ -414,3 +420,5 @@ public:
 	static void *Next()				{return (StaticObject::pool(OverLoad<S>())).nextptr();}
 	static void Release(void *ptr)	{(StaticObject::pool(OverLoad<S>())).release(ptr);}
 };
+
+#undef OBJECT_SIZE

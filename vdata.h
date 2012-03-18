@@ -440,25 +440,18 @@ class vObject : public vBase
 {
 public:
 	PSL_MEMORY_MANAGER(vObject)
-	vObject()				{class_v = NULL;code = NULL;}
-	vObject(int i):array(i)	{class_v = NULL;code = NULL;}
-	vObject(Variable *v)	{class_v = v->ref();code = NULL;}
-	vObject(Code *c)		{class_v = NULL;code = c->inc();}
-	~vObject()	{
-		if (class_v)class_v->finalize();
-		if (code)	code->finalize();
-	}
+	vObject()				{code = NULL;}
+	vObject(int i):array(i)	{code = NULL;}
+	vObject(Code *c)		{code = c->inc();}
+	~vObject()				{if (code)	code->finalize();}
 	void destructor()
 	{
-		if (class_v)
+		const static string destructor = "destructor";
+		if (member.count(destructor) && member[destructor].get()->type() == METHOD)
 		{
-			const static string destructor = "destructor";
-			if (member.count(destructor))
-			{
-				PSL_TEMPORARY_ENV(env);
-				variable arg;
-				member[destructor].get()->call(env, arg);
-			}
+			PSL_TEMPORARY_ENV(env);
+			variable arg;
+			member[destructor].get()->call(env, arg);
 			member.erase(destructor);
 		}
 	}
@@ -472,8 +465,6 @@ public:
 			array[i].copy(v->array[i]);
 		for (table::iterator it = v->member.begin(); it != v->member.end(); ++it)
 			member[it->first].copy(it->second);
-		if (v->class_v)	class_v = v->class_v->ref();
-		else			class_v = NULL;
 		if (v->code)	code = v->code->inc();
 		else			code = NULL;
 	}
@@ -484,8 +475,6 @@ public:
 			array[i].get()->searchcount(v, c);
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			member[it->first].get()->searchcount(v, c);
-		if (class_v)
-			class_v->searchcount(v, c);
 	}
 	void mark()
 	{
@@ -494,8 +483,6 @@ public:
 			array[0].get()->mark();
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			member[it->first].get()->mark();
-		if (class_v)
-			class_v->mark();
 	}
 
 	vBase *substitution(Variable *v)
@@ -614,7 +601,7 @@ public:
 	{
 		if (!code)
 			return;
-		env.addScope(new FunctionScope(code, class_v ? class_v : v));
+		env.addScope(new FunctionScope(code, v));
 	}
 	void prepareInstance(Environment &env, Variable *v)
 	{
@@ -634,14 +621,14 @@ public:
 	{
 		if (!code)
 			return variable(NIL);
-		env.addScope(new FunctionScope(code, class_v ? class_v : v));
+		env.addScope(new FunctionScope(code, v));
 		env.push(arg);
 		env.Run();
 		return env.pop();
 	}
 	Variable *instance(Variable *v)
 	{
-		vObject *o = new vObject(v);
+		vObject *o = new vObject();
 		Variable *x = new Variable(o);
 		rsv temp(x, 0);
 
@@ -694,7 +681,6 @@ public:
 private:
 	rlist array;
 	table member;
-	Variable *class_v;
 	Code *code;
 	void kcopy(Variable *v)
 	{
