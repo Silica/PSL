@@ -120,7 +120,7 @@ typedef std::map<string,rsv> table;
 class table
 {
 	typedef unsigned long hash;
-	static hash gethash(const string &s, hash max)	{return s.hash() & max;}
+	static hash gethash(const string &s, hash max)	{return s.hash() & (max-1);}
 public:
 	struct data
 	{
@@ -204,6 +204,28 @@ private:
 	int search(const string &s) const
 	{
 		hash h = gethash(s, reserve);
+		// 頻繁にアクセスする値が奧に追いやられるのを防ぐ
+		// 交互にアクセスする様な値が衝突すると、毎回交換する為に非常に非効率
+		// カウント等をして、ある程度の閾値を設けておく方が正しいのだが
+		// そういうことをするコスト自体が？
+/*		if (d[h] && d[h]->first == s)
+			return h;
+		for (size_t i = h+1; i < reserve; ++i)
+			if (d[i] && d[i]->first == s)
+			{
+				data *temp = d[h];
+				d[h] = d[i];
+				d[i] = temp;
+				return h;
+			}
+		for (size_t i = 0; i < h; ++i)
+			if (d[i] && d[i]->first == s)
+			{
+				data *temp = d[h];
+				d[h] = d[i];
+				d[i] = temp;
+				return h;
+			}*/
 		for (size_t i = h; i < reserve; ++i)
 			if (d[i] && d[i]->first == s)
 				return i;
@@ -231,7 +253,7 @@ private:
 		vector<data*> temp(reserve);
 #endif
 		int max = reserve;
-		reserve = reserve*2 + 1;
+		reserve = reserve ? reserve*2 : 2;
 #ifdef PSL_USE_STL_VECTOR
 		temp.swap(d);
 		d.resize(reserve, NULL);
