@@ -86,7 +86,7 @@ public:
 			if (res*2 > t)
 				t = res * 2;
 			T *n = new T[t];
-			for (size_t i = 0; i < len; i++)
+			for (size_t i = 0; i < len; ++i)
 				n[i] = x[i];
 			res = t;
 			delete[] x;
@@ -146,12 +146,12 @@ public:
 		int n;
 	};
 	friend class iterator;
-	table()		{reserve = len = 0;}
+	table()		{reserve = len = 0;d = NULL;}
 	~table()
 	{
-		int s = d.size();
-		for (int i = 0; i < s; i++)
+		for (size_t i = 0; i < reserve; ++i)
 			delete d[i];
+		delete[] d;
 	}
 	size_t count(const string &s) const
 	{
@@ -173,7 +173,7 @@ public:
 		hash h = gethash(s, reserve);
 		int i = getnextnull(h);
 		d[i] = new data(s);
-		len++;
+		++len;
 		return d[i]->second;
 	}
 	void erase(const string &s)
@@ -193,7 +193,7 @@ public:
 			return iterator(this, -1);
 		else
 		{
-			for (size_t i = 0; i < reserve; i++)
+			for (size_t i = 0; i < reserve; ++i)
 				if (d[i])
 					return iterator(this, i);
 		}
@@ -247,40 +247,36 @@ private:
 	}
 	void resize() const
 	{
-#ifdef PSL_USE_STL_VECTOR
-		std::vector<data*> temp(reserve, NULL);
-#else
-		vector<data*> temp(reserve);
-#endif
-		int max = reserve;
-		reserve = reserve ? reserve*2 : 2;
-#ifdef PSL_USE_STL_VECTOR
-		temp.swap(d);
-		d.resize(reserve, NULL);
-#else
-		d.resize(reserve);
-		for (int i = 0; i < max; i++)
+		if (!reserve)
 		{
-			temp[i] = d[i];
-			d[i] = NULL;
+			reserve = 2;
+			Reserve();
+			return;
 		}
-		for (size_t i = max; i < reserve; i++)
-			d[i] = NULL;
-#endif
-
-		for (int i = 0; i < max; i++)
+		size_t max = reserve;
+		reserve = reserve * 2;
+		data **old = Reserve();
+		for (size_t i = 0; i < max; ++i)
 		{
-			if (temp[i])
+			if (old[i])
 			{
-				hash h = gethash(temp[i]->first, reserve);
+				hash h = gethash(old[i]->first, reserve);
 				int n = getnextnull(h);
-				d[n] = temp[i];
+				d[n] = old[i];
 			}
 		}
+		delete[] old;
+	}
+	data **Reserve() const
+	{
+		data **old = d;
+		d = new data*[reserve];
+		std::memset(d, 0, sizeof(data*)*reserve);
+		return old;
 	}
 	mutable size_t len;
 	mutable size_t reserve;
-	mutable vector<data*> d;
+	mutable data **d;
 };
 #endif
 
@@ -317,7 +313,7 @@ public:
 	#ifndef PSL_POPSTACK_NULL
 	void clear()
 	{
-		for (int i = len; i < res; i++)
+		for (int i = len; i < res; ++i)
 		{
 			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 			x[i] = Variable::StaticObject::rsvnull();

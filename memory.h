@@ -352,7 +352,7 @@ class StaticObject
 	struct sobj
 	{
 		MemoryPool<8> pool8;
-		MemoryPool<44> pool44;
+		MemoryPool<36> pool36;
 		VMemoryPool vpool;
 		~sobj()
 		{
@@ -396,7 +396,7 @@ public:
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	static MemoryPool<8> &pool(OverLoad<8> x)	{return so().pool8;};
-	static MemoryPool<44> &pool(OverLoad<44> x)	{return so().pool44;};
+	static MemoryPool<36> &pool(OverLoad<36> x)	{return so().pool36;};
 	static VMemoryPool &vpool()		{return so().vpool;}
 };
 
