@@ -545,7 +545,7 @@ public:
 		unsigned char a = buf->at(0);
 		unsigned long l = buf->length();
 		unsigned char b = buf->at(l-1);
-		return (a | (b<<8)) ^ (l<<4);
+		return (b | (a<<8)) ^ (l<<4);
 	}
 private:
 	void setint(int i, int c = 0)
