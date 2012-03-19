@@ -90,7 +90,6 @@ public:
 	}
 	virtual Scope *Continue()
 	{
-		line = 0;
 		return this;
 	}
 	virtual Scope *Goto(const string &label)
