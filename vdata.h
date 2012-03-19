@@ -446,7 +446,11 @@ public:
 	~vObject()				{if (code)	code->finalize();}
 	void destructor()
 	{
+		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+		const string &destructor = StaticObject::String::destructor();
+		#else
 		const static string destructor = "destructor";
+		#endif
 		if (member.count(destructor) && member[destructor].get()->type() == METHOD)
 		{
 			PSL_TEMPORARY_ENV(env);

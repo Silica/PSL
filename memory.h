@@ -353,11 +353,13 @@ class StaticObject
 {
 	struct sobj
 	{
+		const string destructor;
 		#define pool(s,n) MemoryPool<s> pool##n;
 		pool(8,8)
 		pool(sizeof(Variable::vObject),VO)
 		#undef pool
 		VMemoryPool vpool;
+		sobj():destructor("destructor"){}
 		~sobj()
 		{
 			vpool.GarbageCollection();
@@ -404,6 +406,11 @@ public:
 	pool(sizeof(Variable::vObject),VO)
 	#undef pool
 	static VMemoryPool &vpool()		{return so().vpool;}
+	struct String
+	{
+		static const string &destructor()		{return so().destructor;}
+	};
+	friend class String;
 };
 
 
