@@ -65,11 +65,11 @@
 	#define PSL_MEMORY_MANAGER(x)
 #endif
 #if defined(PSL_USE_VARIABLE_MEMORY_MANAGER) && !defined(PSL_SHARED_GLOBAL)
-	#define PSL_TEMPORARY_ENV(x) Variable::Environment &x = Variable::StaticObject::envtemp()
-	#define PSL_TEMPORARY_ENV0(x) Variable::Environment &x = Variable::StaticObject::envtemp()
+	#define PSL_TEMPORARY_ENV(x) Environment &x = StaticObject::envtemp()
+	#define PSL_TEMPORARY_ENV0(x) Environment &x = StaticObject::envtemp()
 #else
-	#define PSL_TEMPORARY_ENV(x) Variable::Environment x
-	#define PSL_TEMPORARY_ENV0(x) Variable::Environment x(0)
+	#define PSL_TEMPORARY_ENV(x) Environment x
+	#define PSL_TEMPORARY_ENV0(x) Environment x(0)
 #endif
 
 
@@ -240,7 +240,7 @@ private:
 			default:		x = new vObject();break;
 		}}
 		void finalize()		{if (!--rc)	{rc=0x80000000;x->destructor();delete this;}}
-		void safedelete()	{rsv v(new Variable(x), 0);x = new vInt(0);}
+		void safedelete()	{rsv v(new Variable(x), 0);x = NULL;x = new vInt(0);}
 		bool searchcount(Variable *v, int &c)
 		{
 			if (rc & 0x40000000)
@@ -421,7 +421,6 @@ private:
 		Variable *ref()		{++rc;return this;}
 		PSL_DUMP((){PSL_PRINTF(("rc:%4d, ", rc));x->dump();})
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-		#include "memory.h"
 		static void *operator new(size_t t)		{return VMemoryManager::Next();}
 		static void operator delete(void *ptr)	{VMemoryManager::Release(ptr);}
 #endif
@@ -431,12 +430,21 @@ private:
 		friend class vRArray;
 		friend class vReference;
 	} *x;
+#ifdef __GNUC__
+public:
+#else
 private:
+#endif
+	typedef Variable::Environment Environment;
+private:
+	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	#include "memory.h"
+	#endif
 	variable(Variable *v)	{x = v->ref();}
 	variable(Type t, Variable *v)	{x = new Variable(v);}
 
-	void prepare(Variable::Environment &env)			{x->prepare(env);}
-	void prepareInstance(Variable::Environment &env)	{x->prepareInstance(env);}
+	void prepare(Environment &env)			{x->prepare(env);}
+	void prepareInstance(Environment &env)	{x->prepareInstance(env);}
 
 	size_t codelength()					{return x->codelength();}
 	Variable::Code *getcode()			{return x->getcode();}
@@ -454,12 +462,12 @@ public:
 	rsv ref()		{return x;}
 	rsv pointer()	{return variable(POINTER, x);}
 
-	rsv operator()()											{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
-	rsv operator()(variable &arg)								{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	rsv operator()()									{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
+	rsv operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	#ifndef PSL_SHARED_GLOBAL
-	rsv operator()(Variable::Environment &env, variable &arg)	{return x->call(env, arg);}
+	rsv operator()(Environment &env, variable &arg)		{return x->call(env, arg);}
 	#endif
-	rsv instance()												{return rsv(x->instance(), 0);}
+	rsv instance()										{return rsv(x->instance(), 0);}
 	#define cva(n) const variable &arg##n
 	#define ap(n) arg.push(arg##n);
 	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
@@ -473,13 +481,6 @@ public:
 	#undef CALL
 
 	PSL_DUMP((){x->dump();})
-
-#ifdef __GNUC__
-public:
-#else
-private:
-#endif
-	typedef Variable::Environment environment;
 };
 
 #endif

@@ -315,7 +315,7 @@ public:
 	#ifdef PSL_POPSTACK_NULL
 		rsv v = x[--len];
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-		x[len] = Variable::StaticObject::rsvnull();
+		x[len] = StaticObject::rsvnull();
 		#else
 		const static rsv null;
 		x[len] = null;
@@ -331,7 +331,7 @@ public:
 		for (size_t i = len; i < res; ++i)
 		{
 			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
-			x[i] = Variable::StaticObject::rsvnull();
+			x[i] = StaticObject::rsvnull();
 			#else
 			const static rsv null;
 			x[i] = null;
