@@ -3,7 +3,7 @@
 
 #include "variable.h"
 
-class PSL : private variable::environment
+class PSL : private variable::Environment
 {
 public:
 	#ifndef PSL_DEBUG

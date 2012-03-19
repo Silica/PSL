@@ -89,7 +89,7 @@ private:
 	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	static variable GarbageCollection(variable &v)
 	{
-		Variable::StaticObject::vpool().GarbageCollection();
+		StaticObject::vpool().GarbageCollection();
 		return variable();
 	}
 	#endif

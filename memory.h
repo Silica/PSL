@@ -63,7 +63,7 @@ protected:
 		}
 	} p;
 };
-class VMemoryPool : public MemoryPool<8>
+class VMemoryPool : public MemoryPool<sizeof(Variable)>
 {
 public:
 	void GarbageCollection()
@@ -189,7 +189,7 @@ protected:
 		short next;
 	} ptr[poolsize];
 };
-class VMemoryPool : public MemoryPool<8>
+class VMemoryPool : public MemoryPool<sizeof(Variable)>
 {
 public:
 	void GarbageCollection()
@@ -314,7 +314,7 @@ protected:
 		}
 	} p;
 };
-class VMemoryPool : public MemoryPool<8>
+class VMemoryPool : public MemoryPool<sizeof(Variable)>
 {
 public:
 	void GarbageCollection()
@@ -353,9 +353,9 @@ class StaticObject
 {
 	struct sobj
 	{
-		#define pool(s) MemoryPool<s> pool##s;
-		pool(8)
-		pool(OBJECT_SIZE)
+		#define pool(s,n) MemoryPool<s> pool##n;
+		pool(8,8)
+		pool(sizeof(Variable::vObject),VO)
 		#undef pool
 		VMemoryPool vpool;
 		~sobj()
@@ -399,9 +399,9 @@ public:
 	#endif
 public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
-	#define pool(s) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##s;}
-	pool(8)
-	pool(OBJECT_SIZE)
+	#define pool(s,n) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##n;}
+	pool(8,8)
+	pool(sizeof(Variable::vObject),VO)
 	#undef pool
 	static VMemoryPool &vpool()		{return so().vpool;}
 };
