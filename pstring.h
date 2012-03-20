@@ -448,17 +448,32 @@ public:
 		}
 		return *this;
 	}
-	string &sprintf(const char *format, ...)	/* ŠëŒ¯AŽg‚¤‚È */
+	string &sprintf(const char *format, ...)
 	{
 		using namespace std;
-		SharedBuffer *n = new SharedBuffer(1024);
 		va_list arg;
 		va_start(arg, format);
-		n->setlen(vsprintf(n->buffer(), format, arg));
+		int size;
+		if (buf && !buf->shared())
+		{
+			size = vsnprintf(buf->buffer(), buf->maxlength(), format, arg);
+			if (size <= (int)buf->maxlength())
+			{
+				va_end(arg);
+				return *this;
+			}
+		}
+		else
+			size = vsnprintf(NULL, 0, format, arg);
+		if (size >= 0)
+		{
+			SharedBuffer *n = new SharedBuffer(size);
+			n->setlen(vsnprintf(n->buffer(), size+1, format, arg));
+			if (buf)
+				buf->finalize();
+			buf = n;
+		}
 		va_end(arg);
-		if (buf)
-			buf->finalize();
-		buf = n;
 		return *this;
 	}
 
