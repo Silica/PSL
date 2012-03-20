@@ -266,7 +266,13 @@ private:
 							++i;
 							including = New(name, definelist);
 							if (!including)
-								PSL_PRINTF(("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str()));
+							{
+								int dir = filename.rfind('\\');
+								if (dir > 0 || ((dir = filename.rfind('/')) > 0))
+									including = New(filename / static_cast<size_t>(dir+1) + name, definelist);
+								if (!including)
+									PSL_PRINTF(("tokenizer %s %d: can't open include file <%s>\n", filename.c_str(), line, name.c_str()));
+							}
 						}
 						break;
 					}
