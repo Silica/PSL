@@ -451,7 +451,8 @@ public:
 		#else
 		const static string destructor = "destructor";
 		#endif
-		if (member.count(destructor) && member[destructor].get()->type() == METHOD)
+		Type t;
+		if (member.count(destructor) && ((t = member[destructor].get()->type()) == METHOD || t == CMETHOD))
 		{
 			PSL_TEMPORARY_ENV(env);
 			variable arg;
