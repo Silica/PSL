@@ -52,7 +52,7 @@ public:
 	}
 	error LoadCompiledCode(std::FILE *fp, unsigned long size)
 	{
-		variable cc = global;
+		variable cc;
 		unsigned long l;
 		fread(&l, 1, sizeof(l), fp);
 		if (l != 0xBCDEF01A)
@@ -60,9 +60,10 @@ public:
 		size -= sizeof(l);
 		variable::Variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
-//		variable::PSLlib::Basic(global);
 		variable::Variable::bcreader::read(b, cc);
-		cc.prepare(*this);
+		variable g = global;
+		g = cc;
+		g.prepare(*this);
 		return NONE;
 	}
 	error LoadCompiledCode(const char *filename)
@@ -119,16 +120,15 @@ private:
 	bool parse(variable::Tokenizer *t)
 	{
 		variable::Parser p(t);
-//		variable::PSLlib::Basic(global);
 
-		variable g = global;
+		variable g;
 		p.Parse(g);
 		if (p.getErrorNum())
 			return true;
 
-//		g.dump();
-
-		global.get()->prepare(*this);
+		variable gl = global;
+		gl = g;
+		gl.prepare(*this);
 		return false;
 	}
 	#ifdef PSL_DEBUG
