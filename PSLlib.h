@@ -40,6 +40,7 @@ public:
 		Table::set(v["table"]);
 		File::set(v["file"]);
 		Binary::set(v["binary"]);
+		Time::set(v["time"]);
 	}
 private:
 	static variable Print(variable &v)
@@ -402,5 +403,19 @@ private:
 			r["length"] = size;
 			return r;
 		}
+	};
+	class Time
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			v["time"] = time;
+			v["clock"] = Clock;
+			v["CLOCKS_PER_SEC"] = CLOCKS_PER_SEC;
+		}
+	private:
+		static variable time(variable &v)	{return static_cast<int>(std::time(NULL));}
+		static variable Clock(variable &v)	{return std::clock();}
 	};
 };
