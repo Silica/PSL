@@ -41,6 +41,7 @@ public:
 		File::set(v["file"]);
 		Binary::set(v["binary"]);
 		Time::set(v["time"]);
+		Math::set(v["math"]);
 	}
 private:
 	static variable Print(variable &v)
@@ -417,5 +418,24 @@ private:
 	private:
 		static variable time(variable &v)	{return static_cast<int>(std::time(NULL));}
 		static variable Clock(variable &v)	{return std::clock();}
+	};
+	class Math
+	{
+	public:
+		static void set(const rsv &r)
+		{
+			variable v = r;
+			v["abs"] = Abs;
+			v["fabs"] = FAbs;
+			v["sqrt"] = Sqrt;
+			v["pow"] = Pow;
+			v["log"] = Log;
+		}
+	private:
+		static variable Abs(variable &v)	{return std::abs(static_cast<int>(v));}
+		static variable FAbs(variable &v)	{return std::fabs(static_cast<double>(v));}
+		static variable Sqrt(variable &v)	{return std::sqrt(static_cast<double>(v));}
+		static variable Pow(variable &v)	{return std::pow(static_cast<double>(v[0]), static_cast<double>(v[1]));}
+		static variable Log(variable &v)	{return std::log(static_cast<double>(v));}
 	};
 };

@@ -2,6 +2,7 @@
 #define VARIABLE_H
 
 #include <ctime>
+#include <cmath>
 
 #include "pstring.h"
 
