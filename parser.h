@@ -581,8 +581,8 @@ private:
 				c.pushcode(oc);
 				int b = c.codelength();
 				getexp8(c);
-				oc->set(c.codelength()+1 - b);
 				c.pushcode(new Variable::JR(1));
+				oc->set(c.codelength() - b);
 				c.pushcode(new Variable::PUSH_NULL);
 			}
 			#else
@@ -605,8 +605,8 @@ private:
 				c.pushcode(oc);
 				int b = c.codelength();
 				getexp9(c);
-				oc->set(c.codelength()+1 - b);
 				c.pushcode(new Variable::JR(1));
+				oc->set(c.codelength() - b);
 				c.pushcode(new Variable::PUSH_INT(1));
 			}
 			#else
@@ -685,13 +685,21 @@ private:
 			c.pushcode(oc);
 			int b = c.codelength();
 			getexp11(c);
-			oc->set(c.codelength()+1 - b);
-			oc = new Variable::JR(0);
-			c.pushcode(oc);
+			Variable::OpCode *oc2 = new Variable::JR(0);
+			c.pushcode(oc2);
+			oc->set(c.codelength() - b);
 			b = c.codelength();
 			if (!t->getNextIf(':'))	Error(TINCOT);
 			getexp11(c);
-			oc->set(c.codelength() - b);
+			#if defined(PSL_OPTIMIZE_PARENTHESES) && defined(PSL_OPTIMIZE_IN_COMPILE)
+			if (t->checkNext() && t->checkNext() != ',')
+			{
+				Variable::Code *code = c.getcode();
+				if (code->get(code->length() - 1) == Variable::OpCode::MNEMONIC::PARENTHESES)
+					b += 1;
+			}
+			#endif
+			oc2->set(c.codelength() - b);
 		}
 	}
 	void getexp12(variable &c, bool l = false)
