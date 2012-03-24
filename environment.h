@@ -397,10 +397,10 @@ private:
 	bool optimize(OpCode *c)
 	{
 		OpCode::MNEMONIC::mnemonic cn = c->get();
+		int s = code.size();
 		#ifdef PSL_OPTIMIZE_PARENTHESES
 		if (cn != OpCode::MNEMONIC::LIST)
 		{
-			int s = code.size();
 			if (s >= 1)
 			{
 				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
@@ -419,7 +419,6 @@ private:
 		}
 		if (cn == OpCode::MNEMONIC::POP)
 		{
-			int s = code.size();
 			if (s >= 1)
 			{
 				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
@@ -454,7 +453,6 @@ private:
 		#ifdef PSL_OPTIMIZE_CONSTANT_CALCULATION
 		if (cn == OpCode::MNEMONIC::UNARY || cn == OpCode::MNEMONIC::INC || cn == OpCode::MNEMONIC::DEC)
 		{
-			int s = code.size();
 			if (s >= 1)
 			{
 				if (code[s-1]->get() == OpCode::MNEMONIC::CONSTANT)
@@ -476,7 +474,6 @@ private:
 		}
 		if (cn == OpCode::MNEMONIC::BINARY)
 		{
-			int s = code.size();
 			if (s >= 2)
 			{
 				if ((code[s-1]->get() == OpCode::MNEMONIC::CONSTANT) && (code[s-2]->get() == OpCode::MNEMONIC::CONSTANT))
