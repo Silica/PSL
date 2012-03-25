@@ -102,8 +102,6 @@ public:
 	{
 		Scope *s = owner;
 		owner = NULL;
-		variable v;
-		env.push(v);
 		delete this;
 		return s;
 	}
@@ -142,6 +140,7 @@ public:
 	{
 		Scope *s = owner;
 		owner = NULL;
+		env.pop();
 		env.push(this_v);
 		delete this;
 		return s;

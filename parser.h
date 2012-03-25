@@ -135,13 +135,9 @@ private:
 			Error(TINA, '('/*')'*/, "for");
 		if (!t->getNextIf(';'))
 		{
+			v.pushcode(new Variable::POP);
 			ParseExpression(v, ';');
 			l = v.codelength();
-			if (l)
-			{
-				v.pushcode(new Variable::POP);
-				++l;
-			}
 		}
 		Variable::OpCode *oc = NULL;
 		if (!t->getNextIf(';'))
@@ -160,8 +156,8 @@ private:
 		int cline = v.codelength();
 		if (x.codelength())
 		{
-			v.getcode()->push(x.getcode());
 			v.pushcode(new Variable::POP);
+			v.getcode()->push(x.getcode());
 		}
 		v.pushcode(new Variable::JMP(l));
 		if (oc)
@@ -229,8 +225,8 @@ private:
 		{
 			if (t->nstr == "global" || t->nstr == "static" || t->nstr == "local" || t->nstr == "yield")
 			{
-				ParseExpression(c, ';');
 				c.pushcode(new Variable::POP);
+				ParseExpression(c, ';');
 				return;
 			}
 			t->getNext();
@@ -251,10 +247,11 @@ private:
 			}
 			if (t->nstr == "return")
 			{
-				if (t->checkNext() == ';')
-					c.pushcode(new Variable::PUSH_NULL);
-				else
+				if (t->checkNext() != ';')
+				{
+					c.pushcode(new Variable::POP);
 					ParseExpression(c, ';');
+				}
 				c.pushcode(new Variable::RETURN);
 				return;
 			}
@@ -299,11 +296,10 @@ private:
 				if (g.exist(name))
 					Error(IIAE, 0, name, line);
 				variable m = g[name];
-				if (!m.getcode())
-					m.pushcode(new Variable::POP);
 				ParseBlock(m, m);
 				return;
 			}
+			variable e;
 			if (n == '('/*')'*/)
 			{
 				variable arg;
@@ -331,30 +327,31 @@ private:
 				}
 				else	// ŠÖ”ŒÄ‚Ño‚µ
 				{
-					c.pushcode(new Variable::VARIABLE(name));
-					c.getcode()->push(arg.getcode());
-					c.pushcode(new Variable::CALL);
+					e.pushcode(new Variable::VARIABLE(name));
+					e.getcode()->push(arg.getcode());
+					e.pushcode(new Variable::CALL);
 				}
 			}
 			else if (n == Tokenizer::IDENTIFIER)
 			{
 				t->getNext();
-				c.pushcode(new Variable::VARIABLE(name));
-				c.pushcode(new Variable::INSTANCE);
-				c.pushcode(new Variable::DECLARATION(t->nstr));
+				e.pushcode(new Variable::VARIABLE(name));
+				e.pushcode(new Variable::INSTANCE);
+				e.pushcode(new Variable::DECLARATION(t->nstr));
 			}
 			else
 			{
-				c.pushcode(new Variable::VARIABLE(name));
+				e.pushcode(new Variable::VARIABLE(name));
 			}
-			getSuffOp(c);
-			ParseExpression(c, ';', true);
+			getSuffOp(e);
 			c.pushcode(new Variable::POP);
+			c.getcode()->push(e.getcode());
+			ParseExpression(c, ';', true);
 		}
 		else
 		{
-			ParseExpression(c, ';');
 			c.pushcode(new Variable::POP);
+			ParseExpression(c, ';');
 		}
 	}
 	void ParseBlock(variable &g, variable &c)
