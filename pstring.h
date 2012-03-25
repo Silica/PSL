@@ -319,7 +319,12 @@ public:
 		if (!buf || !s.buf)					return false;
 		size_t l = buf->length();
 		if (l != s.buf->length())			return false;
-		for (size_t t = 0; t < l; ++t)
+		size_t ll = l/sizeof(int);
+		int *b1 = (int*)buf->buffer();
+		int *b2 = (int*)s.buf->buffer();
+		for (size_t t = 0; t < ll; ++t)
+			if (b1[t] != b2[t])				return false;
+		for (size_t t = ll*sizeof(int); t < l; ++t)
 			if (buf->at(t) != s.buf->at(t))	return false;
 		return true;
 	}
