@@ -299,7 +299,6 @@ private:
 				ParseBlock(m, m);
 				return;
 			}
-			variable e;
 			if (n == '('/*')'*/)
 			{
 				variable arg;
@@ -327,25 +326,26 @@ private:
 				}
 				else	// ŠÖ”ŒÄ‚Ño‚µ
 				{
-					e.pushcode(new Variable::VARIABLE(name));
-					e.getcode()->push(arg.getcode());
-					e.pushcode(new Variable::CALL);
+					c.pushcode(new Variable::POP);
+					c.pushcode(new Variable::VARIABLE(name));
+					c.getcode()->push(arg.getcode());
+					c.pushcode(new Variable::CALL);
 				}
 			}
 			else if (n == Tokenizer::IDENTIFIER)
 			{
 				t->getNext();
-				e.pushcode(new Variable::VARIABLE(name));
-				e.pushcode(new Variable::INSTANCE);
-				e.pushcode(new Variable::DECLARATION(t->nstr));
+				c.pushcode(new Variable::POP);
+				c.pushcode(new Variable::VARIABLE(name));
+				c.pushcode(new Variable::INSTANCE);
+				c.pushcode(new Variable::DECLARATION(t->nstr));
 			}
 			else
 			{
-				e.pushcode(new Variable::VARIABLE(name));
+				c.pushcode(new Variable::POP);
+				c.pushcode(new Variable::VARIABLE(name));
 			}
-			getSuffOp(e);
-			c.pushcode(new Variable::POP);
-			c.getcode()->push(e.getcode());
+			getSuffOp(c);
 			ParseExpression(c, ';', true);
 		}
 		else
