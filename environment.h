@@ -278,21 +278,10 @@ public:
 	void add(Code *c)
 	{
 		size_t s = code.size();
-		if (s > 0)
+		if (s > 0 && code[--s]->get() == OpCode::MNEMONIC::RETURN)
 		{
-			OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
-			if (n == OpCode::MNEMONIC::RETURN || n == OpCode::MNEMONIC::POP)
-			{
-				delete code[s-1];
-				code.resize(s-1);
-			}
-		}
-		if (s == code.size())
-		{
-			push(new PUSH_NULL);
-//			c->code[0]->get() == OpCode::MNEMONIC::POP;
-			// ŽŸ‚É‚½‚¾POP‚³‚ê‚éê‡‚Í‚»‚ê‚²‚ÆŽæ‚èœ‚¢‚½•û‚ª‚¢‚¢‚Ì‚Í“–‘R‚¾‚ªc
-			// push(Code *c)‚ªpush(OpCode *c)‚ð’Ê‚·‚±‚Æ‚É‚æ‚èoptimizer‚ð“­‚©‚¹‚é‚Æ‚¢‚¤Žè‚à‚ ‚é‚ªH
+			delete code[s];
+			code.resize(s);
 		}
 		Code *cl = c->clone();
 		vObject o(cl);
@@ -305,10 +294,8 @@ public:
 		while (line < size)
 		{
 			OpCode::RC::RETURNCODE r = code[line++]->Execute(env);
-			if (!r)
-				continue;
-			if (r == OpCode::RC::YIELD)
-				return false;
+			if (!r)						continue;
+			if (r == OpCode::RC::YIELD)	return false;
 			return true;
 		}
 		env.endScope();
