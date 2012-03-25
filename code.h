@@ -572,8 +572,8 @@ public:
 		env.push(r);
 		#ifdef PSL_OPTIMIZE_TAILCALL
 		MNEMONIC::mnemonic n = env.getNext();
-		if (n == MNEMONIC::RETURN || n == MNEMONIC::END)
-			env.Return();	// ññîˆç≈ìKâª
+		if (n == MNEMONIC::RETURN)	env.Return();	// ññîˆç≈ìKâª
+		else if (n == MNEMONIC::END)env.endScope();
 		#endif
 		v.prepare(env);
 		return RC::CALL;
