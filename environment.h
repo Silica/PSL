@@ -407,7 +407,7 @@ private:
 				if (n == OpCode::MNEMONIC::PARENTHESES)
 				{
 					delete code[s-1];
-					code.resize(s-1);
+					code.resize(--s);
 				}
 			}
 		}
@@ -428,8 +428,8 @@ private:
 					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 					{
 						delete c;
-						delete code[s-1];
-						code.resize(s-1);
+						delete code[--s];
+						code.resize(s);
 						return false;
 					}
 				}
@@ -437,14 +437,14 @@ private:
 				#ifdef PSL_OPTIMIZE_SUFFIX_INCREMENT
 				if (n == OpCode::MNEMONIC::INC)
 				{
-					delete code[s-1];
-					code[s-1] = new PINC();
+					delete code[--s];
+					code[s] = new PINC();
 					return true;
 				}
 				if (n == OpCode::MNEMONIC::DEC)
 				{
-					delete code[s-1];
-					code[s-1] = new PDEC();
+					delete code[--s];
+					code[s] = new PDEC();
 					return true;
 				}
 				#endif
@@ -483,7 +483,7 @@ private:
 						delete c;
 						PSL_TEMPORARY_ENV0(optimizer);
 						code[s-2]->Execute(optimizer);
-						code[s-1]->Execute(optimizer);
+						code[--s]->Execute(optimizer);
 						variable r = optimizer.pop();
 						variable l = optimizer.pop();
 						optimizer.push(l);
@@ -491,8 +491,8 @@ private:
 						c->Execute(optimizer);
 						variable a = optimizer.pop();
 						l = a;
-						delete code[s-1];
-						code.resize(s-1);
+						delete code[s];
+						code.resize(s);
 						return false;
 					}
 				}

@@ -143,7 +143,7 @@ public:
 	{
 		variable l = env.pop();
 		variable r = env.pop();
-		l.substitution(r);
+		env.push(l.substitution(r));
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("ARGUMENT\n"));})

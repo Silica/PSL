@@ -613,7 +613,7 @@ public:
 		rsv x(instance(v), 0);
 		if (!code)
 		{
-			env.push(x.get());
+			env.push(x);
 		}
 		else
 		{
