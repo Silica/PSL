@@ -1,3 +1,4 @@
+#define GET(n) MNEMONIC::mnemonic get(){return MNEMONIC::n;}
 class PUSH_INT : public OpCode
 {
 public:
@@ -8,7 +9,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
+	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %d\n", x.get()->toInt()));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_INT);int w = x.get()->toInt();b.push(&w, sizeof(w));}
 private:
@@ -24,7 +25,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
+	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %X\n", x.get()->toInt()));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_HEX);hex w = x.get()->toInt();b.push(&w, sizeof(w));}
 private:
@@ -40,7 +41,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
+	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %f\n", x.get()->toDouble()));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_FLOAT);double w = x.get()->toDouble();b.push(&w, sizeof(w));}
 private:
@@ -56,7 +57,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
+	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %s\n", x.get()->toString().c_str()));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_STRING);string w = x.get()->toString();b.push(w.c_str(), w.length()+1);}
 private:
@@ -71,7 +72,7 @@ public:
 		env.pop();
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::POP;}
+	GET(POP)
 	PSL_DUMP((int d){PSL_PRINTF(("POP\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::POP);}
 };
@@ -85,7 +86,7 @@ public:
 		env.push(v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::CONSTANT;}
+	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH NULL\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_NULL);}
 };
@@ -116,7 +117,7 @@ public:
 		l.substitution(r);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
+	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("SUBSTITUTION\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::SUBSTITUTION);}
 };
@@ -131,7 +132,7 @@ public:
 		l.assignment(r);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
+	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("ASSIGNMENT\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::ASSIGNMENT);}
 };
@@ -159,7 +160,7 @@ public:
 	{
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::PLUS;}
+	GET(PLUS)
 	PSL_DUMP((int d){PSL_PRINTF(("PLUS\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PLUS);}
 };
@@ -173,7 +174,7 @@ public:
 		env.push(-v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
+	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("MINUS\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::MINUS);}
 };
@@ -188,7 +189,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
+	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("NOT\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::NOT);}
 };
@@ -203,7 +204,7 @@ public:
 		env.push(x);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
+	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("COMPL\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::COMPL);}
 };
@@ -219,7 +220,7 @@ public:
 		v += 1;
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::INC;}
+	GET(INC)
 	PSL_DUMP((int d){PSL_PRINTF(("INC\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::INC);}
 };
@@ -233,7 +234,7 @@ public:
 		v += 1;
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
+	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("PINC\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PINC);}
 };
@@ -249,7 +250,7 @@ public:
 		v -= 1;
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::DEC;}
+	GET(DEC)
 	PSL_DUMP((int d){PSL_PRINTF(("DEC\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::DEC);}
 };
@@ -263,7 +264,7 @@ public:
 		v -= 1;
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::UNARY;}
+	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("PDEC\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PDEC);}
 };
@@ -336,7 +337,7 @@ public:
 		env.push(v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::VARIABLE;}
+	GET(VARIABLE)
 	PSL_DUMP((int d){PSL_PRINTF(("VARIABLE %s\n", name.c_str()));})
 	void write(bytecode &b){b.push(MNEMONIC::VARIABLE);b.push(name.c_str(), name.length()+1);}
 private:
@@ -355,7 +356,7 @@ public:
 		env.push(v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
+	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("BAND\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::BAND);}
 };
@@ -371,7 +372,7 @@ public:
 		env.push(v);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::BINARY;}
+	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("BOR\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::BOR);}
 };
@@ -473,7 +474,7 @@ public:
 		env.RJump(j);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::JR;}
+	GET(JR)
 	PSL_DUMP((int d){PSL_PRINTF(("JR %d\n", j));})
 	void write(bytecode &b){b.push(MNEMONIC::JR);b.push(&j, sizeof(j));}
 private:
@@ -538,7 +539,7 @@ public:
 		}
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::LIST;}
+	GET(LIST)
 	PSL_DUMP((int d){PSL_PRINTF(("LIST\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::LIST);}
 };
@@ -555,7 +556,7 @@ public:
 		env.push(r);
 		return RC::NONE;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::PARENTHESES;}
+	GET(PARENTHESES)
 	PSL_DUMP((int d){PSL_PRINTF(("PARENTHESES\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PARENTHESES);}
 };
@@ -570,7 +571,8 @@ public:
 		variable v = env.pop();
 		env.push(r);
 		#ifdef PSL_OPTIMIZE_TAILCALL
-		if (env.getNext() == MNEMONIC::RETURN)
+		MNEMONIC::mnemonic n = env.getNext();
+		if (n == MNEMONIC::RETURN || n == MNEMONIC::END)
 			env.Return();	// ññîˆç≈ìKâª
 		#endif
 		v.prepare(env);
@@ -589,7 +591,7 @@ public:
 		env.Return();
 		return RC::RETURN;
 	}
-	MNEMONIC::mnemonic get()	{return MNEMONIC::RETURN;}
+	GET(RETURN)
 	PSL_DUMP((int d){PSL_PRINTF(("RETURN\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::RETURN);}
 };
@@ -820,3 +822,4 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("INDEX\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::INDEX);}
 };
+#undef GET
