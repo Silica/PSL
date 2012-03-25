@@ -9,17 +9,12 @@ public:
 		v["string"] = "";
 		v["true"] = 1;
 		v["false"] = 0;
-		variable nil = NIL;
-		variable hex = HEX;
-		variable ref = REFERENCE;
-		variable pointer = POINTER;
-		variable thread = THREAD;
-		v["nil"] = nil;
-		v["null"] = nil;
-		v["hex"] = hex;
-		v["ref"] = ref;
-		v["pointer"] = pointer;
-		v["thread"] = thread;
+		v["nil"] = variable(NIL);
+		v["null"] = variable(NIL);
+		v["hex"] = variable(HEX);
+		v["ref"] = variable(REFERENCE);
+		v["pointer"] = variable(POINTER);
+		v["thread"] = variable(THREAD);
 		v["object"];
 
 		v["print"] = Print;
@@ -140,12 +135,9 @@ private:
 		static void set(const rsv &r)
 		{
 			variable v = r;
-			variable length = Length;
-			variable push = Push;
-			variable foreach = Foreach;
-			v["length"] = length;
-			v["push"] = push;
-			v["foreach"] = foreach;
+			v["length"] = variable(Length);
+			v["push"] = variable(Push);
+			v["foreach"] = variable(Foreach);
 		}
 	private:
 		static variable Length(variable &this_v, variable &v)
@@ -157,9 +149,8 @@ private:
 		{
 			if (!this_v)
 			{
-				variable array = v[0];
-				array.push(v[1]);
-				return array.length();
+				v[0].push(v[1]);
+				return v[0].length();
 			}
 			else
 			{
@@ -198,39 +189,20 @@ private:
 		static void set(const rsv &r)
 		{
 			variable v = r;
-			variable exist = Exist;
-			variable del = Delete;
-			variable keys = Keys;
-			v["exist"] = exist;
-			v["delete"] = del;
-			v["keys"] = keys;
+			v["exist"] = variable(Exist);
+			v["delete"] = variable(Delete);
+			v["keys"] = variable(Keys);
 		}
 	private:
 		static variable Exist(variable &this_v, variable &v)
 		{
-			if (!this_v)
-			{
-				variable table = v[0];
-				variable key = v[1];
-				return table.exist(key);
-			}
-			else
-			{
-				return this_v.exist(v);
-			}
+			if (!this_v)	return v[0].exist(v[1]);
+			else			return this_v.exist(v);
 		}
 		static variable Delete(variable &this_v, variable &v)
 		{
-			if (!this_v)
-			{
-				variable table = v[0];
-				variable key = v[1];
-				table.del(key);
-			}
-			else
-			{
-				this_v.del(v);
-			}
+			if (!this_v)	v[0].del(v[1]);
+			else			this_v.del(v);
 			return variable();	// éÊÇËèúÇ¢ÇΩïœêîÇï‘Ç∑Ç∆Ç¢Ç§ÇÃÇ‡éËÅH
 		}
 		static variable Keys(variable &this_v, variable &v)
@@ -245,13 +217,11 @@ private:
 		static void set(const rsv &r)
 		{
 			variable v = r;
-			variable fo = Open;
 			variable fc = Close;
-			variable fr = Read;
-			v["open"] = fo;
+			v["open"] = variable(Open);
 			v["close"] = fc;
 			v["destructor"] = fc;
-			v["read"] = fr;
+			v["read"] = variable(Read);
 		}
 	private:
 		static variable Open(variable &this_v, variable &v)
@@ -312,15 +282,12 @@ private:
 		static void set(const rsv &r)
 		{
 			variable v = r;
-			variable fo = Open;
 			variable fc = Close;
-			variable fr = Read;
-			variable frd = ReadDW;
-			v["open"] = fo;
+			v["open"] = variable(Open);
 			v["close"] = fc;
 			v["destructor"] = fc;
-			v["read"] = fr;
-			v["readdw"] = frd;
+			v["read"] = variable(Read);
+			v["readdw"] = variable(ReadDW);
 		}
 	private:
 		static variable Open(variable &this_v, variable &v)

@@ -228,7 +228,7 @@ public:
 		return stack.pop();
 	#endif
 	}
-	rsv top()
+	rsv &top()
 	{
 		if (stack.empty())
 		{

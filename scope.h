@@ -140,8 +140,7 @@ public:
 	{
 		Scope *s = owner;
 		owner = NULL;
-		env.pop();
-		env.push(this_v);
+		env.top() = this_v;
 		delete this;
 		return s;
 	}
