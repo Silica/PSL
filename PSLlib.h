@@ -10,12 +10,11 @@ public:
 		v["true"] = 1;
 		v["false"] = 0;
 		v["nil"] = variable(NIL);
-		v["null"] = variable(NIL);
 		v["hex"] = variable(HEX);
 		v["ref"] = variable(REFERENCE);
-		v["pointer"] = variable(POINTER);
+		v["nullptr"] = v["pointer"] = variable(POINTER);
 		v["thread"] = variable(THREAD);
-		v["object"];
+		v["object"] = v["null"];
 
 		v["print"] = Print;
 		#ifdef PSL_DEBUG
