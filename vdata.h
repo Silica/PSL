@@ -196,7 +196,7 @@ public:
 	bool toBool()		const {return x ? true : false;}
 	int toInt()			const {return x ? 1 : 0;}
 	double toDouble()	const {return x ? 1 : 0;}
-	string toString()	const {return x ? "[pointer]" : "NULL";}
+	string toString()	const {return x ? "[pointer]" : "[nullptr]";}
 
 	size_t length()		const {return x ? x->length() : 0;}
 	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
@@ -565,7 +565,7 @@ public:
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return array.size();}
 	double toDouble()	const {return array.size();}
-	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : code ? "[function]" : "nil";}
+	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : code ? "[function]" : "[null]";}
 
 	size_t length()				const {return array.size();}
 	bool exist(const string &s)	const {return member.count(s);}
