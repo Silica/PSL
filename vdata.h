@@ -180,8 +180,12 @@ public:
 	vBase *substitution(Variable *v)
 	{
 		if (x)	x->finalize();
-		if (v->type() == POINTER)	x = v->deref()->ref();	// 一段階は考慮しよう
-		else						x = v->ref();			// v自体がポインタだったらどうする？
+		if (v->type() == POINTER)
+		{
+			if (v->toBool())	x = v->deref()->ref();
+			else				x = NULL;
+		}
+		else					x = v->ref();
 		return this;
 	}
 
