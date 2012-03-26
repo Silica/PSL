@@ -704,7 +704,18 @@ private:
 		getexp11(c, l);
 		while (int n = t->checkNext())
 		{
-			EXP(',', 11, LIST)
+			if (n == ',')
+			{
+				t->getNext();
+				n = t->checkNext();
+				if (n == /*'('*/')' || n == ';' || n == ']')
+					break;
+				else
+				{
+					getexp11(c);
+					c.pushcode(new Variable::LIST);
+				}
+			}
 			else
 				break;
 		}
