@@ -189,8 +189,8 @@ public:
 		return this;
 	}
 
-	bool eq(Variable *v)	{return x == v->deref();}
-	bool ne(Variable *v)	{return x != v->deref();}
+	bool eq(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return true ;return x == v->deref();}
+	bool ne(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return false;return x != v->deref();}
 	Variable *deref()	{return x;}
 
 	bool toBool()		const {return x ? true : false;}
