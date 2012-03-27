@@ -93,8 +93,9 @@ public:
 
 	string &operator=(const string &s)
 	{
+		SharedBuffer *b = s.buf ? s.buf->inc() : NULL;
 		if (buf)	buf->finalize();
-		buf = s.buf ? s.buf->inc() : NULL;
+		buf = b;
 		return *this;
 	}
 	string &operator+=(const string &s)
