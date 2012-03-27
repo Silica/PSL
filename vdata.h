@@ -408,7 +408,7 @@ public:
 	bool toBool()		const {if (x.size() == 1)return x[0].get()->toBool();return x.size();}
 	int toInt()			const {if (x.size() == 1)return x[0].get()->toInt();return x.size();}
 	double toDouble()	const {if (x.size() == 1)return x[0].get()->toDouble();return x.size();}
-	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[array]";}
+	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[tuple]";}
 	void *toPointer()	const {if (x.size() == 1)return x[0].get()->toPointer();return NULL;}
 
 	size_t length()				const {if (x.size() == 1)return x[0].get()->length();return x.size();}
