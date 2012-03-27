@@ -17,6 +17,7 @@ public:
 		v["object"] = v["null"];
 
 		v["print"] = Print;
+		v["type"] = Type;
 		#ifdef PSL_DEBUG
 		v["debug"] = Debug;
 		#endif
@@ -46,7 +47,7 @@ private:
 		case INT:		PSL_PRINTF(("%d", (int)v));break;
 		case HEX:		PSL_PRINTF(("%X", (int)v));break;
 		case FLOAT:		PSL_PRINTF(("%f", (double)v));break;
-//		case RARRAY:	PSL_PRINTF(("[list:%d]", v.length()));break;
+//		case RARRAY:	PSL_PRINTF(("[tuple:%d]", v.length()));break;
 		case THREAD:	PSL_PRINTF(("[thread:%s]", (bool)v ? "alive" : "dead"));break;
 		default:
 			{
@@ -55,6 +56,27 @@ private:
 			}
 		}
 		return v;
+	}
+	static variable Type(variable &v)
+	{
+		switch (v.type())
+		{
+		case NIL:		return "nil";
+		case INT:		return "int";
+		case HEX:		return "hex";
+		case FLOAT:		return "float";
+		case STRING:	return "string";
+		case POINTER:	return "pointer";
+		case REFERENCE:	return "ref";
+		case RARRAY:	return "tuple";
+		case OBJECT:	return "object";
+		case METHOD:	return "method";
+		case CFUNCTION:	return "Cfunction";
+		case CMETHOD:	return "Cmethod";
+		case CPOINTER:	return "Cpointer";
+		case THREAD:	return "thread";
+		}
+		return "";
 	}
 	#ifdef PSL_DEBUG
 	static variable Debug(variable &v)
