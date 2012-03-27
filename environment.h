@@ -572,6 +572,7 @@ public:
 		{
 			variable v = owner->getLocal();
 			variable l = local;
+			v = l;
 			return v;
 		}
 		return local;
