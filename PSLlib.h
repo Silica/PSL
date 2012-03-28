@@ -25,6 +25,7 @@ public:
 	static void Standard(const rsv &r)
 	{
 		variable v = r;
+		v["range"] = Range;
 		v["foreach"] = Foreach;
 		v["eval"] = Eval;
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
@@ -85,6 +86,45 @@ private:
 		return v;
 	}
 	#endif
+	static variable Range(variable &v)
+	{
+		variable l;
+		if (v.length() == 1)
+		{
+			int len = v;
+			for (int i = len; --i >= 0;)
+				l[i] = i;
+		}
+		else if (v.length() == 2)
+		{
+			int start = v[0];
+			int end = v[1];
+			int len = end - start;
+			for (int i = len; --i >= 0;)
+				l[i] = --end;
+		}
+		else if (v.length() > 2)
+		{
+			int start = v[0];
+			int end = v[1];
+			int step = v[2];
+			if (!step)
+				step = start < end ? 1 : -1;
+			if (step > 0)
+				while (start < end)
+				{
+					l.push(start);
+					start += step;
+				}
+			else
+				while (start > end)
+				{
+					l.push(start);
+					start += step;
+				}
+		}
+		return l;
+	}
 	static variable Foreach(variable &v)
 	{
 		variable l = v[0];
