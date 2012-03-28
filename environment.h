@@ -215,11 +215,13 @@ public:
 	void push(const rsv &v)	{stack.push(v);}
 	rsv pop()
 	{
+		#ifdef PSL_CHECKSTACK
 		if (stack.empty())
 		{
 			warning(2);
 			return rsv();
 		}
+		#endif
 	#ifdef PSL_USE_STL_STACK
 		rsv v = stack.top();
 		stack.pop();
@@ -230,11 +232,13 @@ public:
 	}
 	rsv &top()
 	{
+		#ifdef PSL_CHECKSTACK
 		if (stack.empty())
 		{
 			warning(2);
 			stack.push(rsv());
 		}
+		#endif
 		return stack.top();
 	}
 	bool Runable()	{return scope;}

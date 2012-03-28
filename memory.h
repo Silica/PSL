@@ -71,7 +71,9 @@ public:
 		StaticObject::global().get()->mark();
 		#endif
 		Mark();
+		#ifdef PSL_USE_DESTRUCTOR
 		Destructor();
+		#endif
 		Delete();
 		UnMark();
 		ReleaseEmpty();
