@@ -453,6 +453,9 @@ public:
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		const string &destructor = StaticObject::String::destructor();
 		#else
+			#ifdef PSL_THREAD_SAFE
+		if (member.empty())	return;
+			#endif
 		PSL_CONST_STATIC string destructor = "destructor";
 		#endif
 		Type t;
