@@ -35,6 +35,7 @@
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
+#define PSL_CHECKSTACK		// POP時にスタックをチェックする
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ
 /*	速度は未知数
@@ -45,6 +46,7 @@
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
 #define PSL_USE_CONSOLE						// std::printfを使う
+#define PSL_USE_DESTRUCTOR					// PSL内のクラスのデストラクタを使う
 
 //#define PSL_THREAD_SAFE						// メモリマネージャ使わない、global共有しない、static変数を使わない
 // ここまで
@@ -257,7 +259,11 @@ private:
 			case THREAD:	x = new vThread();break;
 			default:		x = new vObject();break;
 		}}
+		#ifdef PSL_USE_DESTRUCTOR
 		void finalize()		{if (!--rc)	{rc=0x80000000;x->destructor();delete this;}}
+		#else
+		void finalize()		{if (!--rc)	delete this;}
+		#endif
 		void safedelete()	{rsv v(new Variable(x), 0);x = NULL;x = new vInt(0);}
 		bool searchcount(Variable *v, int &c)
 		{
