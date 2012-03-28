@@ -45,6 +45,8 @@
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
 #define PSL_USE_CONSOLE						// std::printfを使う
+
+//#define PSL_THREAD_SAFE						// メモリマネージャ使わない、global共有しない、static変数を使わない
 // ここまで
 
 
@@ -58,6 +60,13 @@
 	#define PSL_DUMP(x) void dump x
 #else
 	#define PSL_DUMP(x)
+#endif
+#ifdef PSL_THREAD_SAFE
+	#undef PSL_USE_VARIABLE_MEMORY_MANAGER
+	#undef PSL_SHARED_GLOBAL
+	#define PSL_CONST_STATIC const
+#else
+	#define PSL_CONST_STATIC const static
 #endif
 #ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	#define PSL_MEMORY_MANAGER(x) static void *operator new(size_t t){return MemoryManager<sizeof(x)>::Next();}static void operator delete(void *ptr){MemoryManager<sizeof(x)>::Release(ptr);}
@@ -192,7 +201,9 @@ public:
 	operator long double()	const	{return x->toDouble();}
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
+	#ifndef PSL_THREAD_SAFE
 	operator const char*()	const	{static string s;s = x->toString();return s.c_str();}
+	#endif
 	operator void*()		const	{return x->toPointer();}
 
 	variable operator[](int i)				{return x->index(i);}

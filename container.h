@@ -317,7 +317,7 @@ public:
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		x[len] = StaticObject::rsvnull();
 		#else
-		const static rsv null;
+		PSL_CONST_STATIC rsv null;
 		x[len] = null;
 		#endif
 		return v;
@@ -333,7 +333,7 @@ public:
 			#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 			x[i] = StaticObject::rsvnull();
 			#else
-			const static rsv null;
+			PSL_CONST_STATIC rsv null;
 			x[i] = null;
 			#endif
 		}
