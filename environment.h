@@ -593,7 +593,7 @@ public:
 		{
 			string s = k[i];
 			rsv z = l[s];
-			if (v.get() != z.get())
+			if (v.get() != z.get() && z.get()->type() != REFERENCE)
 				x.set(s, l[s]);
 		}
 		return v;
