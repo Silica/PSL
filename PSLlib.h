@@ -129,11 +129,24 @@ private:
 	{
 		variable l = v[0];
 		variable f = v[1];
-		variable k = l.keys();
-		int s = k.length();
-		for (int i = 0; i < s; ++i)
-			f(k[i], l[k[i]]);
-		return k;
+		int size = l.length();
+		if (size)
+		{
+			for (int i = 0; i < size; ++i)
+			{
+				variable a = l[i];
+				f(a);
+			}
+			return size;
+		}
+		else
+		{
+			variable k = l.keys();
+			size = k.length();
+			for (int i = 0; i < size; ++i)
+				f(k[i], l[k[i]]);
+			return k;
+		}
 	}
 	static variable Eval(variable &v)
 	{
@@ -253,6 +266,7 @@ private:
 			v["exist"] = variable(Exist);
 			v["delete"] = variable(Delete);
 			v["keys"] = variable(Keys);
+			v["foreach"] = variable(Foreach);
 		}
 	private:
 		static variable Exist(variable &this_v, variable &v)
@@ -270,6 +284,35 @@ private:
 		{
 			if (!this_v)return v.keys();
 			else		return this_v.keys();	// “–‘R‚È‚ª‚çexist‚âkeys‚ªŠÜ‚Ü‚ê‚é‚±‚Æ‚É‚È‚éA‚Ü‚ ‚¢‚¢‚©
+		}
+		static variable Foreach(variable &this_v, variable &v)
+		{
+			if (!this_v)
+			{
+				variable l = v[0];
+				variable f = v[1];
+				variable k = l.keys();
+				int s = k.length();
+				for (int i = 0; i < s; ++i)
+				{
+					string str = k[i];
+					if (!l[str].type(METHOD) && !l[str].type(CMETHOD))
+						f(str, l[str]);
+				}
+				return k;
+			}
+			else
+			{
+				variable k = this_v.keys();
+				int s = k.length();
+				for (int i = 0; i < s; ++i)
+				{
+					string str = k[i];
+					if (!this_v[str].type(METHOD) && !this_v[str].type(CMETHOD))
+						v(str, this_v[str]);
+				}
+				return k;
+			}
 		}
 	};
 	class File
