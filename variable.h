@@ -210,7 +210,17 @@ public:
 	#endif
 	operator void*()		const	{return x->toPointer();}
 
-	variable operator[](int i)				{return x->index(i);}
+	variable operator[](size_t i)			{return x->index(i);}
+	variable operator[](int i)				{
+		if (i < 0)
+		{
+			int l = x->length();
+			i = l + i;
+			if (i < 0)
+				i = 0;
+		}
+		return x->index(i);
+	}
 	variable operator[](const char *s)		{return x->child(s);}
 	variable operator[](const string &s)	{return x->child(s);}
 	variable operator[](const variable &v)	{
