@@ -48,6 +48,8 @@
 #define PSL_USE_CONSOLE						// std::printfを使う
 #define PSL_USE_DESTRUCTOR					// PSL内のクラスのデストラクタを使う
 
+#define PSL_CLOSURE_REFERENCE				// クロージャをコピーではなく参照にする
+
 //#define PSL_THREAD_SAFE						// メモリマネージャ使わない、global共有しない、static変数を使わない
 // ここまで
 

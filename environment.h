@@ -193,7 +193,8 @@ public:
 		scope->addLocal(name, x);
 		return x;
 	}
-	rsv getLocal()	{return scope->getLocal();}
+	rsv getLocal()		{return scope->getLocal();}
+	rsv setLocal(rsv v)	{return scope->setLocal(v);}
 	void addLocal(const string &name, variable &v)		{if (!scope->addLocal(name, v, this))warning(3, name);}
 	void addGlobal(const string &name, variable &v)		{if (!global.get()->set(name, v))warning(3, name);push(v);}
 	void addStatic(const string &name, variable &v)		{scope->addStatic(name, v, this);}
@@ -580,6 +581,22 @@ public:
 			return v;
 		}
 		return local;
+	}
+	virtual rsv setLocal(rsv v)
+	{
+		if (owner)
+			owner->setLocal(v);
+		variable x = v;
+		variable l = local;
+		variable k = l.keys();
+		for (size_t i = 0; i < k.length(); ++i)
+		{
+			string s = k[i];
+			rsv z = l[s];
+			if (v.get() != z.get())
+				x.set(s, l[s]);
+		}
+		return v;
 	}
 protected:
 	rsv local;

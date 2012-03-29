@@ -106,6 +106,20 @@ public:
 		return s;
 	}
 	virtual rsv getLocal()	{return local;}
+	virtual rsv setLocal(rsv v)
+	{
+		variable x = v;
+		variable l = local;
+		variable k = l.keys();
+		for (size_t i = 0; i < k.length(); ++i)
+		{
+			string s = k[i];
+			rsv z = l[s];
+			if (v.get() != z.get() && z.get()->type() != REFERENCE)
+				x.set(s, l[s]);
+		}
+		return v;
+	}
 protected:
 	rsv static_v;
 };

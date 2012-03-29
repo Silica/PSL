@@ -403,7 +403,11 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.top();
+		#ifdef PSL_CLOSURE_REFERENCE
+		env.setLocal(v);
+		#else
 		v = env.getLocal();	// ƒ[ƒJƒ‹•Ï”ó‚¯æ‚è
+		#endif
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("CLOSURE\n"));})
