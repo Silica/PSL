@@ -563,8 +563,10 @@ public:
 	{
 		if (!buf)
 			return 0;
-		unsigned char a = buf->at(0);
 		unsigned long l = buf->length();
+		if (!l)
+			return 0;
+		unsigned char a = buf->at(0);
 		unsigned char b = buf->at(l-1);
 		return (b | (a<<8)) ^ (l<<4);
 	}
