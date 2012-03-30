@@ -151,13 +151,7 @@ private:
 	}
 	static variable New(variable &v)
 	{
-//		variable x = v.instance();	// これだけだとコンストラクタが実行されないのでー
-		// variable::instance自体をこの構成にしたらどうか？
-		// どうかというか明らかにそれが正しいのだが
-		PSL_TEMPORARY_ENV(env);
-		v.prepareInstance(env);
-		env.Run();
-		variable x = env.pop();
+		variable x = v.instance();
 		return x.pointer();
 	}
 	static variable Eval(variable &v)
