@@ -487,6 +487,7 @@ private:
 	void pushcode(Variable::OpCode *c)	{return x->pushcode(c);}
 	void pushlabel(const string &s)		{return x->pushlabel(s);}
 	friend class PSL;
+	friend class PSLlib;
 	friend class Parser;
 	friend class Variable::vCMethod;
 	friend class Variable::CALL;
