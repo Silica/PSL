@@ -854,6 +854,11 @@ public:
 	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{this_v = v;}
+	Variable *index(size_t t)
+	{
+		if (t)	return this_v;
+		else	return NULL;
+	}
 
 	void prepare(Environment &env, Variable *v)
 	{
