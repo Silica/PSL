@@ -269,7 +269,8 @@ public:
 
 	void prepare(Environment &env, Variable *v)			{x->prepare(env);}
 	void prepareInstance(Environment &env, Variable *v)	{x->prepareInstance(env);}
-	Variable *instance(Variable *v)	{return x->instance();}
+//	Variable *instance(Variable *v)	{return x->instance();}
+	rsv instance(Environment &env, Variable *v)	{return x->instance(env);}
 	rsv call(Environment &env, variable &arg, Variable *v)	{return x->call(env, arg);}
 
 	// ライブラリ関数で使うかもしれないので一応
@@ -425,7 +426,8 @@ public:
 
 	void prepare(Environment &env, Variable *v)				{if (x.size() == 1)x[0].get()->prepare(env);}
 	void prepareInstance(Environment &env, Variable *v)		{if (x.size() == 1)x[0].get()->prepareInstance(env);}
-	Variable *instance(Variable *v)							{if (x.size() == 1)return x[0].get()->instance();return v->clone();}
+//	Variable *instance(Variable *v)							{if (x.size() == 1)return x[0].get()->instance();return v->clone();}
+	rsv instance(Environment &env, Variable *v)				{if (x.size() == 1)return x[0].get()->instance(env);return v->clone();}
 	rsv call(Environment &env, variable &arg, Variable *v)	{if (x.size() == 1)return x[0].get()->call(env, arg);return variable(NIL);}
 
 	// これもまず使わないと思うんだが、将来的にライブラリ関数が要求する可能性はあるので
@@ -638,36 +640,21 @@ public:
 		env.Run();
 		return env.pop();
 	}
-	Variable *instance(Variable *v)
+	rsv instance(Environment &env, Variable *v)
 	{
-		vObject *o = new vObject();
-		Variable *x = new Variable(o);
-		rsv temp(x, 0);
-
-		int size = array.size();
-		o->array.resize(size);
-		for (int i = 0; i < size; ++i)
-			o->array[i].copy(array[i]);
-
-		for (table::iterator it = member.begin(); it != member.end(); ++it)
+		rsv x(instance(v), 0);
+		if (!code)
 		{
-			if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
-			{
-				rsv z(it->second.get()->clone(), 0);
-				z.get()->push(x);
-				o->member[it->first].set(z.get()->ref());
-			}
-			else if (it->second.get()->getcode())	// コード持ってれば
-			{
-				rsv z(new Variable(new vMethod(it->second.get(), x)), 0);
-				o->member[it->first].set(z.get()->ref());
-			}
-			else
-			{
-				o->member[it->first].copy(it->second);
-			}
+			return x;
 		}
-		return x->ref();
+		else
+		{
+			env.addScope(new ConstructorScope(code, v, x.get()));
+			variable z;
+			env.push(z);
+			env.Run();
+			return env.pop();
+		}
 	}
 
 	size_t codelength()		{return code ? code->length() : 0;}
@@ -712,6 +699,37 @@ private:
 				code->finalize();
 			code = c->inc();
 		}
+	}
+	Variable *instance(Variable *v)
+	{
+		vObject *o = new vObject();
+		Variable *x = new Variable(o);
+		rsv temp(x, 0);
+
+		int size = array.size();
+		o->array.resize(size);
+		for (int i = 0; i < size; ++i)
+			o->array[i].copy(array[i]);
+
+		for (table::iterator it = member.begin(); it != member.end(); ++it)
+		{
+			if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
+			{
+				rsv z(it->second.get()->clone(), 0);
+				z.get()->push(x);
+				o->member[it->first].set(z.get()->ref());
+			}
+			else if (it->second.get()->getcode())	// コード持ってれば
+			{
+				rsv z(new Variable(new vMethod(it->second.get(), x)), 0);
+				o->member[it->first].set(z.get()->ref());
+			}
+			else
+			{
+				o->member[it->first].copy(it->second);
+			}
+		}
+		return x->ref();
 	}
 };
 

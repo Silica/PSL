@@ -370,8 +370,8 @@ private:
 	public:
 		void prepare(Environment &env)			{x->prepare(env, this);}
 		void prepareInstance(Environment &env)	{x->prepareInstance(env, this);}
-		Variable *instance()					{return x->instance(this);}
 		variable call(Environment &env, variable &arg)	{return x->call(env, arg, this);}
+		rsv instance(Environment &env)			{return x->instance(env, this);}
 
 		Variable(Code *c)		{rc = 1;x = new vObject(c);}
 		size_t codelength()		{return x->codelength();}
@@ -436,8 +436,8 @@ private:
 
 			virtual void prepare(Environment &env, Variable *v)	{}
 			virtual void prepareInstance(Environment &env, Variable *v)	{env.push(rsv(v->clone(), 0));}
-			virtual Variable *instance(Variable *v)	{return v->clone();}
 			virtual rsv call(Environment &env, variable &arg, Variable *v)	{return variable(NIL);}
+			virtual rsv instance(Environment &env, Variable *v)	{return v->clone();}
 
 			virtual size_t codelength()	{return 0;}
 			virtual Code *getcode()		{return NULL;}
@@ -503,8 +503,9 @@ public:
 	rsv operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	#ifndef PSL_SHARED_GLOBAL
 	rsv operator()(Environment &env, variable &arg)		{return x->call(env, arg);}
+	rsv instance(Environment &env)						{return x->instance(env);}
 	#endif
-	rsv instance()										{return rsv(x->instance(), 0);}
+	rsv instance()										{PSL_TEMPORARY_ENV(env);return x->instance(env);}
 	#define cva(n) const variable &arg##n
 	#define ap(n) arg.push(arg##n);
 	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
