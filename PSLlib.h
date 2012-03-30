@@ -27,6 +27,7 @@ public:
 		variable v = r;
 		v["range"] = Range;
 		v["foreach"] = Foreach;
+		v["new"] = New;
 		v["eval"] = Eval;
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		v["GarbageCollection"] = GarbageCollection;
@@ -147,6 +148,17 @@ private:
 				f(k[i], l[k[i]]);
 			return k;
 		}
+	}
+	static variable New(variable &v)
+	{
+//		variable x = v.instance();	// これだけだとコンストラクタが実行されないのでー
+		// variable::instance自体をこの構成にしたらどうか？
+		// どうかというか明らかにそれが正しいのだが
+		PSL_TEMPORARY_ENV(env);
+		v.prepareInstance(env);
+		env.Run();
+		variable x = env.pop();
+		return x.pointer();
 	}
 	static variable Eval(variable &v)
 	{
