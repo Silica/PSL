@@ -949,10 +949,8 @@ public:
 
 	bool toBool() const
 	{
-		if (!x)
-			return false;
-		if (!e)
-			return x->getcode();
+		if (!x)	return false;
+		if (!e)	return x->getcode();
 		return e->Runable();
 	}
 	int toInt()			const {return x ? 1 : 0;}
