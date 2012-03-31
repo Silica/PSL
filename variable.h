@@ -36,6 +36,7 @@
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
 #define PSL_CHECKSTACK		// POP時にスタックをチェックする
+//#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ
 /*	速度は未知数
@@ -90,6 +91,14 @@ class variable
 {
 	typedef unsigned int size_t;
 public:
+	struct PSLException
+	{
+		enum ErrorCode
+		{
+			Scope,
+		} errorcode;
+		PSLException(ErrorCode e):errorcode(e){}
+	};
 	typedef variable(*function)(variable&);
 	typedef variable(*method)(variable&,variable&);
 	typedef unsigned long hex;
