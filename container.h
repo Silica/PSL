@@ -124,6 +124,7 @@ class table
 public:
 	struct data
 	{
+		PSL_MEMORY_MANAGER(data)
 		data(const string &s):first(s)	{}
 		string first;
 		rsv second;
