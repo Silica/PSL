@@ -755,7 +755,8 @@ private:
 	{
 		getexp13(c, l);
 		if (!t->getNextIf(e))
-			Error(TINAE, e, "", t->getPrevLine());
+			if (e != ';' || t->checkNext() != /*'{'*/'}')
+				Error(TINAE, e, "", t->getPrevLine());
 	}
 private:
 	Tokenizer *t;
