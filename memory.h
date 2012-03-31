@@ -138,6 +138,8 @@ class StaticObject
 		const string destructor;
 		#define pool(s,n) MemoryPool<s> pool##n;
 		pool(8,8)
+		pool(12,12)
+		pool(16,16)
 		pool(sizeof(Variable::vObject),VO)
 		#undef pool
 		VMemoryPool vpool;
@@ -185,6 +187,8 @@ public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	#define pool(s,n) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##n;}
 	pool(8,8)
+	pool(12,12)
+	pool(16,16)
 	pool(sizeof(Variable::vObject),VO)
 	#undef pool
 	static VMemoryPool &vpool()		{return so().vpool;}

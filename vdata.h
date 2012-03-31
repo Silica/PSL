@@ -94,6 +94,7 @@ private:
 class vFloat : public vBase
 {
 public:
+	PSL_MEMORY_MANAGER(vFloat)
 	vFloat(double d)	{x = d;}
 	Type type()	const	{return FLOAT;}
 	vBase *clone()	{return new vFloat(x);}
@@ -308,6 +309,7 @@ public:
 class vRArray : public vBase
 {
 public:
+	PSL_MEMORY_MANAGER(vRArray)
 	vRArray():x(2){}
 	vRArray(int i):x(i){}
 	Type type()	const	{return RARRAY;}
@@ -737,6 +739,7 @@ private:
 class vMethod : public vBase
 {
 public:
+	PSL_MEMORY_MANAGER(vMethod)
 	vMethod(Variable *v, Variable *x)
 	{
 		function = v->ref();
@@ -853,6 +856,7 @@ private:
 class vCMethod : public vBase
 {
 public:
+	PSL_MEMORY_MANAGER(vCMethod)
 	vCMethod(method func, Variable *x)	{f = func;this_v = x;}
 	Type type()	const	{return CMETHOD;}
 	vBase *clone()	{return new vCMethod(f, this_v);}
@@ -946,6 +950,7 @@ private:
 class vThread : public vBase
 {
 public:
+	PSL_MEMORY_MANAGER(vThread)
 	vThread()	{x = NULL;e = NULL;}
 	vThread(Variable *v)	{x = v ? v->ref() : NULL;e = NULL;}
 	~vThread()	{if (x)x->finalize();delete e;}
