@@ -4,17 +4,19 @@ public:
 	static void Basic(const rsv &r)
 	{
 		variable v = r;
-		v["int"] = 0;
-		v["float"] = 0.0;
-		v["string"] = "";
-		v["true"] = 1;
-		v["false"] = 0;
-		v["nil"] = variable(NIL);
-		v["hex"] = variable(HEX);
-		v["ref"] = variable(REFERENCE);
-		v["nullptr"] = v["pointer"] = variable(POINTER);
-		v["thread"] = variable(THREAD);
-		v["object"] = v["null"];
+		v.set("int", 0);
+		v.set("float", 0.0);
+		v.set("string", "");
+		v.set("true", 1);
+		v.set("false", 0);
+		v.set("nil", NIL);
+		v.set("hex", HEX);
+		v.set("ref", REFERENCE);
+		v.set("pointer", POINTER);
+		v.set("nullptr", POINTER);
+		v.set("thread", THREAD);
+		v["object"];
+		v["null"];
 
 		v["print"] = Print;
 		v["type"] = Type;

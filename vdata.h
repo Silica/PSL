@@ -594,6 +594,7 @@ public:
 			r = false;
 		member[s] = v;
 		return r;
+		// 2回探索する為どう考えても効率が悪い
 	}
 	void del(const string &s)	{member.erase(s);}
 	void method_this(Variable *v)	// メソッドのthisを差し替える
@@ -619,7 +620,7 @@ public:
 	}
 	void prepareInstance(Environment &env, Variable *v)
 	{
-		rsv x(instance(v), 0);
+		rsv x(createinstance(v), 0);
 		if (!code)
 		{
 			env.push(x);
@@ -642,7 +643,7 @@ public:
 	}
 	rsv instance(Environment &env, Variable *v)
 	{
-		rsv x(instance(v), 0);
+		rsv x(createinstance(v), 0);
 		if (!code)
 		{
 			return x;
@@ -700,7 +701,7 @@ private:
 			code = c->inc();
 		}
 	}
-	Variable *instance(Variable *v)
+	Variable *createinstance(Variable *v)
 	{
 		vObject *o = new vObject();
 		Variable *x = new Variable(o);
