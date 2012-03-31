@@ -498,6 +498,7 @@ private:
 class Scope
 {
 public:
+	PSL_MEMORY_MANAGER(MethodScope)
 	enum Type
 	{
 		NONE,

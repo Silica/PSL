@@ -130,6 +130,7 @@ private:
 	}
 	#undef POOLOOP
 };
+typedef MemoryPool<sizeof(Variable::MethodScope),32> SMemoryPool;
 
 class StaticObject
 {
@@ -142,6 +143,7 @@ class StaticObject
 		pool(16,16)
 		pool(sizeof(Variable::vObject),VO)
 		#undef pool
+		SMemoryPool poolScope;
 		VMemoryPool vpool;
 		sobj():destructor("destructor"){}
 		~sobj()
@@ -191,6 +193,7 @@ public:
 	pool(16,16)
 	pool(sizeof(Variable::vObject),VO)
 	#undef pool
+	static SMemoryPool &pool(OverLoad<sizeof(Variable::MethodScope)> x)	{return so().poolScope;}
 	static VMemoryPool &vpool()		{return so().vpool;}
 	struct String
 	{
