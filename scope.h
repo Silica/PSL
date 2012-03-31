@@ -61,9 +61,10 @@ public:
 	virtual Type getType()	{return FUNCTION;}
 	virtual Variable *getVariable(const string &name)
 	{
-		if (local.get()->exist(name))	return local.get()->child(name);
-		if (static_v.get()->exist(name))return static_v.get()->child(name);
-		else							return NULL;
+		Variable *v;
+		v = local.get()->getifexist(name);		if (v)return v;
+		v = static_v.get()->getifexist(name);	if (v)return v;
+		return NULL;
 	}
 	virtual bool addStatic(const string &name, variable &v, Environment *env)
 	{
@@ -131,10 +132,11 @@ public:
 	virtual Type getType()	{return METHOD;}
 	Variable *getVariable(const string &name)
 	{
-		if (local.get()->exist(name))	return local.get()->child(name);
-		if (this_v.get()->exist(name))	return this_v.get()->child(name);
-		if (static_v.get()->exist(name))return static_v.get()->child(name);
-		else							return NULL;
+		Variable *v;
+		v = local.get()->getifexist(name);		if (v)return v;
+		v = this_v.get()->getifexist(name);		if (v)return v;
+		v = static_v.get()->getifexist(name);	if (v)return v;
+		return NULL;
 	}
 	bool Declaration(const string &name, variable &v, Environment *env)
 	{

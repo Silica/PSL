@@ -591,13 +591,25 @@ public:
 	}
 	bool set(const string &s, const variable &v)
 	{
+		#ifdef PSL_USE_STL_MAP
 		bool r = true;
 		if (exist(s))
 			r = false;
 		member[s] = v;
 		return r;
-		// 2回探索する為どう考えても効率が悪い
+		#else
+		return member.set(s, v);
+		#endif
 	}
+	Variable *getifexist(const string &s)
+	{
+		#ifdef PSL_USE_STL_MAP
+		return member.count(s) ? member[s].get() : NULL;
+		#else
+		return member.getifexist(s);
+		#endif
+	}
+
 	void del(const string &s)	{member.erase(s);}
 	void method_this(Variable *v)	// メソッドのthisを差し替える
 	{

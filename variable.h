@@ -368,6 +368,7 @@ private:
 		Variable *index(size_t t)			{Variable *v = x->index(t);return v ? v : this;}
 		Variable *child(const string &s)	{Variable *v = x->child(s);return v ? v : this;}
 		Variable *keys()	{Variable *v = x->keys();v->rc = 0;return v;}
+		Variable *getifexist(const string &s)	{return x->getifexist(s);}
 		bool set(const string &s, const variable &v)	{return x->set(s, v);}
 		void del(const string &s)						{x->del(s);}
 
@@ -439,6 +440,7 @@ private:
 			virtual Variable *child(const string &s)	{return NULL;}
 			virtual void push(Variable *v){}
 			virtual Variable *keys()	{return new Variable();}
+			virtual Variable *getifexist(const string &s)	{return NULL;}
 			virtual bool set(const string &s, const variable &v)	{return false;}
 			virtual void del(const string &s)	{}
 			virtual void method_this(Variable *v)	{}
