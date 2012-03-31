@@ -126,6 +126,7 @@ public:
 	{
 		PSL_MEMORY_MANAGER(data)
 		data(const string &s):first(s)	{}
+		data(const string &s, const variable &v):first(s),second(v)	{}
 		string first;
 		rsv second;
 	};
@@ -206,6 +207,36 @@ public:
 		return iterator(this, -1);
 	}
 	int end()	{return -1;}
+
+	Variable *getifexist(const string &s) const
+	{
+		if (len)
+		{
+			int i = search(s);
+			if (i >= 0)
+				return d[i]->second.get();
+		}
+		return NULL;
+	}
+	bool set(const string &s, const variable &v)
+	{
+		if (len)
+		{
+			int i = search(s);
+			if (i >= 0)
+			{
+				d[i]->second = v;
+				return false;
+			}
+		}
+		if (len >= reserve)
+			resize();
+		hash h = gethash(s, reserve);
+		int i = getnextnull(h);
+		d[i] = new data(s, v);
+		++len;
+		return true;
+	}
 private:
 	int search(const string &s) const
 	{
@@ -270,7 +301,7 @@ private:
 			Reserve();
 			return;
 		}
-		reserve = reserve * 2;
+		reserve *= 2;
 		data **old = Reserve();
 		for (size_t i = 0; i < reserve; ++i)
 		{

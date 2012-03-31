@@ -185,9 +185,9 @@ public:
 	~Environment()	{delete scope;if (stack.size())warning(0, (int)stack.size());}
 	rsv getVariable(const string &name)
 	{
-		Variable *v = scope->getVariable(name);
-		if (v)								return v;
-		else if (global.get()->exist(name))	return global.get()->child(name);
+		Variable *v;
+		v = scope->getVariable(name);		if (v)return v;
+		v = global.get()->getifexist(name);	if (v)return v;
 		warning(1, name);
 		variable x;
 		scope->addLocal(name, x);
@@ -513,8 +513,8 @@ public:
 	virtual Type getType()	{return NONE;}
 	virtual Variable *getVariable(const string &name)
 	{
-		if (local.get()->exist(name))	return local.get()->child(name);
-		else							return owner->getVariable(name);
+		if (Variable *v = local.get()->getifexist(name))return v;
+		else											return owner->getVariable(name);
 	}
 	void set(Scope *s)
 	{

@@ -90,7 +90,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH NULL\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_NULL);}
 };
-class POP_VARIABLE : public OpCode
+/*class POP_VARIABLE : public OpCode
 {
 public:
 	OpCode *clone()	{return new POP_VARIABLE(name);}
@@ -104,7 +104,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("POP VARIABLE %s\n", name.c_str()));})
 private:
 	string name;
-};
+};*/
 
 class SUBSTITUTION : public OpCode
 {
