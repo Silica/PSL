@@ -107,7 +107,7 @@ public:
 		return s;
 	}
 	virtual rsv getLocal()	{return local;}
-	virtual rsv setLocal(rsv v)
+	virtual rsv setLocal(const rsv &v)
 	{
 		variable x = v;
 		variable l = local;
