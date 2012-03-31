@@ -130,7 +130,22 @@ private:
 	}
 	#undef POOLOOP
 };
+#ifdef PSL_CHECK_SCOPE_NEST
+class SMemoryPool : public MemoryPool<sizeof(Variable::MethodScope),256>
+{
+public:
+	void *nextptr()
+	{
+		if (current == NULL)
+			throw PSLException(PSLException::Scope);
+		DATA *c = current;
+		current = c->next;
+		return c;
+	}
+};
+#else
 typedef MemoryPool<sizeof(Variable::MethodScope),32> SMemoryPool;
+#endif
 
 class StaticObject
 {
