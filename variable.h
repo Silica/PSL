@@ -333,8 +333,8 @@ private:
 		void substitution(Variable *v)	{x = x->substitution(v);x->method_this(this);}
 		void assignment(Variable *v)	{x = x->assignment(v);x->method_this(this);}
 
+		void add(Variable *v)	{x->add(v);x->method_this(this);}
 		#define OP(n) void n(Variable *v)	{x->n(v);}
-		OP(add)
 		OP(sub)
 		OP(mul)
 		OP(div)
