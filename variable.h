@@ -338,6 +338,7 @@ private:
 
 		void substitution(Variable *v)	{x = x->substitution(v);x->method_this(this);}
 		void assignment(Variable *v)	{x = x->assignment(v);x->method_this(this);}
+		void gset(Variable *v)			{x = x->assignment(v);}
 
 		void add(Variable *v)	{x->add(v);x->method_this(this);}
 		#define OP(n) void n(Variable *v)	{x->n(v);}
@@ -495,6 +496,8 @@ private:
 	#endif
 	variable(Variable *v)	{x = v->ref();}
 	variable(Type t, Variable *v)	{x = new Variable(v);}
+
+	void gset(const variable &v)	{x->gset(v.x);}
 
 	void prepare(Environment &env)			{x->prepare(env);}
 	void prepareInstance(Environment &env)	{x->prepareInstance(env);}
