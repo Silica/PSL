@@ -355,7 +355,7 @@ private:
 			else
 			{
 				using namespace std;
-				FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
 				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
@@ -367,7 +367,7 @@ private:
 		static variable Close(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+			FILE *fp = this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
 			this_v["$$__FILE*fp__$$"] = NULL;
@@ -376,7 +376,7 @@ private:
 		}
 		static variable Read(variable &this_v, variable &v)
 		{
-			std::FILE *fp = (std::FILE*)(void*)this_v["$$__FILE*fp__$$"];
+			std::FILE *fp = this_v["$$__FILE*fp__$$"];
 			int size = v;
 			if (!fp || !size)
 				return "";
@@ -421,7 +421,7 @@ private:
 			else
 			{
 				using namespace std;
-				FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
 				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
@@ -433,7 +433,7 @@ private:
 		static variable Close(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+			FILE *fp = this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
 			this_v["$$__FILE*fp__$$"] = NULL;
@@ -443,7 +443,7 @@ private:
 		static variable Read(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+			FILE *fp = this_v["$$__FILE*fp__$$"];
 			int size = v;
 			variable r;
 			if (!fp || !size)
@@ -465,7 +465,7 @@ private:
 		static variable ReadDW(variable &this_v, variable &v)
 		{
 			using namespace std;
-			FILE *fp = (FILE*)(void*)this_v["$$__FILE*fp__$$"];
+			FILE *fp = this_v["$$__FILE*fp__$$"];
 			int size = v;
 			variable r;
 			if (!fp || !size)

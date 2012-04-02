@@ -214,10 +214,16 @@ public:
 	operator long double()	const	{return x->toDouble();}
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
-	#ifndef PSL_THREAD_SAFE
-	operator const char*()	const	{static string s;s = x->toString();return s.c_str();}
-	#endif
 	operator void*()		const	{return x->toPointer();}
+	template<typename T>	T *toPointer()	const	{return reinterpret_cast<T*>(x->toPointer());}
+	template<typename T>	operator T*()	const	{return reinterpret_cast<T*>(x->toPointer());}
+	#ifndef PSL_THREAD_SAFE
+		#ifdef __BORLANDC__
+		template<>
+		#endif
+	operator const char*()	const	{static string s;s = x->toString();return s.c_str();}
+	const char *c_str()		const	{static string s;s = x->toString();return s.c_str();}
+	#endif
 
 	variable operator[](size_t i)			{return x->index(i);}
 	variable operator[](int i)				{
