@@ -5,6 +5,7 @@
 
 class PSL : private variable::Environment
 {
+	typedef variable::rsv rsv;
 public:
 	#ifndef PSL_DEBUG
 	PSL() : variable::Variable::Environment(1){}
@@ -62,7 +63,7 @@ public:
 		fread(b.get(), 1, size, fp);
 		variable::Variable::bcreader::read(b, cc);
 		variable g = global;
-		g = cc;
+		g.gset(cc);
 		g.prepare(*this);
 		return NONE;
 	}
@@ -79,10 +80,10 @@ public:
 		fclose(fp);
 		return e;
 	}
-	variable::rsv Run(const variable &arg = 0)
+	rsv Run(const variable &arg = 0)
 	{
 		if (!Runable())
-			return variable::rsv();
+			return rsv();
 		#ifdef PSL_DEBUG
 		if (!init)
 		#endif
@@ -92,7 +93,7 @@ public:
 	}
 	#ifdef PSL_DEBUG
 	PSL() : variable::Variable::Environment(1){init = false;}
-	variable::rsv StepExec()
+	rsv StepExec()
 	{
 		if (!Runable())
 		{
@@ -103,13 +104,13 @@ public:
 		if (!init)
 		{
 			init = true;
-			push(variable::rsv());
+			push(rsv());
 		}
 		variable::Variable::Environment::StepExec();
-		return variable::rsv();
+		return rsv();
 	}
 	#endif
-	variable::rsv get(const string &name)				{return global.get()->child(name);}
+	rsv get(const string &name)							{return global.get()->child(name);}
 	void add(const string &name, const variable &v)		{global.get()->set(name, v);}
 	void add(const string &name, variable::function f)	{global.get()->set(name, variable(f));}
 	void add(const string &name, variable::method f)	{global.get()->set(name, variable(f));}
@@ -127,13 +128,14 @@ private:
 			return true;
 
 		variable gl = global;
-		gl = g;
+		gl.gset(g);
 		gl.prepare(*this);
 		return false;
 	}
 	#ifdef PSL_DEBUG
 	bool init;
 	#endif
+	#include "binder.h"
 };
 
 #endif
