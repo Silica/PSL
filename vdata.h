@@ -998,9 +998,7 @@ public:
 
 	void prepare(Environment &env, Variable *v)
 	{
-		if (!x)
-			return;
-		if (e && !e->Runable())
+		if (!x || (e && !e->Runable()))
 			return;
 		if (!e)
 		{
@@ -1011,6 +1009,19 @@ public:
 		e->Run();
 		variable r = e->pop();
 		env.push(r);
+	}
+	rsv call(Environment &env, variable &arg, Variable *v)
+	{
+		if (!x || (e && !e->Runable()))
+			return variable(NIL);
+		if (!e)
+		{
+			e = new Environment(env);
+			x->prepare(*e);
+		}
+		e->push(arg);
+		e->Run();
+		return e->pop();
 	}
 
 	PSL_DUMP((){PSL_PRINTF(("vThread:%X\n", e));if(x)x->dump();})
