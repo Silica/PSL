@@ -603,11 +603,8 @@ public:
 	}
 	Variable *getifexist(const string &s)
 	{
-		#ifdef PSL_USE_STL_MAP
-		return member.count(s) ? member[s].get() : NULL;
-		#else
-		return member.getifexist(s);
-		#endif
+		table::iterator it = member.find(s);
+		return (it != member.end()) ? it->second.get() : NULL;
 	}
 
 	void del(const string &s)	{member.erase(s);}
