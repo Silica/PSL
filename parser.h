@@ -332,20 +332,17 @@ private:
 					c.pushcode(new Variable::CALL);
 				}
 			}
-			else if (n == Tokenizer::IDENTIFIER)
-			{
-				t->getNext();
-				c.pushcode(new Variable::POP);
-				c.pushcode(new Variable::VARIABLE(name));
-				c.pushcode(new Variable::INSTANCE);
-				c.pushcode(new Variable::DECLARATION(t->nstr));
-			}
 			else
 			{
 				c.pushcode(new Variable::POP);
 				c.pushcode(new Variable::VARIABLE(name));
 			}
 			getSuffOp(c);
+			if (t->getNextIf(Tokenizer::IDENTIFIER))
+			{
+				c.pushcode(new Variable::INSTANCE);
+				c.pushcode(new Variable::DECLARATION(t->nstr));
+			}
 			ParseExpression(c, ';', true);
 		}
 		else
