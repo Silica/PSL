@@ -66,7 +66,11 @@ private:
 };
 
 #ifdef PSL_USE_STL_VECTOR
-typedef std::vector vector;
+	#define PSL_USE_STL_STACK
+typedef std::vector vector;	// VCやgccだとエラー出るんですけど
+//#define vector std::vector	// やりたくない
+//#define PSL_VECTOR std::vector	// という方法か
+//vector使う場所で個別に対処するか
 #else
 template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
 {
@@ -207,17 +211,17 @@ public:
 		return iterator(this, -1);
 	}
 	int end()	{return -1;}
-
-	Variable *getifexist(const string &s) const
+	iterator find(const string &s)
 	{
 		if (len)
 		{
 			int i = search(s);
 			if (i >= 0)
-				return d[i]->second.get();
+				return iterator(this, i);
 		}
-		return NULL;
+		return iterator(this, -1);
 	}
+
 	bool set(const string &s, const variable &v)
 	{
 		if (len)
@@ -327,12 +331,7 @@ private:
 };
 #endif
 
-#ifdef PSL_USE_STL_VECTOR
-	#define PSL_USE_STL_STACK
-typedef std::vector<rsv> rlist;
-#else
 typedef vector<rsv> rlist;
-#endif
 
 #ifdef PSL_USE_STL_STACK
 typedef std::stack<rsv> rstack;

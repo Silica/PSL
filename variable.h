@@ -516,8 +516,8 @@ private:
 	friend class Variable::Code;
 public:
 	variable(variable::Variable::Code *c)	{x = new Variable(c);}
-	rsv ref()		{return x;}
-	rsv pointer()	{return variable(POINTER, x);}
+	rsv ref()		const	{return x;}
+	rsv pointer()	const	{return variable(POINTER, x);}
 
 	rsv operator()()									{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
 	rsv operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
