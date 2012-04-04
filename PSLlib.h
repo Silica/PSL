@@ -182,6 +182,7 @@ private:
 			v["ctoi"] = ctoi;
 			v["length"] = Strlen;
 			v["getchar"] = getChar;
+			v["gets"] = Gets;
 		}
 	private:
 		static variable Char(variable &v)
@@ -209,6 +210,19 @@ private:
 		{
 			string s = v;
 			return s[0];
+		}
+		static variable Gets(variable &v)
+		{
+			string s;
+			int c;
+			using namespace std;
+			while ((c = getc(stdin)) != EOF)
+			{
+				s += (char)c;
+				if (c == '\n')
+					break;
+			}
+			return s;
 		}
 	};
 	class Array
