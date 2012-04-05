@@ -2,7 +2,11 @@
 #include "PSL.h"
 
 #include <stdio.h>
+#ifdef _WIN32
 #include <conio.h>
+#else
+#define getch getchar
+#endif
 #include <time.h>
 
 
