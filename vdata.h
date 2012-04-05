@@ -441,7 +441,7 @@ public:
 
 	PSL_DUMP((){PSL_PRINTF(("vRArray:%d\n", x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();})
 private:
-	mutable rlist x;
+	rlist x;
 };
 
 class vObject : public vBase
