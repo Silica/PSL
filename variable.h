@@ -382,8 +382,8 @@ private:
 		bool set(const string &s, const variable &v)	{return x->set(s, v);}
 		void del(const string &s)						{x->del(s);}
 
-	private:
 		#include "bytecode.h"
+	private:
 		#include "environment.h"
 		friend class Parser;
 		friend class variable;

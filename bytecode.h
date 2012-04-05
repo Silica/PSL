@@ -13,10 +13,10 @@ public:
 		code.resize(size + l);
 		std::memcpy(&code[size], p, l);
 	}
+	void resize(size_t t)	{code.resize(t);}
 private:
 	vector<byte> code;
 };
-
 class bcreader
 {
 	static bool readbyte(bytecode::byte *&byte, bytecode::byte *end, variable &v)

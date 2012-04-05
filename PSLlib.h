@@ -394,10 +394,10 @@ private:
 			int size = v;
 			if (!fp || !size)
 				return "";
-			vector<Variable::bytecode::byte> vbuf(size+1);	// template‚É‚æ‚é—e—Ê‚Ì”ì‘å‰»‚ğ–h‚®ˆ×‚ÌŒ^‚ÌÄ—˜—p
-			char *buf = (char*)&vbuf[0];
-			size = std::fread(buf, 1, size, fp);
-			buf[size] = 0;
+			Variable::bytecode vbuf(size+1);	// template‚É‚æ‚é—e—Ê‚Ì”ì‘å‰»‚ğ–h‚®ˆ×‚ÌŒ^‚ÌÄ—˜—p
+			char *buf = (char*)vbuf.get();
+			vbuf.resize(std::fread(buf, 1, size, fp));
+			vbuf.push(0);
 			string s = buf;
 			return s;
 		}
