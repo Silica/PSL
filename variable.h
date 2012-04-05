@@ -90,6 +90,9 @@
 class variable
 {
 	typedef unsigned int size_t;
+	#ifndef _WIN32
+	typedef long long __int64;
+	#endif
 public:
 	struct PSLException
 	{
