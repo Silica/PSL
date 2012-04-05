@@ -522,16 +522,16 @@ public:
 	rsv ref()		const	{return x;}
 	rsv pointer()	const	{return variable(POINTER, x);}
 
-	rsv operator()()									{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
-	rsv operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	variable operator()()									{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
+	variable operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	#ifndef PSL_SHARED_GLOBAL
-	rsv operator()(Environment &env, variable &arg)		{return x->call(env, arg);}
-	rsv instance(Environment &env)						{return x->instance(env);}
+	variable operator()(Environment &env, variable &arg)	{return x->call(env, arg);}
+	variable instance(Environment &env)						{return x->instance(env);}
 	#endif
-	rsv instance()										{PSL_TEMPORARY_ENV(env);return x->instance(env);}
+	variable instance()										{PSL_TEMPORARY_ENV(env);return x->instance(env);}
 	#define cva(n) const variable &arg##n
 	#define ap(n) arg.push(arg##n);
-	#define CALL(z,y) rsv operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	#define CALL(z,y) variable operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	CALL((cva(1),cva(2)),								ap(1)ap(2))
 	CALL((cva(1),cva(2),cva(3)),						ap(1)ap(2)ap(3))
 	CALL((cva(1),cva(2),cva(3),cva(4)),					ap(1)ap(2)ap(3)ap(4))

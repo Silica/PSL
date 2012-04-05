@@ -360,10 +360,10 @@ private:
 				if (!fp)
 					return 0;
 				variable f;
-				f["$$__FILE*fp__$$"] = fp;
-				f["name"] = name;
 				set(f);
 				variable r = f.instance();
+				r["$$__FILE*fp__$$"] = fp;
+				r.set("name", name);
 				return r.pointer();
 			}
 			else
