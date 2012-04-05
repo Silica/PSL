@@ -19,35 +19,33 @@ private:
 };
 class bcreader
 {
+	static string readString(bytecode::byte *&byte)
+	{
+		string s = (char*)byte;
+		byte += s.length()+1;
+		return s;
+	}
+	template<typename T>
+	static T read(bytecode::byte *&byte)
+	{
+		T x = *(T*)byte;
+		byte += sizeof(T);
+		return x;
+	}
 	static bool readbyte(bytecode::byte *&byte, bytecode::byte *end, variable &v)
 	{
 		switch (*(byte++))
 		{
 		case OpCode::MNEMONIC::BEGIN:
 			{
-				string s = (char*)byte;
-				byte += s.length()+1;
-				variable x = v[s];
+				variable x = v[readString(byte)];
 				readcode(byte, end, x);
 			}
 			break;
-		case OpCode::MNEMONIC::END:
-			return true;
-		case OpCode::MNEMONIC::PUSH_HEX:
-			{
-				hex x = *(hex*)byte;
-				byte += sizeof(hex);
-				v.pushcode(new PUSH_HEX(x));
-			}
-			break;
-		case OpCode::MNEMONIC::PUSH_FLOAT:
-			{
-				double x = *(double*)byte;
-				byte += sizeof(double);
-				v.pushcode(new PUSH_FLOAT(x));
-			}
-			break;
-		#define OPC_I(n) case OpCode::MNEMONIC::n:{int x = *(int*)byte;byte += sizeof(int);v.pushcode(new n(x));}break;
+		case OpCode::MNEMONIC::END:			return true;
+		case OpCode::MNEMONIC::PUSH_HEX:	v.pushcode(new PUSH_HEX(read<hex>(byte)));break;
+		case OpCode::MNEMONIC::PUSH_FLOAT:	v.pushcode(new PUSH_FLOAT(read<double>(byte)));break;
+		#define OPC_I(n) case OpCode::MNEMONIC::n:{v.pushcode(new n(read<int>(byte)));}break;
 			OPC_I(PUSH_INT)
 			OPC_I(JMP)
 			OPC_I(JT)
@@ -56,7 +54,7 @@ class bcreader
 			OPC_I(JRT)
 			OPC_I(JRF)
 		#undef OPC_I
-		#define OPC_S(n) case OpCode::MNEMONIC::n:{string s = (char*)byte;byte += s.length()+1;v.pushcode(new n(s));}break;
+		#define OPC_S(n) case OpCode::MNEMONIC::n:{string s = readString(byte);v.pushcode(new n(s));}break;
 			OPC_S(PUSH_STRING)
 			OPC_S(VARIABLE)
 			OPC_S(GOTO)
@@ -66,7 +64,7 @@ class bcreader
 			OPC_S(DECLARATION)
 			OPC_S(MEMBER)
 		#undef OPC_S
-		#define OPCODE(n) case OpCode::MNEMONIC::n:	v.pushcode(new n());	break;
+		#define OPCODE(n) case OpCode::MNEMONIC::n:v.pushcode(new n());break;
 			OPCODE(POP)
 			OPCODE(PUSH_NULL)
 			OPCODE(SUBSTITUTION)
@@ -122,6 +120,14 @@ class bcreader
 			OPCODE(INSTANCE)
 			OPCODE(INDEX)
 		#undef OPCODE
+		case OpCode::MNEMONIC::PUSH_CODE:
+			{
+				variable x;
+				byte += 2;
+				readcode(byte, end, x);
+				v.pushcode(new PUSH_CODE(x));
+			}
+			break;
 		case OpCode::MNEMONIC::IF:
 		#ifdef PSL_DEBUG
 			{
@@ -131,14 +137,6 @@ class bcreader
 			}
 			break;
 		#endif
-		case OpCode::MNEMONIC::PUSH_CODE:
-			{
-				variable x;
-				byte += 2;
-				readcode(byte, end, x);
-				v.pushcode(new PUSH_CODE(x));
-			}
-			break;
 		case OpCode::MNEMONIC::SCOPE:
 			{
 				variable x;
@@ -148,8 +146,7 @@ class bcreader
 			break;
 		case OpCode::MNEMONIC::LOOP:
 			{
-				int l = *(int*)byte;
-				byte += sizeof(int);
+				int l = read<int>(byte);
 				variable x;
 				readcode(byte, end, x);
 				v.pushcode(new LOOP(x.getcode(), l));
@@ -158,14 +155,12 @@ class bcreader
 		case OpCode::MNEMONIC::LABELBEGIN:
 			while (*byte != OpCode::MNEMONIC::END)
 			{
-				int l = *(int*)byte;
-				byte += sizeof(int);
-				string s = (char*)byte;
-				byte += s.length()+1;
+				int l = read<int>(byte);
+				string s = readString(byte);
 				if (Code *c = v.getcode())
 					c->pushlabel(s, l);
 			}
-			byte++;
+			++byte;
 			break;
 		}
 		return false;
@@ -180,12 +175,8 @@ public:
 	static void read(bytecode &b, variable &v)
 	{
 		bytecode::byte *byte = b.get();
-		bytecode::byte *end = b.get() + b.size();
-		if (b.size() < 2)
-			return;
-		if (byte[0] != OpCode::MNEMONIC::BEGIN)
-			return;
-		if (byte[1] != 0)
+		bytecode::byte *end = byte + b.size();
+		if (b.size() < 2 || byte[0] != OpCode::MNEMONIC::BEGIN || byte[1] != 0)
 			return;
 		byte += 2;
 		readcode(byte, end, v);
