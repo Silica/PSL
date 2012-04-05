@@ -470,8 +470,7 @@ private:
 					size = i;
 					break;
 				}
-				hex h = c;
-				r[i] = h;
+				r.push(static_cast<hex>(c));
 			}
 			r["length"] = size;
 			return r;
@@ -492,7 +491,7 @@ private:
 					size = i;
 					break;
 				}
-				r[i] = h;
+				r.push(h);
 			}
 			r["length"] = size;
 			return r;

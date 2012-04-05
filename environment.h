@@ -258,11 +258,7 @@ public:
 		for (size_t i = 0; i < code.size(); ++i)
 			delete code[i];
 	}
-	void finalize()
-	{
-		if (!--rc)
-			delete this;
-	}
+	void finalize()	{if (!--rc)delete this;}
 	Code *clone()
 	{
 		variable v;
@@ -518,11 +514,11 @@ public:
 	}
 	void set(Scope *s)
 	{
-		if (!owner)		owner = s;
-		else			owner->set(s);
+		if (!owner)	owner = s;
+		else		owner->set(s);
 	}
-	void Jump(int l)					{line = l;}
-	void RJump(int l)					{line += l;}
+	void Jump(int l)	{line = l;}
+	void RJump(int l)	{line += l;}
 	bool Run(Environment &env)	{return code->Run(env, line);}
 	#ifdef PSL_DEBUG
 	void StepExec(Environment &env)	{return code->StepExec(env, line);}
@@ -538,8 +534,7 @@ public:
 			return this;
 		if (!owner)
 			return NULL;
-		Scope *s = owner->Goto(label);
-		if (s)
+		if (Scope *s = owner->Goto(label))
 		{
 			owner = NULL;
 			delete this;
@@ -562,8 +557,8 @@ public:
 	}
 	virtual bool addStatic(const string &name, variable &v, Environment *env)
 	{
-		if (owner)		return owner->addStatic(name, v, env);
-		else if (env)	env->push(v);
+		if (owner)	return owner->addStatic(name, v, env);
+		if (env)	env->push(v);
 		return false;
 	}
 	virtual bool Declaration(const string &name, variable &v, Environment *env)
