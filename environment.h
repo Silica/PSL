@@ -379,6 +379,9 @@ public:
 		b.push(OpCode::MNEMONIC::END);	// END‚ÍŠÖ”‚¾‚¯‚¶‚á‚È‚­ƒ‹[ƒv‚É‚à‚ ‚é‚Ì‚Å‚â‚Á‚Ï‚è‚±‚±‚É
 	};
 private:
+	#ifdef PSL_USE_STL_VECTOR
+	std::
+	#endif
 	vector<OpCode*> code;
 	table label;
 	int rc;

@@ -15,6 +15,9 @@ public:
 	}
 	void resize(size_t t)	{code.resize(t);}
 private:
+	#ifdef PSL_USE_STL_VECTOR
+	std::
+	#endif
 	vector<byte> code;
 };
 class bcreader

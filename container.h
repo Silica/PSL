@@ -30,6 +30,8 @@ public:
 		x = v;
 	}
 	Variable *get()	const{if(!x)x = new Variable();return x;}
+private:
+	mutable Variable *x;
 #else	// 上で大丈夫である確信が持てない、新規変数を作る時にrsvで作って(共有して)いなければOKの筈だが
 	// そして今や僅差になった
 	// また上だとinline化した時に肥大化著しい
@@ -60,17 +62,14 @@ public:
 		x = v;
 	}
 	Variable *get()	const{return x;}
-#endif
 private:
-	mutable Variable *x;
+	Variable *x;
+#endif
 };
 
 #ifdef PSL_USE_STL_VECTOR
 	#define PSL_USE_STL_STACK
-typedef std::vector vector;	// VCやgccだとエラー出るんですけど
-//#define vector std::vector	// やりたくない
-//#define PSL_VECTOR std::vector	// という方法か
-//vector使う場所で個別に対処するか
+typedef std::vector<rsv> rlist;
 #else
 template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
 {
@@ -103,7 +102,7 @@ public:
 			reserve(res*2+1);
 		x[len++] = v;
 	}
-	T &operator[](size_t t)
+	T &operator[](size_t t) const
 	{
 //			if (t >= len)
 //				resize(t+1);
@@ -116,6 +115,7 @@ protected:
 	size_t res;
 	size_t len;
 };
+typedef vector<rsv> rlist;
 #endif
 
 #ifdef PSL_USE_STL_MAP
@@ -168,7 +168,7 @@ public:
 			return 0;
 		return 1;
 	}
-	rsv &operator[](const string &s) const
+	rsv &operator[](const string &s)
 	{
 		if (len)
 		{
@@ -297,7 +297,7 @@ private:
 			}
 		d[h] = NULL;
 	}
-	void resize() const
+	void resize()
 	{
 		if (!reserve)
 		{
@@ -318,20 +318,18 @@ private:
 		}
 		delete[] old;
 	}
-	data **Reserve() const
+	data **Reserve()
 	{
 		data **old = d;
 		d = new data*[reserve * 2];
 		std::memset(d, 0, sizeof(data*) * 2 * reserve);
 		return old;
 	}
-	mutable size_t len;
-	mutable size_t reserve;
-	mutable data **d;
+	size_t len;
+	size_t reserve;
+	data **d;
 };
 #endif
-
-typedef vector<rsv> rlist;
 
 #ifdef PSL_USE_STL_STACK
 typedef std::stack<rsv> rstack;
