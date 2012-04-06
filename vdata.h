@@ -656,17 +656,12 @@ public:
 	{
 		rsv x(createinstance(v), 0);
 		if (!code)
-		{
 			return x;
-		}
-		else
-		{
-			env.addScope(new ConstructorScope(code, v, x.get()));
-			variable z;
-			env.push(z);
-			env.Run();
-			return env.pop();
-		}
+		env.addScope(new ConstructorScope(code, v, x.get()));
+		variable z;
+		env.push(z);
+		env.Run();
+		return env.pop();
 	}
 
 	size_t codelength()		{return code ? code->length() : 0;}
@@ -995,13 +990,9 @@ public:
 
 	void prepare(Environment &env, Variable *v)
 	{
-		if (!x || (e && !e->Runable()))
+		if (!toBool())
 			return;
-		if (!e)
-		{
-			e = new Environment(env);
-			x->prepare(*e);
-		}
+		newenv(env);
 		e->push(env.pop());
 		e->Run();
 		variable r = e->pop();
@@ -1009,13 +1000,9 @@ public:
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
-		if (!x || (e && !e->Runable()))
+		if (!toBool())
 			return variable(NIL);
-		if (!e)
-		{
-			e = new Environment(env);
-			x->prepare(*e);
-		}
+		newenv(env);
 		e->push(arg);
 		e->Run();
 		return e->pop();
@@ -1025,4 +1012,10 @@ public:
 private:
 	Variable *x;
 	Environment *e;
+	void newenv(Environment &env)
+	{
+		if (e)	return;
+		e = new Environment(env);
+		x->prepare(*e);
+	}
 };
