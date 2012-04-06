@@ -375,7 +375,7 @@ private:
 				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
 				if (fp)	this_v["name"] = name;
 				else	this_v["name"] = "";
-				return 0;
+				return this_v.pointer();
 			}
 		}
 		static variable Close(variable &this_v, variable &v)
@@ -441,7 +441,7 @@ private:
 				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
 				if (fp)	this_v["name"] = name;
 				else	this_v["name"] = "";
-				return 0;
+				return this_v.pointer();
 			}
 		}
 		static variable Close(variable &this_v, variable &v)
