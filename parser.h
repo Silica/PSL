@@ -342,6 +342,7 @@ private:
 			{
 				c.pushcode(new Variable::INSTANCE);
 				c.pushcode(new Variable::DECLARATION(t->nstr));
+				getSuffOp(c);
 			}
 			ParseExpression(c, ';', true);
 		}
@@ -668,6 +669,7 @@ private:
 				{
 					c.pushcode(new Variable::INSTANCE);
 					c.pushcode(new Variable::DECLARATION(t->nstr));
+					getSuffOp(c);
 				}
 				l = true;
 			}
