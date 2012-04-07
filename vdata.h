@@ -956,10 +956,10 @@ class vThread : public vBase
 public:
 	PSL_MEMORY_MANAGER(vThread)
 	vThread()	{x = NULL;e = NULL;}
-	vThread(Variable *v)	{x = v ? v->ref() : NULL;e = NULL;}
+	vThread(Variable *v, Environment *ee)	{x = v ? v->ref() : NULL;e = ee ? ee->clone() : NULL;}
 	~vThread()	{if (x)x->finalize();delete e;}
 	Type type()	const	{return THREAD;}
-	vBase *clone()	{return new vThread(x);}
+	vBase *clone()	{return new vThread(x, e);}
 	void searchcount(Variable *v, int &c){if (x)x->searchcount(v, c);}
 	void mark(){if (x)x->mark();}
 
@@ -985,8 +985,7 @@ public:
 	string toString()	const {return "[Thread]";}
 
 	size_t length()		const {return x ? 1 : 0;}
-	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
-	Variable *child(const string &s)	{return x ? x->child(s) : NULL;}
+	Variable *child(const string &s)	{return e ? e->getVariable(s).get() : NULL;}
 
 	void prepare(Environment &env, Variable *v)
 	{
