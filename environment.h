@@ -183,6 +183,20 @@ public:
 	#endif
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
 	~Environment()	{delete scope;if (stack.size())warning(0, (int)stack.size());}
+	Environment *clone()
+	{
+		Environment *e = new Environment(*this);
+		if (scope)
+			e->scope = scope->clone();
+		#ifdef PSL_USE_STL_STACK
+			e->stack = stack;
+		#else
+		int s = stack.size();
+		for (int i = 0; i < s; i++)
+			e->stack[i] = stack[i];
+		#endif
+		return e;
+	}
 	rsv getVariable(const string &name)
 	{
 		Variable *v;
@@ -510,6 +524,7 @@ public:
 	Scope(Code *c)			{code = c->inc();line = 0;owner = NULL;}
 	virtual ~Scope()		{code->finalize();delete owner;}
 	virtual Type getType()	{return NONE;}
+	virtual Scope *clone() = 0;
 	virtual Variable *getVariable(const string &name)
 	{
 		if (Variable *v = local.get()->getifexist(name))return v;
@@ -602,6 +617,15 @@ protected:
 	Scope *owner;
 	Code *code;
 	size_t line;
+	void copyto(Scope *s)
+	{
+		variable l = local;
+		variable c = l;
+		s->local = c;
+		if (owner)
+			s->owner = owner->clone();
+		s->line = line;
+	}
 };
 
 #include "scope.h"
