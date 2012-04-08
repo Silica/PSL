@@ -188,11 +188,24 @@ public:
 		Environment *e = new Environment(*this);
 		if (scope)
 			e->scope = scope->clone();
-		#ifdef PSL_USE_STL_STACK
-			e->stack = stack;
-		#else
 		int s = stack.size();
-		for (int i = 0; i < s; i++)
+		#ifdef PSL_USE_STL_STACK
+		if (s)
+		{
+			rlist l(s);
+			for (int i = s; i-- > 0;)
+			{
+				l[i] = stack.top();
+				stack.pop();
+			}
+			for (int i = 0; i < s; ++i)
+			{
+				stack.push(l[i]);
+				e->stack.push(l[i]);
+			}
+		}
+		#else
+		for (int i = 0; i < s; ++i)
 			e->stack[i] = stack[i];
 		#endif
 		return e;
