@@ -834,4 +834,19 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("INDEX\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::INDEX);}
 };
+class LOCALINDEX : public OpCode
+{
+public:
+	LOCALINDEX(int i)	{x = i;}
+	OpCode *clone()	{return new LOCALINDEX(x);}
+	RC::RETURNCODE Execute(Environment &env)
+	{
+		env.push(env.getLocalIndex(x));
+		return RC::NONE;
+	}
+	PSL_DUMP((int d){PSL_PRINTF(("LOCALINDEX:%d\n", x));})
+	void write(bytecode &b){b.push(MNEMONIC::LOCALINDEX);b.push(&x, sizeof(x));}
+private:
+	int x;
+};
 #undef GET
