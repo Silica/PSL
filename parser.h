@@ -449,6 +449,15 @@ private:
 			}
 			getSuffOp(c);
 		}
+		else if (n == '@')
+		{
+			t->getNext();
+			int i = 0;
+			if (t->getNextIf(Tokenizer::INT))
+				i = t->nint;
+			c.pushcode(new Variable::LOCALINDEX(i));
+			getSuffOp(c);
+		}
 		else PRE_OP('+', PLUS)
 		else PRE_OP('-', MINUS)
 		else PRE_OP('!', NOT)

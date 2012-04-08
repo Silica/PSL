@@ -26,6 +26,7 @@ public:
 
 			MEMBER,
 			INDEX,
+			LOCALINDEX,
 
 			CALL,
 			RETURN,
@@ -220,6 +221,7 @@ public:
 		scope->addLocal(name, x);
 		return x;
 	}
+	rsv getLocalIndex(int i)	{return scope->getLocalIndex(i);}
 	rsv getLocal()				{return scope->getLocal();}
 	rsv setLocal(const rsv &v)	{return scope->setLocal(v);}
 	void addLocal(const string &name, variable &v)		{if (!scope->addLocal(name, v, this))warning(3, name);}
@@ -597,6 +599,11 @@ public:
 		bool r = local.get()->set(name, v);
 		if (env)	env->push(v);
 		return r;
+	}
+	rsv getLocalIndex(int i)
+	{
+		variable l = local;
+		return l[i];
 	}
 	virtual rsv getLocal()
 	{
