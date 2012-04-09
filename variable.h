@@ -169,7 +169,7 @@ public:
 	}
 
 	#define OP(n,o) variable &operator o##=(const variable &v)	{x->n(v.x);return *this;}\
-					rsv operator o(const variable &v)	{variable z = *this;z.x->n(v.x);return z;}
+					variable operator o(const variable &v)	{variable z = *this;z.x->n(v.x);return z;}
 	OP(add,+)
 	OP(sub,-)
 	OP(mul,*)
@@ -190,7 +190,7 @@ public:
 	CMP(gt,>)
 	#undef CMP
 	variable operator+();
-	rsv operator-()	{variable v = *this;v.x->neg();return v;}
+	variable operator-()	{variable v = *this;v.x->neg();return v;}
 	variable operator*()	{return x->deref();}
 //	variable operator&();	// vPointer‚Ìˆ×‚Ég‚¢‚½‚¢‚ªA‚±‚ê‚ğ‚â‚é‚Ì‚Í‚¿‚å‚Á‚Æc
 	variable operator~();
