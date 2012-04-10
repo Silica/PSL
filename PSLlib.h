@@ -522,6 +522,9 @@ private:
 			v["sqrt"] = Sqrt;
 			v["pow"] = Pow;
 			v["log"] = Log;
+			v["sin"] = Sin;
+			v["cos"] = Cos;
+			v["tan"] = Tan;
 		}
 	private:
 		static variable Abs(variable &v)	{return std::abs(static_cast<int>(v));}
@@ -529,5 +532,8 @@ private:
 		static variable Sqrt(variable &v)	{return std::sqrt(static_cast<double>(v));}
 		static variable Pow(variable &v)	{return std::pow(static_cast<double>(v[0]), static_cast<double>(v[1]));}
 		static variable Log(variable &v)	{return std::log(static_cast<double>(v));}
+		static variable Sin(variable &v)	{return std::sin(static_cast<double>(v));}
+		static variable Cos(variable &v)	{return std::cos(static_cast<double>(v));}
+		static variable Tan(variable &v)	{return std::tan(static_cast<double>(v));}
 	};
 };
