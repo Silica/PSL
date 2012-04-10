@@ -218,8 +218,8 @@ public:
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
 	operator void*()		const	{return x->toPointer();}
-	template<typename T>	T *toPointer()	const	{return reinterpret_cast<T*>(x->toPointer());}
-	template<typename T>	operator T*()	const	{return reinterpret_cast<T*>(x->toPointer());}
+	template<typename T>	T *toPointer()	const	{return static_cast<T*>(x->toPointer());}
+	template<typename T>	operator T*()	const	{return static_cast<T*>(x->toPointer());}
 	#ifndef PSL_THREAD_SAFE
 		#ifdef __BORLANDC__
 		template<>

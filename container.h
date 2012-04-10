@@ -192,7 +192,7 @@ public:
 		if (i < 0)
 			return;
 		delete d[i];
-		if (i < (int)reserve)
+		if (i < static_cast<int>(reserve))
 			move(i);
 		else
 			d[i] = NULL;

@@ -70,7 +70,7 @@ public:
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
-	#define CMP(n,o) bool n(Variable *v)	{return x o (unsigned)v->toInt();}
+	#define CMP(n,o) bool n(Variable *v)	{return x o static_cast<hex>(v->toInt());}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -161,7 +161,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	PSL_DUMP((){PSL_PRINTF(("vString:%s\n", (const char*)x));})
+	PSL_DUMP((){PSL_PRINTF(("vString:%s\n", x.c_str()));})
 private:
 	string x;
 };

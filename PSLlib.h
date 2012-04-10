@@ -48,11 +48,11 @@ private:
 		switch (v.type())
 		{
 		case NIL:		PSL_PRINTF(("nil"));break;
-		case INT:		PSL_PRINTF(("%d", (int)v));break;
-		case HEX:		PSL_PRINTF(("%X", (int)v));break;
-		case FLOAT:		PSL_PRINTF(("%f", (double)v));break;
+		case INT:		PSL_PRINTF(("%d", static_cast<int>(v)));break;
+		case HEX:		PSL_PRINTF(("%X", static_cast<int>(v)));break;
+		case FLOAT:		PSL_PRINTF(("%f", static_cast<double>(v)));break;
 //		case RARRAY:	PSL_PRINTF(("[tuple:%d]", v.length()));break;
-		case THREAD:	PSL_PRINTF(("[thread:%s]", (bool)v ? "alive" : "dead"));break;
+		case THREAD:	PSL_PRINTF(("[thread:%s]", static_cast<bool>(v) ? "alive" : "dead"));break;
 		default:
 			{
 				PSL_PRINTF(("%s", v.toString().c_str()));
@@ -218,7 +218,7 @@ private:
 			using namespace std;
 			while ((c = getc(stdin)) != EOF)
 			{
-				s += (char)c;
+				s += static_cast<char>(c);
 				if (c == '\n')
 					break;
 			}
@@ -395,7 +395,7 @@ private:
 			if (!fp || !size)
 				return "";
 			Variable::bytecode vbuf(size+1);	// templateÇ…ÇÊÇÈóeó ÇÃîÏëÂâªÇñhÇÆà◊ÇÃå^ÇÃçƒóòóp
-			char *buf = (char*)vbuf.get();
+			char *buf = reinterpret_cast<char*>(vbuf.get());
 			vbuf.resize(std::fread(buf, 1, size, fp));
 			vbuf.push(0);
 			string s = buf;

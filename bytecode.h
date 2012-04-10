@@ -24,14 +24,14 @@ class bcreader
 {
 	static string readString(bytecode::byte *&byte)
 	{
-		string s = (char*)byte;
+		string s = reinterpret_cast<char*>(byte);
 		byte += s.length()+1;
 		return s;
 	}
 	template<typename T>
 	static T read(bytecode::byte *&byte)
 	{
-		T x = *(T*)byte;
+		T x = *reinterpret_cast<T*>(byte);
 		byte += sizeof(T);
 		return x;
 	}

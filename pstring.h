@@ -407,7 +407,7 @@ public:
 	{
 		if (buf)
 		{
-			if (i < 0 || i >= (int)buf->length()) i = buf->length()-1;
+			if (i < 0 || i >= static_cast<int>(buf->length())) i = buf->length()-1;
 			for (; i >= 0; --i)
 			{
 				if (buf->at(i) == c)
@@ -464,7 +464,7 @@ public:
 		if (buf && !buf->shared())
 		{
 			size = vsnprintf(buf->buffer(), buf->maxlength(), format, arg);
-			if (size <= (int)buf->maxlength())
+			if (size <= static_cast<int>(buf->maxlength()))
 			{
 				va_end(arg);
 				return *this;

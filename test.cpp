@@ -16,10 +16,27 @@ int main(int argc, char **argv)
 		return 0;
 
 	PSL p;
-	if (p.LoadScript(argv[1]))
-//	if (p.LoadCompiledCode(argv[1]))
+	PSL::error e = p.LoadScript(argv[1]);
+	if (e)
 	{
-		printf(" - compile error\n");
+		if (e == PSL::FOPEN_ERROR)
+		{
+			string input = argv[1];
+			for (int i = 2; i < argc; ++i)
+			{
+				input += ' ';
+				input += argv[i];
+			}
+			input += ';';
+			p.LoadString(input);
+			variable v = p.Run();
+			printf("%s", v.toString().c_str());
+			return 0;
+		}
+		else
+		{
+			printf(" - compile error\n");
+		}
 	}
 	else
 	{

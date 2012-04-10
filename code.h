@@ -185,7 +185,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		variable x = !(bool)v;
+		variable x = !static_cast<bool>(v);
 		env.push(x);
 		return RC::NONE;
 	}
@@ -200,7 +200,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		variable x(~(int)v);
+		variable x(~static_cast<int>(v));
 		env.push(x);
 		return RC::NONE;
 	}
@@ -352,7 +352,7 @@ public:
 	{
 		variable r = env.pop();
 		variable l = env.pop();
-		variable v((bool)l && (bool)r);
+		variable v(static_cast<bool>(l) && static_cast<bool>(r));
 		env.push(v);
 		return RC::NONE;
 	}
@@ -368,7 +368,7 @@ public:
 	{
 		variable r = env.pop();
 		variable l = env.pop();
-		variable v((bool)l || (bool)r);
+		variable v(static_cast<bool>(l) || static_cast<bool>(r));
 		env.push(v);
 		return RC::NONE;
 	}
@@ -440,7 +440,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		if ((bool)v)
+		if (static_cast<bool>(v))
 			env.Jump(j);
 		return RC::NONE;
 	}
@@ -493,7 +493,7 @@ public:
 	RC::RETURNCODE Execute(Environment &env)
 	{
 		variable v = env.pop();
-		if ((bool)v)
+		if (static_cast<bool>(v))
 			env.RJump(j);
 		return RC::NONE;
 	}
