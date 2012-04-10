@@ -17,6 +17,11 @@ public:
 		PARSE_ERROR,
 		NOT_COMPILED_CODE,
 	};
+	error LoadString(const char *text)
+	{
+		variable::Tokenizer t(text, "LoadString", 0);
+		return parse(&t) ? PARSE_ERROR : NONE;
+	}
 	error LoadScript(const char *filename)
 	{
 		if (!LoadCompiledCode(filename))

@@ -132,7 +132,6 @@ public:
 	virtual MNEMONIC::mnemonic get()	{return MNEMONIC::NOP;}
 	virtual void write(bytecode &b)	{};
 	virtual void dump(int d = 0){};
-private:
 };
 
 #ifdef PSL_WARNING_POP_EMPTY_STACK
@@ -183,7 +182,7 @@ public:
 	Environment()		{scope = NULL;PSLlib::Basic(global);}
 	#endif
 	Environment(const Environment &env):global(env.global)	{scope = NULL;}
-	~Environment()	{delete scope;if (stack.size())warning(0, (int)stack.size());}
+	~Environment()	{delete scope;if (stack.size())warning(0, static_cast<int>(stack.size()));}
 	Environment *clone()
 	{
 		Environment *e = new Environment(*this);
@@ -338,7 +337,7 @@ public:
 		{
 			for (table::iterator it = label.begin(); it != label.end(); ++it)
 			{
-				if ((unsigned)it->second.get()->toInt() == line)
+				if (static_cast<size_t>(it->second.get()->toInt()) == line)
 					PSL_PRINTF(("%s:\n", it->first.c_str()));
 			}
 			PSL_PRINTF(("exec: "));
@@ -365,7 +364,7 @@ public:
 		line = label[s].get()->toInt();
 		return true;
 	}
-	void pushlabel(const string &s)			{variable v = (int)code.size();label[s] = v;}
+	void pushlabel(const string &s)			{variable v = code.size();label[s] = v;}
 	void pushlabel(const string &s, int l)	{variable v = l;label[s] = v;}
 	void push(OpCode *c)
 	{
