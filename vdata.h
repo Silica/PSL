@@ -78,6 +78,7 @@ public:
 	CMP(lt,<)
 	CMP(gt,>)
 	#undef CMP
+	void neg()	{x = ~x + 1;}
 
 	bool toBool()		const {return x;}
 	int toInt()			const {return x;}
@@ -99,7 +100,7 @@ public:
 	Type type()	const	{return FLOAT;}
 	vBase *clone()	{return new vFloat(x);}
 
-	vBase *substitution(Variable *v)	{x = v->toInt();return this;}
+	vBase *substitution(Variable *v)	{x = v->toDouble();return this;}
 
 	#define OP(n,o) void n(Variable *v)	{x o v->toDouble();}
 	OP(add,+=)
@@ -116,6 +117,7 @@ public:
 	CMP(lt,<)
 	CMP(gt,>)
 	#undef CMP
+	void neg()	{x = -x;}
 
 	bool toBool()		const {return x;}
 	int toInt()			const {return x;}
