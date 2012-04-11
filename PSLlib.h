@@ -181,8 +181,10 @@ private:
 			v["char"] = Char;
 			v["ctoi"] = ctoi;
 			v["length"] = Strlen;
+			#ifdef PSL_USE_CONSOLE
 			v["getchar"] = getChar;
 			v["gets"] = Gets;
+			#endif
 		}
 	private:
 		static variable Char(variable &v)
