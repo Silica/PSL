@@ -169,7 +169,7 @@ public:
 	}
 
 	#define OP(n,o) variable &operator o##=(const variable &v)	{x->n(v.x);return *this;}\
-					variable operator o(const variable &v)	{variable z = *this;z.x->n(v.x);return z;}
+					variable operator o(const variable &v)	const	{variable z = *this;z.x->n(v.x);return z;}
 	OP(add,+)
 	OP(sub,-)
 	OP(mul,*)
@@ -181,7 +181,7 @@ public:
 	OP(shl,<<)
 	OP(shr,>>)
 	#undef OP
-	#define CMP(n,o) bool operator o(const variable &v)	{return x->n(v.x);}
+	#define CMP(n,o) bool operator o(const variable &v)	const	{return x->n(v.x);}
 	CMP(eq,==)
 	CMP(ne,!=)
 	CMP(le,<=)
@@ -190,11 +190,11 @@ public:
 	CMP(gt,>)
 	#undef CMP
 	variable operator+();
-	variable operator-()	{variable v = *this;v.x->neg();return v;}
-	variable operator*()	{return x->deref();}
+	variable operator-()	const {variable v = *this;v.x->neg();return v;}
+	variable operator*()	const {return x->deref();}
 //	variable operator&();	// vPointerの為に使いたいが、これをやるのはちょっと…
 	variable operator~();
-	bool operator!()	{return !x->toBool();}
+	bool operator!()	const {return !x->toBool();}
 	variable &operator++();
 	variable &operator--();
 	variable operator++(int i);	// 後置
@@ -254,7 +254,7 @@ public:
 		return x->index(i);
 	}
 	size_t length() const				{return x->length();}
-	bool exist(const string &s)			{return x->exist(s);}
+	bool exist(const string &s) const	{return x->exist(s);}
 	void push(const variable &v)		{return x->push(v.x);}
 	variable keys()	{return x->keys();}
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
@@ -455,7 +455,11 @@ private:
 			virtual void del(const string &s)	{}
 			virtual void method_this(Variable *v)	{}
 
-			virtual void prepare(Environment &env, Variable *v)	{}
+			virtual void prepare(Environment &env, Variable *v)	{
+				variable a = env.pop();
+				variable c(v->clone(), 0);
+				env.push(c.substitution(a));
+			}
 			virtual void prepareInstance(Environment &env, Variable *v)	{env.push(rsv(v->clone(), 0));}
 			virtual rsv call(Environment &env, variable &arg, Variable *v)	{return variable(NIL);}
 			virtual rsv instance(Environment &env, Variable *v)	{return v->clone();}
@@ -498,6 +502,7 @@ private:
 	#include "memory.h"
 	#endif
 	variable(Variable *v)	{x = v->ref();}
+	variable(Variable *v, int i)	{x = v;}
 	variable(Type t, Variable *v)	{x = new Variable(v);}
 
 	void gset(const variable &v)	{x->gset(v.x);}
@@ -512,6 +517,7 @@ private:
 	friend class PSL;
 	friend class PSLlib;
 	friend class Parser;
+	friend class Variable::vBase;
 	friend class Variable::vCMethod;
 	friend class Variable::CALL;
 	friend class Variable::INSTANCE;

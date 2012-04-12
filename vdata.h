@@ -155,6 +155,7 @@ public:
 	CMP(lt,<)
 	CMP(gt,>)
 	#undef CMP
+	void neg()	{x.reverse();}
 
 	bool toBool()		const {return x.length();}
 	int toInt()			const {return x;}
