@@ -320,19 +320,7 @@ public:
 		if (!buf || !s.buf)					return false;
 		size_t l = buf->length();
 		if (l != s.buf->length())			return false;
-/*		size_t ll = l/sizeof(int);
-		int *b1 = (int*)buf->buffer();
-		int *b2 = (int*)s.buf->buffer();
-		for (size_t t = ll*sizeof(int); t < l; ++t)
-			if (buf->at(t) != s.buf->at(t))	return false;
-		for (size_t t = 0; t < ll; ++t)
-			if (b1[t] != b2[t])				return false;
-		return true;*/
 		return !std::memcmp(buf->buffer(), s.buf->buffer(), l);
-	}
-	bool operator!=(const string &s) const
-	{
-		return !(*this==s);
 	}
 	bool operator==(const char *s) const
 	{
@@ -350,10 +338,6 @@ public:
 		if (s[l] != 0)				return false;
 		return true;
 	}
-	bool operator!=(const char *s) const
-	{
-		return !(*this==s);
-	}
 	bool operator<=(const string &s) const
 	{
 		if (buf == s.buf)	return true;
@@ -367,10 +351,6 @@ public:
 		}
 		if (buf->length() <= s.buf->length())	return true;
 		return false;
-	}
-	bool operator<(const string &s) const
-	{
-		return !(*this >= s);
 	}
 	bool operator>=(const string &s) const
 	{
@@ -386,10 +366,10 @@ public:
 		if (buf->length() >= s.buf->length())	return true;
 		return false;
 	}
-	bool operator>(const string &s) const
-	{
-		return !(*this <= s);
-	}
+	bool operator!=(const string &s) const	{return !(*this==s);}
+	bool operator!=(const char *s) const	{return !(*this==s);}
+	bool operator<(const string &s) const	{return !(*this >= s);}
+	bool operator>(const string &s) const	{return !(*this <= s);}
 
 	int find(char c, int i = 0) const	/* iˆÊ’u‚©‚çŒŸõ‚µ‚Äc‚Ì•¶Žš‚ð”­Œ©‚µ‚½ˆÊ’u‚ð•Ô‚· */
 	{
@@ -444,6 +424,7 @@ public:
 		if (buf)
 		{
 			size_t m = buf->length();
+			only_and_extend(m);
 			size_t e = m/2;
 			char *b = buf->buffer();
 			for (size_t t = 0; t < e; ++t)

@@ -51,7 +51,7 @@ private:
 		case INT:		PSL_PRINTF(("%d", static_cast<int>(v)));break;
 		case HEX:		PSL_PRINTF(("%X", static_cast<int>(v)));break;
 		case FLOAT:		PSL_PRINTF(("%f", static_cast<double>(v)));break;
-//		case RARRAY:	PSL_PRINTF(("[tuple:%d]", v.length()));break;
+		case RARRAY:	PSL_PRINTF(("[tuple:%d]", v.length()));break;
 		case THREAD:	PSL_PRINTF(("[thread:%s]", static_cast<bool>(v) ? "alive" : "dead"));break;
 		default:
 			{
@@ -181,6 +181,10 @@ private:
 			v["char"] = Char;
 			v["ctoi"] = ctoi;
 			v["length"] = Strlen;
+			v["substr"] = Substr;
+			v["find"] = Find;
+			v["rfind"] = rFind;
+			v["split"] = Split;
 			#ifdef PSL_USE_CONSOLE
 			v["getchar"] = getChar;
 			v["gets"] = Gets;
@@ -194,10 +198,27 @@ private:
 			variable ch = s;
 			return ch;
 		}
-		static variable Strlen(variable &v)
+		static variable ctoi(variable &v)	{return v.toString()[0];}
+		static variable Strlen(variable &v)	{return v.toString().length();}
+		static variable Substr(variable &v)	{return v[0].toString().substr(v[1], v[2]);}
+		static variable Find(variable &v)	{return v[0].toString().find(v[1].toString().c_str()[0], v[2]);}
+		static variable rFind(variable &v)	{return v[0].toString().rfind(v[1].toString().c_str()[0], v.length() > 2 ? static_cast<int>(v[2]) : -1);}
+		static variable Split(variable &v)
 		{
-			string s = v;
-			return s.length();
+			string s = v[0];
+			char c = v[1].toString().c_str()[0];
+			variable r;
+			int l = s.length();
+			int prev = 0;
+			for (int i = 0; i < l; ++i)
+			{
+				if ((i = s.find(c, i)) < 0)
+					break;
+				r.push(s.substr(prev, i-prev));
+				prev = i+1;
+			}
+			r.push(s.substr(prev));
+			return r;
 		}
 		static variable getChar(variable &v)
 		{
@@ -207,11 +228,6 @@ private:
 			s = c;
 			variable ch = s;
 			return ch;
-		}
-		static variable ctoi(variable &v)
-		{
-			string s = v;
-			return s[0];
 		}
 		static variable Gets(variable &v)
 		{
