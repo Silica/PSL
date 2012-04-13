@@ -400,9 +400,20 @@ public:
 	OP(shl)
 	OP(shr)
 	#undef OP
+	bool eq(Variable *v)
+	{
+		size_t size = x.size();
+		if (size == 1)
+			return x[0].get()->eq(v);
+		if (size != v->length())
+			return false;
+		for (size_t i = 0; i < size; ++i)
+			if (x[i].get()->ne(v->index(i)))
+				return false;
+		return true;
+	}
+	bool ne(Variable *v)	{return !eq(v);}
 	#define CMP(n) bool n(Variable *v)	{if (x.size() == 1)return x[0].get()->n(v);return false;}
-	CMP(eq)
-	CMP(ne)
 	CMP(le)
 	CMP(ge)
 	CMP(lt)
@@ -569,8 +580,29 @@ public:
 			ccopy(v);
 		}
 	}
-	bool eq(Variable *v)	{return toBool() == v->toBool();}
-	bool ne(Variable *v)	{return toBool() != v->toBool();}
+	bool eq(Variable *v)
+	{
+		size_t size = v->length();
+		if (size != array.size())
+			return false;
+		for (size_t i = 0; i < size; ++i)
+		{
+			if (array[i].get()->ne(v->index(i)))
+				return false;
+		}
+		rsv k(v->keys());
+		size = k.get()->length();
+		if (member.size() != size)
+			return false;
+		for (size_t i = 0; i < size; ++i)
+		{
+			string s = k.get()->index(i)->toString();
+			if (member[s].get()->ne(v->child(s)))
+				return false;
+		}
+		return true;
+	}
+	bool ne(Variable *v)	{return !eq(v);}
 
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return array.size();}

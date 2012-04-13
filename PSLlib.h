@@ -371,9 +371,9 @@ private:
 		static variable Open(variable &this_v, variable &v)
 		{
 			string name = v.toString();
+			using namespace std;
 			if (!this_v)
 			{
-				using namespace std;
 				FILE *fp = fopen(name, "r");
 				if (!fp)
 					return 0;
@@ -386,7 +386,6 @@ private:
 			}
 			else
 			{
-				using namespace std;
 				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
@@ -437,9 +436,9 @@ private:
 		static variable Open(variable &this_v, variable &v)
 		{
 			string name = v.toString();
+			using namespace std;
 			if (!this_v)
 			{
-				using namespace std;
 				FILE *fp = fopen(name, "rb");
 				if (!fp)
 					return 0;
@@ -452,7 +451,6 @@ private:
 			}
 			else
 			{
-				using namespace std;
 				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
