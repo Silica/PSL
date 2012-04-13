@@ -1,10 +1,11 @@
 #define GET(n) MNEMONIC::mnemonic get(){return MNEMONIC::n;}
+#define EXEC RC::RETURNCODE Execute(Environment &env)
 class PUSH_INT : public OpCode
 {
 public:
 	PUSH_INT(int i):x(new Variable(i),0){}
 	OpCode *clone()	{return new PUSH_INT(x.get()->toInt());}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.push(x);
 		return RC::NONE;
@@ -20,7 +21,7 @@ class PUSH_HEX : public OpCode
 public:
 	PUSH_HEX(hex l):x(new Variable(new vHex(l)),0){}
 	OpCode *clone()	{return new PUSH_HEX(x.get()->toInt());}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.push(x);
 		return RC::NONE;
@@ -36,7 +37,7 @@ class PUSH_FLOAT : public OpCode
 public:
 	PUSH_FLOAT(double d):x(new Variable(d),0){}
 	OpCode *clone()	{return new PUSH_FLOAT(x.get()->toDouble());}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.push(x);
 		return RC::NONE;
@@ -52,7 +53,7 @@ class PUSH_STRING : public OpCode
 public:
 	PUSH_STRING(string &s):x(new Variable(s),0){}
 	OpCode *clone()	{string s = x.get()->toString();return new PUSH_STRING(s);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.push(x);
 		return RC::NONE;
@@ -67,7 +68,7 @@ class POP : public OpCode
 {
 public:
 	OpCode *clone()	{return new POP;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.pop();
 		return RC::NONE;
@@ -80,7 +81,7 @@ class PUSH_NULL : public OpCode
 {
 public:
 	OpCode *clone()	{return new PUSH_NULL;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v;
 		env.push(v);
@@ -90,27 +91,12 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH NULL\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::PUSH_NULL);}
 };
-/*class POP_VARIABLE : public OpCode
-{
-public:
-	OpCode *clone()	{return new POP_VARIABLE(name);}
-	POP_VARIABLE(string &s)	{name = s;}
-	RC::RETURNCODE Execute(Environment &env)
-	{
-		variable v = env.getVariable(name);
-		v = env.pop();
-		return RC::NONE;
-	}
-	PSL_DUMP((int d){PSL_PRINTF(("POP VARIABLE %s\n", name.c_str()));})
-private:
-	string name;
-};*/
 
 class SUBSTITUTION : public OpCode
 {
 public:
 	OpCode *clone()	{return new SUBSTITUTION;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable l = env.top();
@@ -125,7 +111,7 @@ class ASSIGNMENT : public OpCode
 {
 public:
 	OpCode *clone()	{return new ASSIGNMENT;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable l = env.top();
@@ -140,7 +126,7 @@ class ARGUMENT : public OpCode
 {
 public:
 	OpCode *clone()	{return new ARGUMENT;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable l = env.pop();
 		variable r = env.pop();
@@ -156,7 +142,7 @@ class PLUS : public OpCode
 {
 public:
 	OpCode *clone()	{return new PLUS;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		return RC::NONE;
 	}
@@ -168,7 +154,7 @@ class MINUS : public OpCode
 {
 public:
 	OpCode *clone()	{return new MINUS;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.push(-v);
@@ -182,7 +168,7 @@ class NOT : public OpCode
 {
 public:
 	OpCode *clone()	{return new NOT;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		variable x = !static_cast<bool>(v);
@@ -197,7 +183,7 @@ class COMPL : public OpCode
 {
 public:
 	OpCode *clone()	{return new COMPL;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		variable x(~static_cast<int>(v));
@@ -212,7 +198,7 @@ class INC : public OpCode	// 後置
 {
 public:
 	OpCode *clone()	{return new INC;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		variable c = v;	// 値をコピー
@@ -228,7 +214,7 @@ class PINC : public OpCode	// 前置
 {
 public:
 	OpCode *clone()	{return new PINC;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.top();
 		v += 1;
@@ -242,7 +228,7 @@ class DEC : public OpCode	// 後置
 {
 public:
 	OpCode *clone()	{return new DEC;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		variable c = v;	// 値をコピー
@@ -258,7 +244,7 @@ class PDEC : public OpCode	// 前置
 {
 public:
 	OpCode *clone()	{return new PDEC;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.top();
 		v -= 1;
@@ -272,7 +258,7 @@ class DEREF : public OpCode
 {
 public:
 	OpCode *clone()	{return new DEREF;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.push(*v);
@@ -285,7 +271,7 @@ class REF : public OpCode
 {
 public:
 	OpCode *clone()	{return new REF;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.push(v.pointer());
@@ -294,7 +280,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("REF\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::REF);}
 };
-#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}RC::RETURNCODE Execute(Environment&env){variable r=env.pop();variable l=env.top();l o r;return RC::NONE;}MNEMONIC::mnemonic get(){return MNEMONIC::BINARY;}PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
+#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}EXEC{variable r=env.pop();variable l=env.top();l o r;return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
 OOC(SADD,+=);
 OOC(SSUB,-=);
 OOC(SMUL,*=);
@@ -307,7 +293,7 @@ OOC(SSHL,<<=);
 OOC(SSHR,>>=);
 //OOC(MOV,=);
 #undef OOC
-#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}RC::RETURNCODE Execute(Environment&env){variable r=env.pop();variable l=env.pop();variable x(l o r);env.push(x);return RC::NONE;}MNEMONIC::mnemonic get(){return MNEMONIC::BINARY;}PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
+#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}EXEC{variable r=env.pop();variable l=env.pop();variable x(l o r);env.push(x);return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
 OOC(ADD,+);
 OOC(SUB,-);
 OOC(MUL,*);
@@ -331,7 +317,7 @@ class VARIABLE : public OpCode
 public:
 	VARIABLE(string &s)	{name = s;}
 	OpCode *clone()	{return new VARIABLE(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.getVariable(name);
 		env.push(v);
@@ -348,7 +334,7 @@ class BAND : public OpCode
 {
 public:
 	OpCode *clone()	{return new BAND;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable l = env.pop();
@@ -364,7 +350,7 @@ class BOR : public OpCode
 {
 public:
 	OpCode *clone()	{return new BOR;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable l = env.pop();
@@ -384,7 +370,7 @@ class PUSH_CODE : public OpCode
 public:
 	PUSH_CODE(const rsv &v):x(v){}
 	OpCode *clone()	{return new PUSH_CODE(x);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = x;		// 一旦受け取り
 		variable c = v;		// コピー作成
@@ -400,7 +386,7 @@ class CLOSURE : public OpCode
 {
 public:
 	OpCode *clone()	{return new CLOSURE;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.top();
 		#ifdef PSL_CLOSURE_REFERENCE
@@ -421,7 +407,7 @@ public:
 	JMP(int i)	{j = i;}
 	OpCode *clone()	{return new JMP(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.Jump(j);
 		return RC::NONE;
@@ -437,7 +423,7 @@ public:
 	JT(int i)	{j = i;}
 	OpCode *clone()	{return new JT(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		if (static_cast<bool>(v))
@@ -455,7 +441,7 @@ public:
 	JF(int i)	{j = i;}
 	OpCode *clone()	{return new JF(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		if (!v)
@@ -473,7 +459,7 @@ public:
 	JR(int i)	{j = i;}
 	OpCode *clone()	{return new JR(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.RJump(j);
 		return RC::NONE;
@@ -490,7 +476,7 @@ public:
 	JRT(int i)	{j = i;}
 	OpCode *clone()	{return new JRT(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		if (static_cast<bool>(v))
@@ -508,7 +494,7 @@ public:
 	JRF(int i)	{j = i;}
 	OpCode *clone()	{return new JRF(j);}
 	void set(int s){j = s;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		if (!v)
@@ -525,7 +511,7 @@ class LIST : public OpCode
 {
 public:
 	OpCode *clone()	{return new LIST;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable l = env.pop();
@@ -552,7 +538,7 @@ class PARENTHESES : public OpCode
 {
 public:
 	OpCode *clone()	{return new PARENTHESES;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		variable r(variable::RARRAY);
@@ -569,7 +555,7 @@ class CALL : public OpCode
 {
 public:
 	OpCode *clone()	{return new CALL;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable r = env.pop();
 		variable v = env.pop();
@@ -584,7 +570,7 @@ public:
 		env.push(r);
 		#ifdef PSL_OPTIMIZE_TAILCALL
 		MNEMONIC::mnemonic n = env.getNext();
-		if (n == MNEMONIC::RETURN)	env.Return();	// 末尾最適化
+		if (n == MNEMONIC::RETURN)	env.Return();
 		else if (n == MNEMONIC::END)env.endScope();
 		#endif
 		v.prepare(env);
@@ -598,7 +584,7 @@ class RETURN : public OpCode
 {
 public:
 	OpCode *clone()	{return new RETURN;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.Return();
 		return RC::RETURN;
@@ -611,7 +597,7 @@ class BREAK : public OpCode
 {
 public:
 	OpCode *clone()	{return new BREAK;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.Break();
 		return RC::BREAK;
@@ -623,7 +609,7 @@ class CONTINUE : public OpCode
 {
 public:
 	OpCode *clone()	{return new CONTINUE;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.Continue();
 		return RC::CONTINUE;
@@ -635,7 +621,7 @@ class YIELD : public OpCode
 {
 public:
 	OpCode *clone()	{return new YIELD;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 //		env.Yield();	// ってすることなくね？
 		return RC::YIELD;
@@ -648,7 +634,7 @@ class GOTO : public OpCode
 public:
 	GOTO(string &s)	{label = s;}
 	OpCode *clone()	{return new GOTO(label);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.Goto(label);
 		return RC::GOTO;
@@ -665,7 +651,7 @@ public:
 	SCOPE(Code *c)	{statement = c->inc();}
 	OpCode *clone()	{return new SCOPE(statement);}
 	~SCOPE()	{statement->finalize();}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		Scope *s = new AnonymousScope(statement);
 		env.addScope(s);
@@ -682,7 +668,7 @@ public:
 	LOOP(Code *c, int l)	{statement = c->inc();cline = l;}
 	OpCode *clone()	{return new LOOP(statement, cline);}
 	~LOOP()	{statement->finalize();}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		Scope *s = new LoopScope(statement, cline);
 		env.addScope(s);
@@ -710,7 +696,7 @@ class LOCAL : public OpCode
 public:
 	LOCAL(string &s)	{name = s;}
 	OpCode *clone()	{return new LOCAL(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.addLocal(name, v);
@@ -726,7 +712,7 @@ class GLOBAL : public OpCode
 public:
 	GLOBAL(string &s)	{name = s;}
 	OpCode *clone()	{return new GLOBAL(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.addGlobal(name, v);
@@ -742,7 +728,7 @@ class STATIC : public OpCode
 public:
 	STATIC(string &s)	{name = s;}
 	OpCode *clone()	{return new STATIC(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.addStatic(name, v);
@@ -759,7 +745,7 @@ class DECLARATION : public OpCode
 public:
 	DECLARATION(string &s)	{name = s;}
 	OpCode *clone()	{return new DECLARATION(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		env.Declaration(name, v);
@@ -775,7 +761,7 @@ class INSTANCE : public OpCode
 {
 public:
 	OpCode *clone()	{return new INSTANCE;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
 		v.prepareInstance(env);
@@ -784,35 +770,16 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("INSTANCE\n"));})
 	void write(bytecode &b){b.push(MNEMONIC::INSTANCE);}
 };
-/*
-labelをコード中に埋め込むという案もあった
-class LABEL : public OpCode
-{
-public:
-	LABEL(string &s)	{name = s;}
-	RC::RETURNCODE Execute(Environment &env)
-	{
-		// なにもしない
-		return RC::NONE;
-	}
-	PSL_DUMP((int d){PSL_PRINTF(("LABEL %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::LABEL);b.push(name.c_str(), name.length()+1);}
-private:
-	string name;
-};
-*/
-
 
 class MEMBER : public OpCode
 {
 public:
 	MEMBER(string &s)	{name = s;}
 	OpCode *clone()	{return new MEMBER(name);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable v = env.pop();
-		variable x = v[name];
-		env.push(x);
+		env.push(v[name]);
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("MEMBER %s\n", name.c_str()));})
@@ -824,7 +791,7 @@ class INDEX : public OpCode
 {
 public:
 	OpCode *clone()	{return new INDEX;}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		variable i = env.pop();
 		variable v = env.pop();
@@ -839,7 +806,7 @@ class LOCALINDEX : public OpCode
 public:
 	LOCALINDEX(int i)	{x = i;}
 	OpCode *clone()	{return new LOCALINDEX(x);}
-	RC::RETURNCODE Execute(Environment &env)
+	EXEC
 	{
 		env.push(env.getLocalIndex(x));
 		return RC::NONE;
@@ -850,3 +817,4 @@ private:
 	int x;
 };
 #undef GET
+#undef EXEC

@@ -339,9 +339,9 @@ class rstack : public rlist
 public:
 	void push(const rsv &v)	{push_back(v);}
 	rsv &top()	{return x[len-1];}
+	#ifdef PSL_POPSTACK_NULL
 	rsv pop()
 	{
-	#ifdef PSL_POPSTACK_NULL
 		rsv v = x[--len];
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 		x[len] = StaticObject::rsvnull();
@@ -350,11 +350,9 @@ public:
 		x[len] = null;
 		#endif
 		return v;
-	#else
-		return x[--len];
-	#endif
 	}
-	#ifndef PSL_POPSTACK_NULL
+	#else
+	rsv &pop()	{return x[--len];}
 	void clear()
 	{
 		for (size_t i = len; i < res; ++i)
