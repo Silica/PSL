@@ -337,7 +337,12 @@ typedef std::stack<rsv> rstack;
 class rstack : public rlist
 {
 public:
+	#ifdef PSL_CHECKSTACK_PUSH
 	void push(const rsv &v)	{push_back(v);}
+	#else
+	void push(const rsv &v)	{x[len++] = v;}
+	rstack():rlist(16){}
+	#endif
 	rsv &top()	{return x[len-1];}
 	#ifdef PSL_POPSTACK_NULL
 	rsv pop()

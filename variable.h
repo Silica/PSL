@@ -35,7 +35,8 @@
 // デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
 // 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
-#define PSL_CHECKSTACK		// POP時にスタックをチェックする
+#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
+#define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ
