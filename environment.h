@@ -244,7 +244,7 @@ public:
 	void push(const rsv &v)	{stack.push(v);}
 	rsv pop()
 	{
-		#ifdef PSL_CHECKSTACK
+		#ifdef PSL_CHECKSTACK_POP
 		if (stack.empty())
 		{
 			warning(2);
@@ -261,7 +261,7 @@ public:
 	}
 	rsv &top()
 	{
-		#ifdef PSL_CHECKSTACK
+		#ifdef PSL_CHECKSTACK_POP
 		if (stack.empty())
 		{
 			warning(2);
@@ -599,11 +599,7 @@ public:
 		if (env)	env->push(v);
 		return r;
 	}
-	rsv getLocalIndex(int i)
-	{
-		variable l = local;
-		return l[i];
-	}
+	rsv getLocalIndex(int i)	{return local.get()->index(i);}
 	virtual rsv getLocal()
 	{
 		if (owner)
