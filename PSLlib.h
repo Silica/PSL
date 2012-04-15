@@ -252,6 +252,7 @@ private:
 			v["length"] = variable(Length);
 			v["push"] = variable(Push);
 			v["foreach"] = variable(Foreach);
+			v["join"] = variable(Join);
 		}
 	private:
 		static variable Length(variable &this_v, variable &v)
@@ -295,6 +296,33 @@ private:
 				}
 			}
 			return size;
+		}
+		static variable Join(variable &this_v, variable &v)
+		{
+			string r;
+			string s;
+			if (!this_v)
+			{
+				variable array = v[0];
+				if (v[1])
+					s = v[1].toString();
+				int size = array.length();
+				if (size)
+					r = array[0].toString();
+				for (int i = 1; i < size; ++i)
+					r += s + array[i].toString();
+			}
+			else
+			{
+				if (v)
+					s = v.toString();
+				int size = this_v.length();
+				if (size)
+					r = this_v[0].toString();
+				for (int i = 1; i < size; ++i)
+					r += s + this_v[i].toString();
+			}
+			return r;
 		}
 	};
 	class Table
