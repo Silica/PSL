@@ -230,28 +230,21 @@ public:
 	#endif
 
 	variable operator[](size_t i)			{return x->index(i);}
-	variable operator[](int i)				{
-		if (i < 0)
-		{
-			int l = x->length();
-			i = l + i;
-			if (i < 0)
-				i = 0;
-		}
-		return x->index(i);
-	}
+	variable operator[](int i)				{return x->index(minusindex(i));}
 	variable operator[](const char *s)		{return x->child(s);}
 	variable operator[](const string &s)	{return x->child(s);}
 	variable operator[](const variable &v)	{
 		if (v.type(STRING) || v.type(FLOAT))	return x->child(v);
-		int i = v;
-		if (i < 0)
+		if (v.type(RARRAY))
 		{
-			int l = x->length();
-			i = l + i;
-			if (i < 0)
-				i = 0;
+			int s = minusindex(v.x->index(0)->toInt());
+			int l = v.x->index(1)->toInt();
+			variable r(RARRAY);
+			if (l < 0)	for (int i = 0; i > l; --i)	r.x->push(x->index(s+i));
+			else		for (int i = 0; i < l; ++i)	r.x->push(x->index(s+i));
+			return r.x;
 		}
+		int i = minusindex(v);
 		return x->index(i);
 	}
 	size_t length() const				{return x->length();}
@@ -261,6 +254,17 @@ public:
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
 	void del(const string &s)						{return x->del(s);}
 private:
+	int minusindex(int i)
+	{
+		if (i < 0)
+		{
+			int l = x->length();
+			i = l + i;
+			if (i < 0)
+				i = 0;
+		}
+		return i;
+	}
 	#include "PSLlib.h"
 	#include "tokenizer.h"
 	#include "parser.h"

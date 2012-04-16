@@ -523,11 +523,22 @@ public:
 			delete this;
 			return x;
 		}
+
+		Variable *o = v;
+		rsv temp(v);
+		if (v->type() == RARRAY)
+			temp = rsv(v = v->clone(), 0);
 		size_t size = v->length();
 		if (size > array.size())
 			array.resize(size);
 		for (size_t i = 0; i < size; ++i)
-			array[i].get()->substitution(v->index(i));
+		{
+			Variable *z = array[i].get();
+			if (z->type() == POINTER || z->type() == REFERENCE)
+				z->substitution(o->index(i));
+			else
+				z->substitution(v->index(i));
+		}
 
 		kcopy(v);
 		ccopy(v);
@@ -541,11 +552,22 @@ public:
 			delete this;
 			return x;
 		}
+
+		Variable *o = v;
+		rsv temp(v);
+		if (v->type() == RARRAY)
+			temp = rsv(v = v->clone(), 0);
 		size_t size = v->length();
 		if (size > array.size())
 			array.resize(size);
 		for (size_t i = 0; i < size; ++i)
-			array[i].get()->assignment(v->index(i));
+		{
+			Variable *z = array[i].get();
+			if (z->type() == POINTER || z->type() == REFERENCE)
+				z->assignment(o->index(i));
+			else
+				z->assignment(v->index(i));
+		}
 
 		rsv k(v->keys());
 		size = k.get()->length();
