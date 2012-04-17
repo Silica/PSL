@@ -484,6 +484,23 @@ public:
 		s -= i;
 		return s;
 	}
+	string &operator*=(size_t i)	/* iŒÂ•ª‚Ì•¶š—ñ */
+	{
+		if (buf)
+		{
+			size_t c = buf->length();
+			only_and_extend(c*i);
+			for (size_t x = 0; x < i; ++x)
+				buf->fcopy(buf->buffer(), c, c*x);
+		}
+		return *this;
+	}
+	string operator*(size_t i) const
+	{
+		string s = *this;
+		s *= i;
+		return s;
+	}
 	string &operator/=(size_t i)	/* æ“ª‚©‚çi•¶š‚Ü‚Å‚Ì•¶š—ñ */
 	{
 		if (buf)
