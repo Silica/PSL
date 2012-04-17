@@ -144,6 +144,7 @@ public:
 	void add(Variable *v)	{x += v->toString();}
 	#define OP(n,o) void n(Variable *v)	{x o v->toInt();}
 	OP(sub,-=)
+	OP(mul,*=)
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP
@@ -273,7 +274,6 @@ public:
 
 	void prepare(Environment &env, Variable *v)			{x->prepare(env);}
 	void prepareInstance(Environment &env, Variable *v)	{x->prepareInstance(env);}
-//	Variable *instance(Variable *v)	{return x->instance();}
 	rsv instance(Environment &env, Variable *v)	{return x->instance(env);}
 	rsv call(Environment &env, variable &arg, Variable *v)	{return x->call(env, arg);}
 
@@ -442,7 +442,6 @@ public:
 
 	void prepare(Environment &env, Variable *v)				{if (x.size() == 1)x[0].get()->prepare(env);}
 	void prepareInstance(Environment &env, Variable *v)		{if (x.size() == 1)x[0].get()->prepareInstance(env);}
-//	Variable *instance(Variable *v)							{if (x.size() == 1)return x[0].get()->instance();return v->clone();}
 	rsv instance(Environment &env, Variable *v)				{if (x.size() == 1)return x[0].get()->instance(env);return v->clone();}
 	rsv call(Environment &env, variable &arg, Variable *v)	{if (x.size() == 1)return x[0].get()->call(env, arg);return variable(NIL);}
 
