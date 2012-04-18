@@ -1,10 +1,12 @@
 #define GET(n) MNEMONIC::mnemonic get(){return MNEMONIC::n;}
+#define CLONE(n) OpCode *clone(){return new n;}
 #define EXEC RC::RETURNCODE Execute(Environment &env)
+#define WRITE(n,x) void write(bytecode &b){b.push(MNEMONIC::n);x}
 class PUSH_INT : public OpCode
 {
 public:
 	PUSH_INT(int i):x(new Variable(i),0){}
-	OpCode *clone()	{return new PUSH_INT(x.get()->toInt());}
+	CLONE(PUSH_INT(x.get()->toInt()))
 	EXEC
 	{
 		env.push(x);
@@ -12,7 +14,7 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %d\n", x.get()->toInt()));})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_INT);int w = x.get()->toInt();b.push(&w, sizeof(w));}
+	WRITE(PUSH_INT,int w = x.get()->toInt();b.push(&w, sizeof(w));)
 private:
 	rsv x;
 };
@@ -20,7 +22,7 @@ class PUSH_HEX : public OpCode
 {
 public:
 	PUSH_HEX(hex l):x(new Variable(new vHex(l)),0){}
-	OpCode *clone()	{return new PUSH_HEX(x.get()->toInt());}
+	CLONE(PUSH_HEX(x.get()->toInt()))
 	EXEC
 	{
 		env.push(x);
@@ -28,7 +30,7 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %X\n", x.get()->toInt()));})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_HEX);hex w = x.get()->toInt();b.push(&w, sizeof(w));}
+	WRITE(PUSH_HEX,hex w = x.get()->toInt();b.push(&w, sizeof(w));)
 private:
 	rsv x;
 };
@@ -36,7 +38,7 @@ class PUSH_FLOAT : public OpCode
 {
 public:
 	PUSH_FLOAT(double d):x(new Variable(d),0){}
-	OpCode *clone()	{return new PUSH_FLOAT(x.get()->toDouble());}
+	CLONE(PUSH_FLOAT(x.get()->toDouble()))
 	EXEC
 	{
 		env.push(x);
@@ -44,15 +46,15 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %f\n", x.get()->toDouble()));})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_FLOAT);double w = x.get()->toDouble();b.push(&w, sizeof(w));}
+	WRITE(PUSH_FLOAT,double w = x.get()->toDouble();b.push(&w, sizeof(w));)
 private:
 	rsv x;
 };
 class PUSH_STRING : public OpCode
 {
 public:
-	PUSH_STRING(string &s):x(new Variable(s),0){}
-	OpCode *clone()	{string s = x.get()->toString();return new PUSH_STRING(s);}
+	PUSH_STRING(const string &s):x(new Variable(s),0){}
+	CLONE(PUSH_STRING(x.get()->toString()))
 	EXEC
 	{
 		env.push(x);
@@ -60,14 +62,14 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %s\n", x.get()->toString().c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_STRING);string w = x.get()->toString();b.push(w.c_str(), w.length()+1);}
+	WRITE(PUSH_STRING,string w = x.get()->toString();b.push(w.c_str(), w.length()+1);)
 private:
 	rsv x;
 };
 class POP : public OpCode
 {
 public:
-	OpCode *clone()	{return new POP;}
+	CLONE(POP)
 	EXEC
 	{
 		env.pop();
@@ -75,12 +77,12 @@ public:
 	}
 	GET(POP)
 	PSL_DUMP((int d){PSL_PRINTF(("POP\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::POP);}
+	WRITE(POP,)
 };
 class PUSH_NULL : public OpCode
 {
 public:
-	OpCode *clone()	{return new PUSH_NULL;}
+	CLONE(PUSH_NULL)
 	EXEC
 	{
 		variable v;
@@ -89,13 +91,13 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH NULL\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_NULL);}
+	WRITE(PUSH_NULL,)
 };
 
 class SUBSTITUTION : public OpCode
 {
 public:
-	OpCode *clone()	{return new SUBSTITUTION;}
+	CLONE(SUBSTITUTION)
 	EXEC
 	{
 		variable r = env.pop();
@@ -105,12 +107,12 @@ public:
 	}
 	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("SUBSTITUTION\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::SUBSTITUTION);}
+	WRITE(SUBSTITUTION,)
 };
 class ASSIGNMENT : public OpCode
 {
 public:
-	OpCode *clone()	{return new ASSIGNMENT;}
+	CLONE(ASSIGNMENT)
 	EXEC
 	{
 		variable r = env.pop();
@@ -120,12 +122,12 @@ public:
 	}
 	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("ASSIGNMENT\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::ASSIGNMENT);}
+	WRITE(ASSIGNMENT,)
 };
 class ARGUMENT : public OpCode
 {
 public:
-	OpCode *clone()	{return new ARGUMENT;}
+	CLONE(ARGUMENT)
 	EXEC
 	{
 		variable l = env.pop();
@@ -134,26 +136,26 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("ARGUMENT\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::ARGUMENT);}
+	WRITE(ARGUMENT,)
 };
 
 
 class PLUS : public OpCode
 {
 public:
-	OpCode *clone()	{return new PLUS;}
+	CLONE(PLUS)
 	EXEC
 	{
 		return RC::NONE;
 	}
 	GET(PLUS)
 	PSL_DUMP((int d){PSL_PRINTF(("PLUS\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::PLUS);}
+	WRITE(PLUS,)
 };
 class MINUS : public OpCode
 {
 public:
-	OpCode *clone()	{return new MINUS;}
+	CLONE(MINUS)
 	EXEC
 	{
 		variable v = env.pop();
@@ -162,12 +164,12 @@ public:
 	}
 	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("MINUS\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::MINUS);}
+	WRITE(MINUS,)
 };
 class NOT : public OpCode
 {
 public:
-	OpCode *clone()	{return new NOT;}
+	CLONE(NOT)
 	EXEC
 	{
 		variable v = env.pop();
@@ -177,12 +179,12 @@ public:
 	}
 	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("NOT\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::NOT);}
+	WRITE(NOT,)
 };
 class COMPL : public OpCode
 {
 public:
-	OpCode *clone()	{return new COMPL;}
+	CLONE(COMPL)
 	EXEC
 	{
 		variable v = env.pop();
@@ -192,12 +194,12 @@ public:
 	}
 	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("COMPL\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::COMPL);}
+	WRITE(COMPL,)
 };
 class INC : public OpCode	// Œã’u
 {
 public:
-	OpCode *clone()	{return new INC;}
+	CLONE(INC)
 	EXEC
 	{
 		variable v = env.pop();
@@ -208,12 +210,12 @@ public:
 	}
 	GET(INC)
 	PSL_DUMP((int d){PSL_PRINTF(("INC\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::INC);}
+	WRITE(INC,)
 };
 class PINC : public OpCode	// ‘O’u
 {
 public:
-	OpCode *clone()	{return new PINC;}
+	CLONE(PINC)
 	EXEC
 	{
 		variable v = env.top();
@@ -222,12 +224,12 @@ public:
 	}
 	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("PINC\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::PINC);}
+	WRITE(PINC,)
 };
 class DEC : public OpCode	// Œã’u
 {
 public:
-	OpCode *clone()	{return new DEC;}
+	CLONE(DEC)
 	EXEC
 	{
 		variable v = env.pop();
@@ -238,12 +240,12 @@ public:
 	}
 	GET(DEC)
 	PSL_DUMP((int d){PSL_PRINTF(("DEC\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::DEC);}
+	WRITE(DEC,)
 };
 class PDEC : public OpCode	// ‘O’u
 {
 public:
-	OpCode *clone()	{return new PDEC;}
+	CLONE(PDEC)
 	EXEC
 	{
 		variable v = env.top();
@@ -252,12 +254,12 @@ public:
 	}
 	GET(UNARY)
 	PSL_DUMP((int d){PSL_PRINTF(("PDEC\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::PDEC);}
+	WRITE(PDEC,)
 };
 class DEREF : public OpCode
 {
 public:
-	OpCode *clone()	{return new DEREF;}
+	CLONE(DEREF)
 	EXEC
 	{
 		variable v = env.pop();
@@ -265,12 +267,12 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("DEREF\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::DEREF);}
+	WRITE(DEREF,)
 };
 class REF : public OpCode
 {
 public:
-	OpCode *clone()	{return new REF;}
+	CLONE(REF)
 	EXEC
 	{
 		variable v = env.pop();
@@ -278,9 +280,9 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("REF\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::REF);}
+	WRITE(REF,)
 };
-#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}EXEC{variable r=env.pop();variable l=env.top();l o r;return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
+#define OOC(n,o) class n:public OpCode{public:CLONE(n)EXEC{variable r=env.pop();variable l=env.top();l o r;return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})WRITE(n,)}
 OOC(SADD,+=);
 OOC(SSUB,-=);
 OOC(SMUL,*=);
@@ -293,7 +295,7 @@ OOC(SSHL,<<=);
 OOC(SSHR,>>=);
 //OOC(MOV,=);
 #undef OOC
-#define OOC(n,o) class n:public OpCode{public:OpCode*clone(){return new n;}EXEC{variable r=env.pop();variable l=env.pop();variable x(l o r);env.push(x);return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})void write(bytecode &b){b.push(MNEMONIC::n);}}
+#define OOC(n,o) class n:public OpCode{public:CLONE(n)EXEC{variable r=env.pop();variable l=env.pop();variable x(l o r);env.push(x);return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})WRITE(n,)}
 OOC(ADD,+);
 OOC(SUB,-);
 OOC(MUL,*);
@@ -316,7 +318,7 @@ class VARIABLE : public OpCode
 {
 public:
 	VARIABLE(string &s)	{name = s;}
-	OpCode *clone()	{return new VARIABLE(name);}
+	CLONE(VARIABLE(name))
 	EXEC
 	{
 		variable v = env.getVariable(name);
@@ -325,7 +327,7 @@ public:
 	}
 	GET(VARIABLE)
 	PSL_DUMP((int d){PSL_PRINTF(("VARIABLE %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::VARIABLE);b.push(name.c_str(), name.length()+1);}
+	WRITE(VARIABLE,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
@@ -333,7 +335,7 @@ private:
 class BAND : public OpCode
 {
 public:
-	OpCode *clone()	{return new BAND;}
+	CLONE(BAND)
 	EXEC
 	{
 		variable r = env.pop();
@@ -344,12 +346,12 @@ public:
 	}
 	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("BAND\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::BAND);}
+	WRITE(BAND,)
 };
 class BOR : public OpCode
 {
 public:
-	OpCode *clone()	{return new BOR;}
+	CLONE(BOR)
 	EXEC
 	{
 		variable r = env.pop();
@@ -360,7 +362,7 @@ public:
 	}
 	GET(BINARY)
 	PSL_DUMP((int d){PSL_PRINTF(("BOR\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::BOR);}
+	WRITE(BOR,)
 };
 
 
@@ -369,7 +371,7 @@ class PUSH_CODE : public OpCode
 {
 public:
 	PUSH_CODE(const rsv &v):x(v){}
-	OpCode *clone()	{return new PUSH_CODE(x);}
+	CLONE(PUSH_CODE(x))
 	EXEC
 	{
 		variable v = x;		// ˆê’UŽó‚¯Žæ‚è
@@ -378,14 +380,14 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH CODE\n"));if (!d){x.get()->dump();PSL_PRINTF(("CODE END\n"));}})
-	void write(bytecode &b){b.push(MNEMONIC::PUSH_CODE);x.get()->write("", b);}
+	WRITE(PUSH_CODE,x.get()->write("", b);)
 private:
 	rsv x;
 };
 class CLOSURE : public OpCode
 {
 public:
-	OpCode *clone()	{return new CLOSURE;}
+	CLONE(CLOSURE)
 	EXEC
 	{
 		variable v = env.top();
@@ -397,7 +399,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("CLOSURE\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::CLOSURE);}
+	WRITE(CLOSURE,)
 };
 
 
@@ -405,7 +407,7 @@ class JMP : public OpCode
 {
 public:
 	JMP(int i)	{j = i;}
-	OpCode *clone()	{return new JMP(j);}
+	CLONE(JMP(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -413,7 +415,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JMP %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JMP);b.push(&j, sizeof(j));}
+	WRITE(JMP,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -421,7 +423,7 @@ class JT : public OpCode
 {
 public:
 	JT(int i)	{j = i;}
-	OpCode *clone()	{return new JT(j);}
+	CLONE(JT(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -431,7 +433,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JT %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JT);b.push(&j, sizeof(j));}
+	WRITE(JT,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -439,7 +441,7 @@ class JF : public OpCode
 {
 public:
 	JF(int i)	{j = i;}
-	OpCode *clone()	{return new JF(j);}
+	CLONE(JF(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -449,7 +451,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JF %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JF);b.push(&j, sizeof(j));}
+	WRITE(JF,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -457,7 +459,7 @@ class JR : public OpCode		// ‘Š‘ÎƒWƒƒƒ“ƒvAs‚ÍŽÀsŽž‚É‚ÍŽŸ‚ðŽw‚µ‚Ä‚¢‚é‚±‚Æ‚É’ˆ
 {
 public:
 	JR(int i)	{j = i;}
-	OpCode *clone()	{return new JR(j);}
+	CLONE(JR(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -466,7 +468,7 @@ public:
 	}
 	GET(JR)
 	PSL_DUMP((int d){PSL_PRINTF(("JR %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JR);b.push(&j, sizeof(j));}
+	WRITE(JR,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -474,7 +476,7 @@ class JRT : public OpCode
 {
 public:
 	JRT(int i)	{j = i;}
-	OpCode *clone()	{return new JRT(j);}
+	CLONE(JRT(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -484,7 +486,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JRT %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JRT);b.push(&j, sizeof(j));}
+	WRITE(JRT,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -492,7 +494,7 @@ class JRF : public OpCode
 {
 public:
 	JRF(int i)	{j = i;}
-	OpCode *clone()	{return new JRF(j);}
+	CLONE(JRF(j))
 	void set(int s){j = s;}
 	EXEC
 	{
@@ -502,7 +504,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JRF %d\n", j));})
-	void write(bytecode &b){b.push(MNEMONIC::JRF);b.push(&j, sizeof(j));}
+	WRITE(JRF,b.push(&j, sizeof(j));)
 private:
 	int j;
 };
@@ -510,7 +512,7 @@ private:
 class LIST : public OpCode
 {
 public:
-	OpCode *clone()	{return new LIST;}
+	CLONE(LIST)
 	EXEC
 	{
 		variable r = env.pop();
@@ -531,13 +533,13 @@ public:
 	}
 	GET(LIST)
 	PSL_DUMP((int d){PSL_PRINTF(("LIST\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::LIST);}
+	WRITE(LIST,)
 };
 
 class PARENTHESES : public OpCode
 {
 public:
-	OpCode *clone()	{return new PARENTHESES;}
+	CLONE(PARENTHESES)
 	EXEC
 	{
 		variable v = env.pop();
@@ -548,13 +550,13 @@ public:
 	}
 	GET(PARENTHESES)
 	PSL_DUMP((int d){PSL_PRINTF(("PARENTHESES\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::PARENTHESES);}
+	WRITE(PARENTHESES,)
 };
 
 class CALL : public OpCode
 {
 public:
-	OpCode *clone()	{return new CALL;}
+	CLONE(CALL)
 	EXEC
 	{
 		variable r = env.pop();
@@ -577,13 +579,13 @@ public:
 		return RC::CALL;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("CALL\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::CALL);}
+	WRITE(CALL,)
 };
 
 class RETURN : public OpCode
 {
 public:
-	OpCode *clone()	{return new RETURN;}
+	CLONE(RETURN)
 	EXEC
 	{
 		env.Return();
@@ -591,56 +593,56 @@ public:
 	}
 	GET(RETURN)
 	PSL_DUMP((int d){PSL_PRINTF(("RETURN\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::RETURN);}
+	WRITE(RETURN,)
 };
 class BREAK : public OpCode
 {
 public:
-	OpCode *clone()	{return new BREAK;}
+	CLONE(BREAK)
 	EXEC
 	{
 		env.Break();
 		return RC::BREAK;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("BREAK\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::BREAK);}
+	WRITE(BREAK,)
 };
 class CONTINUE : public OpCode
 {
 public:
-	OpCode *clone()	{return new CONTINUE;}
+	CLONE(CONTINUE)
 	EXEC
 	{
 		env.Continue();
 		return RC::CONTINUE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("CONTINUE\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::CONTINUE);}
+	WRITE(CONTINUE,)
 };
 class YIELD : public OpCode
 {
 public:
-	OpCode *clone()	{return new YIELD;}
+	CLONE(YIELD)
 	EXEC
 	{
 //		env.Yield();	// ‚Á‚Ä‚·‚é‚±‚Æ‚È‚­‚ËH
 		return RC::YIELD;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("YIELD\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::YIELD);}
+	WRITE(YIELD,)
 };
 class GOTO : public OpCode
 {
 public:
 	GOTO(string &s)	{label = s;}
-	OpCode *clone()	{return new GOTO(label);}
+	CLONE(GOTO(label))
 	EXEC
 	{
 		env.Goto(label);
 		return RC::GOTO;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("GOTO %s\n", label.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::VARIABLE);b.push(label.c_str(), label.length()+1);}
+	WRITE(VARIABLE,b.push(label.c_str(), label.length()+1);)
 private:
 	string label;
 };
@@ -649,7 +651,7 @@ class SCOPE : public OpCode
 {
 public:
 	SCOPE(Code *c)	{statement = c->inc();}
-	OpCode *clone()	{return new SCOPE(statement);}
+	CLONE(SCOPE(statement))
 	~SCOPE()	{statement->finalize();}
 	EXEC
 	{
@@ -658,7 +660,7 @@ public:
 		return RC::SCOPE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("SCOPE\n"));if (!d){statement->dump();PSL_PRINTF(("SCOPE END\n"));}})
-	void write(bytecode &b){b.push(MNEMONIC::SCOPE);statement->write(b);}
+	WRITE(SCOPE,statement->write(b);)
 protected:
 	Code *statement;
 };
@@ -666,7 +668,7 @@ class LOOP : public OpCode
 {
 public:
 	LOOP(Code *c, int l)	{statement = c->inc();cline = l;}
-	OpCode *clone()	{return new LOOP(statement, cline);}
+	CLONE(LOOP(statement, cline))
 	~LOOP()	{statement->finalize();}
 	EXEC
 	{
@@ -675,7 +677,7 @@ public:
 		return RC::LOOP;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("LOOP\n"));if (!d){statement->dump();PSL_PRINTF(("LOOP END\n"));}})
-	void write(bytecode &b){b.push(MNEMONIC::LOOP);b.push(&cline, sizeof(cline));statement->write(b);}
+	WRITE(LOOP,b.push(&cline, sizeof(cline));statement->write(b);)
 private:
 	Code *statement;
 	int cline;	// continue line
@@ -685,9 +687,9 @@ class IF : public SCOPE
 {
 public:
 	IF(Code *c):SCOPE(c){}
-	OpCode *clone()	{return new IF(statement);}
+	CLONE(IF(statement))
 	PSL_DUMP((int d){PSL_PRINTF(("IF\n"));if (!d){statement->dump();PSL_PRINTF(("IF END\n"));}})
-	void write(bytecode &b){b.push(MNEMONIC::IF);statement->write(b);}
+	WRITE(IF,statement->write(b);)
 };
 #endif
 
@@ -695,7 +697,7 @@ class LOCAL : public OpCode
 {
 public:
 	LOCAL(string &s)	{name = s;}
-	OpCode *clone()	{return new LOCAL(name);}
+	CLONE(LOCAL(name))
 	EXEC
 	{
 		variable v = env.pop();
@@ -703,7 +705,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("LOCAL %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::LOCAL);b.push(name.c_str(), name.length()+1);}
+	WRITE(LOCAL,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
@@ -711,7 +713,7 @@ class GLOBAL : public OpCode
 {
 public:
 	GLOBAL(string &s)	{name = s;}
-	OpCode *clone()	{return new GLOBAL(name);}
+	CLONE(GLOBAL(name))
 	EXEC
 	{
 		variable v = env.pop();
@@ -719,7 +721,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("GLOBAL %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::GLOBAL);b.push(name.c_str(), name.length()+1);}
+	WRITE(GLOBAL,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
@@ -727,7 +729,7 @@ class STATIC : public OpCode
 {
 public:
 	STATIC(string &s)	{name = s;}
-	OpCode *clone()	{return new STATIC(name);}
+	CLONE(STATIC(name))
 	EXEC
 	{
 		variable v = env.pop();
@@ -735,7 +737,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("STATIC %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::STATIC);b.push(name.c_str(), name.length()+1);}
+	WRITE(STATIC,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
@@ -744,7 +746,7 @@ class DECLARATION : public OpCode
 {
 public:
 	DECLARATION(string &s)	{name = s;}
-	OpCode *clone()	{return new DECLARATION(name);}
+	CLONE(DECLARATION(name))
 	EXEC
 	{
 		variable v = env.pop();
@@ -752,7 +754,7 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("DECLARATION %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::DECLARATION);b.push(name.c_str(), name.length()+1);}
+	WRITE(DECLARATION,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
@@ -760,7 +762,7 @@ private:
 class INSTANCE : public OpCode
 {
 public:
-	OpCode *clone()	{return new INSTANCE;}
+	CLONE(INSTANCE)
 	EXEC
 	{
 		variable v = env.pop();
@@ -768,14 +770,14 @@ public:
 		return RC::CALL;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("INSTANCE\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::INSTANCE);}
+	WRITE(INSTANCE,)
 };
 
 class MEMBER : public OpCode
 {
 public:
 	MEMBER(string &s)	{name = s;}
-	OpCode *clone()	{return new MEMBER(name);}
+	CLONE(MEMBER(name))
 	EXEC
 	{
 		variable v = env.pop();
@@ -783,14 +785,14 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("MEMBER %s\n", name.c_str()));})
-	void write(bytecode &b){b.push(MNEMONIC::MEMBER);b.push(name.c_str(), name.length()+1);}
+	WRITE(MEMBER,b.push(name.c_str(), name.length()+1);)
 private:
 	string name;
 };
 class INDEX : public OpCode
 {
 public:
-	OpCode *clone()	{return new INDEX;}
+	CLONE(INDEX)
 	EXEC
 	{
 		variable i = env.pop();
@@ -799,22 +801,24 @@ public:
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("INDEX\n"));})
-	void write(bytecode &b){b.push(MNEMONIC::INDEX);}
+	WRITE(INDEX,)
 };
 class LOCALINDEX : public OpCode
 {
 public:
 	LOCALINDEX(int i)	{x = i;}
-	OpCode *clone()	{return new LOCALINDEX(x);}
+	CLONE(LOCALINDEX(x))
 	EXEC
 	{
 		env.push(env.getLocalIndex(x));
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("LOCALINDEX:%d\n", x));})
-	void write(bytecode &b){b.push(MNEMONIC::LOCALINDEX);b.push(&x, sizeof(x));}
+	WRITE(LOCALINDEX,b.push(&x, sizeof(x));)
 private:
 	int x;
 };
 #undef GET
+#undef CLONE
 #undef EXEC
+#undef WRITE

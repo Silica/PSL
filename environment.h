@@ -8,19 +8,16 @@ public:
 		{
 			NOP = 0,
 			CONSTANT,
-			PUSH,
 			PUSH_INT,
 			PUSH_HEX,
 			PUSH_FLOAT,
 			PUSH_STRING,
 			PUSH_NULL,
 			PUSH_CODE,
-			POP,
 			VARIABLE,
+			POP,
 
-			GLOBAL,
-			LOCAL,
-			STATIC,
+			GLOBAL,LOCAL,STATIC,
 			DECLARATION,
 			INSTANCE,
 
@@ -28,77 +25,30 @@ public:
 			INDEX,
 			LOCALINDEX,
 
-			CALL,
-			RETURN,
-			BREAK,
-			CONTINUE,
+			CALL,RETURN,
+			BREAK,CONTINUE,
 			YIELD,
 			GOTO,
-			SCOPE,
-			LOOP,
-			IF,
-			LABEL,
+			SCOPE,IF,LOOP,
 
-			MOV,
-			SUBSTITUTION,
-			SUBSTITUTE,
-			ASSIGN,
-			ASSIGNMENT,
+			SUBSTITUTION,ASSIGNMENT,
 			ARGUMENT,
 
 			UNARY,
-			MINUS,		// - neg?
-			PLUS,		// +
-			DEREF,		// *
-			REF,		// &
-			NOT,		// !
-			COMPL,		// ~
-			INC,
-			DEC,
-			PINC,
-			PDEC,
+			PLUS,MINUS,
+			DEREF,REF,
+			NOT,COMPL,
+			INC,DEC,PINC,PDEC,
 			CLOSURE,
 
 			BINARY,
-			ADD,
-			SUB,
-			MUL,
-			DIV,
-			MOD,
-			AND,
-			OR,
-			XOR,
-			SHL,
-			SHR,
+			ADD,SUB,MUL,DIV,MOD,AND,OR,XOR,SHL,SHR,
+			SADD,SSUB,SMUL,SDIV,SMOD,SAND,SOR,SXOR,SSHL,SSHR,
 
-			SADD,
-			SSUB,
-			SMUL,
-			SDIV,
-			SMOD,
-			SAND,
-			SOR,
-			SXOR,
-			SSHL,
-			SSHR,
+			EQ,NEQ,LE,GE,LT,GT,
+			BAND,BOR,
 
-			// ”äŠr
-			EQ,
-			NEQ,
-			LE,
-			GE,
-			LT,
-			GT,
-
-			BAND,
-			BOR,
-
-			JMP,
-			JT,
-			JF,
-			JR,
-			JRT,
-			JRF,
+			JMP,JT,JF,JR,JRT,JRF,
 
 			LIST,			// , comma
 			PARENTHESES,	// ()
@@ -113,16 +63,11 @@ public:
 		enum RETURNCODE
 		{
 			NONE = 0,
-			CALL,
-			BREAK,
-			CONTINUE,
-			RETURN,
+			CALL,RETURN,END,
+			BREAK,CONTINUE,
 			GOTO,
 			YIELD,
-			END,
-			SCOPE,
-			IF,
-			LOOP,
+			SCOPE,IF,LOOP,
 		};
 	};
 	virtual ~OpCode(){}
@@ -418,17 +363,10 @@ private:
 		OpCode::MNEMONIC::mnemonic cn = c->get();
 		int s = code.size();
 		#ifdef PSL_OPTIMIZE_PARENTHESES
-		if (cn != OpCode::MNEMONIC::LIST)
+		if (cn != OpCode::MNEMONIC::LIST && s >= 1 && code[s-1]->get() == OpCode::MNEMONIC::PARENTHESES)
 		{
-			if (s >= 1)
-			{
-				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
-				if (n == OpCode::MNEMONIC::PARENTHESES)
-				{
-					delete code[s-1];
-					code.resize(--s);
-				}
-			}
+			delete code[s-1];
+			code.resize(--s);
 		}
 		#endif
 		if (cn == OpCode::MNEMONIC::PLUS)
@@ -436,84 +374,77 @@ private:
 			delete c;
 			return false;
 		}
+		if (s < 1)
+			return true;
 		if (cn == OpCode::MNEMONIC::POP)
 		{
-			if (s >= 1)
+			OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
+			#ifdef PSL_OPTIMIZE_IMMEDIATELY_POP
+			if (n == OpCode::MNEMONIC::CONSTANT || n == OpCode::MNEMONIC::VARIABLE)
 			{
-				OpCode::MNEMONIC::mnemonic n = code[s-1]->get();
-				#ifdef PSL_OPTIMIZE_IMMEDIATELY_POP
-				if (n == OpCode::MNEMONIC::CONSTANT || n == OpCode::MNEMONIC::VARIABLE)
+				if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 				{
-					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
-					{
-						delete c;
-						delete code[--s];
-						code.resize(s);
-						return false;
-					}
-				}
-				#endif
-				#ifdef PSL_OPTIMIZE_SUFFIX_INCREMENT
-				if (n == OpCode::MNEMONIC::INC)
-				{
+					delete c;
 					delete code[--s];
-					code[s] = new PINC();
-					return true;
+					code.resize(s);
+					return false;
 				}
-				if (n == OpCode::MNEMONIC::DEC)
-				{
-					delete code[--s];
-					code[s] = new PDEC();
-					return true;
-				}
-				#endif
 			}
+			#endif
+			#ifdef PSL_OPTIMIZE_SUFFIX_INCREMENT
+			if (n == OpCode::MNEMONIC::INC)
+			{
+				delete code[--s];
+				code[s] = new PINC();
+				return true;
+			}
+			if (n == OpCode::MNEMONIC::DEC)
+			{
+				delete code[--s];
+				code[s] = new PDEC();
+				return true;
+			}
+			#endif
 		}
 		#ifdef PSL_OPTIMIZE_CONSTANT_CALCULATION
 		if (cn == OpCode::MNEMONIC::UNARY || cn == OpCode::MNEMONIC::INC || cn == OpCode::MNEMONIC::DEC)
 		{
-			if (s >= 1)
+			if (code[s-1]->get() == OpCode::MNEMONIC::CONSTANT)
 			{
-				if (code[s-1]->get() == OpCode::MNEMONIC::CONSTANT)
+				if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
 				{
-					if (s < 2 || code[s-2]->get() != OpCode::MNEMONIC::JR)
-					{
-						PSL_TEMPORARY_ENV0(optimizer);
-						code[s-1]->Execute(optimizer);
-						variable v = optimizer.pop();
-						optimizer.push(v);
-						c->Execute(optimizer);
-						delete c;
-						variable a = optimizer.pop();
-						v = a;
-						return false;
-					}
+					PSL_TEMPORARY_ENV0(optimizer);
+					code[s-1]->Execute(optimizer);
+					variable v = optimizer.pop();
+					optimizer.push(v);
+					c->Execute(optimizer);
+					delete c;
+					variable a = optimizer.pop();
+					v = a;
+					return false;
 				}
 			}
 		}
-		if (cn == OpCode::MNEMONIC::BINARY)
+		if (cn == OpCode::MNEMONIC::BINARY && s >= 2)
 		{
-			if (s >= 2)
+			if ((code[s-1]->get() == OpCode::MNEMONIC::CONSTANT) && (code[s-2]->get() == OpCode::MNEMONIC::CONSTANT))
 			{
-				if ((code[s-1]->get() == OpCode::MNEMONIC::CONSTANT) && (code[s-2]->get() == OpCode::MNEMONIC::CONSTANT))
+				if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
 				{
-					if (s < 3 || code[s-3]->get() != OpCode::MNEMONIC::JR)
-					{
-						PSL_TEMPORARY_ENV0(optimizer);
-						code[s-2]->Execute(optimizer);
-						code[--s]->Execute(optimizer);
-						variable r = optimizer.pop();
-						variable l = optimizer.pop();
-						optimizer.push(l);
-						optimizer.push(r);
-						c->Execute(optimizer);
-						delete c;
-						variable a = optimizer.pop();
-						l = a;
-						delete code[s];
-						code.resize(s);
-						return false;
-					}
+					PSL_TEMPORARY_ENV0(optimizer);
+					code[s-2]->Execute(optimizer);
+					code[--s]->Execute(optimizer);
+					variable r = optimizer.pop();
+					variable l = optimizer.pop();
+					optimizer.push(l);
+					optimizer.push(r);
+					c->Execute(optimizer);
+					delete c;
+					variable a = optimizer.pop();
+					l = a;
+					delete code[s];
+					code.resize(s);
+					return false;
 				}
 			}
 		}
