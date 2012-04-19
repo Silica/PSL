@@ -529,6 +529,7 @@ private:
 	friend class Variable::bcreader;
 	friend class Variable::Code;
 public:
+	typedef Variable::bytecode buffer;
 	variable(variable::Variable::Code *c)	{x = new Variable(c);}
 	rsv ref()		const	{return x;}
 	rsv pointer()	const	{return variable(POINTER, x);}
