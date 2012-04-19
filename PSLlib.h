@@ -439,7 +439,7 @@ private:
 			int size = v;
 			if (!fp || !size)
 				return "";
-			Variable::bytecode vbuf(size+1);	// template‚É‚æ‚é—e—Ê‚Ì”ì‘å‰»‚ğ–h‚®ˆ×‚ÌŒ^‚ÌÄ—˜—p
+			buffer vbuf(size+1);
 			char *buf = reinterpret_cast<char*>(vbuf.get());
 			vbuf.resize(std::fread(buf, 1, size, fp));
 			vbuf.push(0);

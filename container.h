@@ -32,11 +32,7 @@ public:
 	Variable *get()	const{if(!x)x = new Variable();return x;}
 private:
 	mutable Variable *x;
-#else	// 上で大丈夫である確信が持てない、新規変数を作る時にrsvで作って(共有して)いなければOKの筈だが
-	// そして今や僅差になった
-	// また上だとinline化した時に肥大化著しい
-	// 更に速度の違いもあるのだが(多分下の方が速い？)
-	// STL_MAPを使うなら↑、そうでないなら↓がいい、とおもう
+#else
 	rsv()				{x = new Variable();}
 	rsv(const rsv &v)	{x = v.x->ref();}
 	~rsv()				{x->finalize();}
