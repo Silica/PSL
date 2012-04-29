@@ -1046,12 +1046,15 @@ public:
 	void prepare(Environment &env, Variable *v)
 	{
 		if (!toBool())
+		{
+			rsv r(new Variable(new vThread(env.pop().get(), NULL)), 0);
+			env.push(r);
 			return;
+		}
 		newenv(env);
 		e->push(env.pop());
 		e->Run();
-		variable r = e->pop();
-		env.push(r);
+		env.push(e->pop());
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
