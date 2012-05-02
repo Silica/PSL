@@ -138,6 +138,7 @@ public:
 	variable(hex h)				{x = new Variable(h);}
 	variable(double d)			{x = new Variable(d);}
 	variable(const char *s)		{x = new Variable(s);}
+	variable(const wchar_t *s)	{x = new Variable(s);}
 	variable(const string &s)	{x = new Variable(s);}
 	variable(function f)		{x = new Variable(f);}
 	variable(method f)			{x = new Variable(f);}

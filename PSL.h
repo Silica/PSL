@@ -2,14 +2,12 @@
 #define PSL_H
 
 #include "variable.h"
+#include <clocale>
 
 class PSL : private variable::Environment
 {
 	typedef variable::rsv rsv;
 public:
-	#ifndef PSL_DEBUG
-	PSL() : variable::Variable::Environment(1){}
-	#endif
 	enum error
 	{
 		NONE = 0,
@@ -96,8 +94,11 @@ public:
 		variable::Variable::Environment::Run();
 		return pop();
 	}
-	#ifdef PSL_DEBUG
-	PSL() : variable::Variable::Environment(1){init = false;}
+	PSL() : variable::Variable::Environment(1)
+	#ifndef PSL_DEBUG
+	{std::setlocale(LC_ALL, "");}
+	#else
+	{std::setlocale(LC_ALL, "");init = false;}
 	rsv StepExec()
 	{
 		if (!Runable())
