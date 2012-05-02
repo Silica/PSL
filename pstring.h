@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
+#include <cwchar>
 #ifdef PSTRING_USE_DOUBLE
 #include <cstdlib>
 #endif
@@ -601,6 +602,53 @@ private:
 	}
 	string(SharedBuffer *b)	{buf = b;}
 	SharedBuffer *buf;
+public:
+	class wstring
+	{
+		class wsbuffer
+		{
+			~wsbuffer()	{delete[] ws;}
+			int rc;
+			int len;
+		public:
+			wchar_t *ws;
+			wsbuffer(int n)
+			{
+				ws = new wchar_t[n+1];
+				rc = 1;
+				len = n;
+			}
+			void finalize()	{if (!--rc)	delete this;}
+			wsbuffer *ref()	{++rc;return this;}
+			void setlen(int l)	{ws[len=l] = 0;}
+		} *buf;
+	public:
+		wstring(const wchar_t *ws)
+		{
+			int l = std::wcslen(ws);
+			buf = new wsbuffer(l);
+			std::memcpy(buf->ws, ws, l*sizeof(wchar_t));
+			buf->setlen(l);
+		}
+		wstring(const char *s)
+		{
+			int l = std::strlen(s);
+			buf = new wsbuffer(l);
+			buf->setlen(std::mbstowcs(buf->ws, s, l));
+		}
+		wstring(const wstring &s)	{buf = s.buf->ref();}
+		wstring &operator=(const wstring &s)	{buf->finalize();buf = s.buf->ref();return *this;}
+		~wstring()	{buf->finalize();}
+		operator const wchar_t*()	{return buf->ws;}
+		const wchar_t *c_str()		{return buf->ws;}
+	};
+	string(const wchar_t *ws)
+	{
+		int l = std::wcslen(ws)*sizeof(wchar_t);
+		buf = new SharedBuffer(l);
+		buf->setlen(std::wcstombs(buf->buffer(), ws, l));
+	}
+	wstring w_str()	{return buf ? buf->c_str() : "";}
 };
 
 #endif
