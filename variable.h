@@ -534,7 +534,7 @@ public:
 	rsv pointer()	const	{return variable(POINTER, x);}
 
 	variable operator()()									{PSL_TEMPORARY_ENV(env);variable v;return x->call(env, v);}
-	variable operator()(variable &arg)						{PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	variable operator()(const variable &arg)				{PSL_TEMPORARY_ENV(env);variable v = arg.ref();return x->call(env, v);}
 	#ifndef PSL_SHARED_GLOBAL
 	variable operator()(Environment &env, variable &arg)	{return x->call(env, arg);}
 	variable instance(Environment &env)						{return x->instance(env);}
