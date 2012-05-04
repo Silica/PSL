@@ -456,7 +456,10 @@ private:
 class Scope
 {
 public:
-	PSL_MEMORY_MANAGER(MethodScope)
+#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
+	static void *operator new(size_t t)		{return SMemoryManager::Next();}
+	static void operator delete(void *ptr)	{SMemoryManager::Release(ptr);}
+#endif
 	enum Type
 	{
 		NONE,

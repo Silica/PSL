@@ -208,7 +208,7 @@ public:
 	pool(16,16)
 	pool(sizeof(Variable::vObject),VO)
 	#undef pool
-	static SMemoryPool &pool(OverLoad<sizeof(Variable::MethodScope)> x)	{return so().poolScope;}
+	static SMemoryPool &spool()		{return so().poolScope;}
 	static VMemoryPool &vpool()		{return so().vpool;}
 	struct String
 	{
@@ -223,6 +223,13 @@ class VMemoryManager
 public:
 	static void *Next()				{return StaticObject::vpool().nextptr();}
 	static void Release(void *ptr)	{StaticObject::vpool().release(ptr);}
+};
+
+class SMemoryManager
+{
+public:
+	static void *Next()				{return StaticObject::spool().nextptr();}
+	static void Release(void *ptr)	{StaticObject::spool().release(ptr);}
 };
 
 template<size_t S> class MemoryManager
