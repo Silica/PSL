@@ -95,7 +95,6 @@ class bcreader
 			OPCODE(SXOR)
 			OPCODE(SSHL)
 			OPCODE(SSHR)
-//			OPCODE(MOV)
 			OPCODE(ADD)
 			OPCODE(SUB)
 			OPCODE(MUL)

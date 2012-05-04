@@ -12,8 +12,6 @@ public:
 	OP(add,+=)
 	OP(sub,-=)
 	OP(mul,*=)
-//	OP(div,/=)
-//	OP(mod,%=)
 	OP(oand,&=)
 	OP(oor,|=)
 	OP(oxor,^=)
@@ -106,7 +104,6 @@ public:
 	OP(add,+=)
 	OP(sub,-=)
 	OP(mul,*=)
-//	OP(div,/=)
 	#undef OP
 	void div(Variable *v)	{if (double d = v->toDouble())x /= d;else x=0;}
 	#define CMP(n,o) bool n(Variable *v)	{return x o v->toDouble();}
@@ -373,7 +370,6 @@ public:
 	rsv instance(Environment &env, Variable *v)				{if (x.size() == 1)return x[0].get()->instance(env);return v->clone();}
 	rsv call(Environment &env, variable &arg, Variable *v)	{if (x.size() == 1)return x[0].get()->call(env, arg);return variable(NIL);}
 
-	// これもまず使わないと思うんだが、将来的にライブラリ関数が要求する可能性はあるので
 	size_t codelength()							{if (x.size() == 1)return x[0].get()->codelength();return 0;}
 	Code *getcode()								{if (x.size() == 1)return x[0].get()->getcode();return NULL;}
 	void pushcode(OpCode *c)					{if (x.size() == 1)x[0].get()->pushcode(c);}
@@ -586,7 +582,7 @@ public:
 	}
 
 	void del(const string &s)	{member.erase(s);}
-	void method_this(Variable *v)	// メソッドのthisを差し替える
+	void method_this(Variable *v)
 	{
 		int size = array.size();
 		for (int i = 0; i < size; ++i)
@@ -704,7 +700,7 @@ private:
 				z.get()->push(x);
 				o->member[it->first].set(z.get()->ref());
 			}
-			else if (it->second.get()->getcode())	// コード持ってれば
+			else if (it->second.get()->getcode())
 			{
 				rsv z(new Variable(new vMethod(it->second.get(), x)), 0);
 				o->member[it->first].set(z.get()->ref());
@@ -725,7 +721,7 @@ public:
 	vMethod(Variable *v, Variable *x)
 	{
 		function = v->ref();
-//		this_v = x->ref();	// 循環参照で死ぬ
+//		this_v = x->ref();	// circular reference
 		this_v = x;
 	}
 	~vMethod()
@@ -750,7 +746,7 @@ public:
 			function->finalize();
 			function = v->ref();
 		}
-/*		else if (v->type() == CFUNCTION)
+		else if (v->type() == CFUNCTION)
 		{
 			vBase *x = v->bclone();
 			delete this;
@@ -762,7 +758,7 @@ public:
 			x->push(this_v);
 			delete this;
 			return x;
-		}*/	// この辺を代入可能にするかは今後の課題
+		}
 		return this;
 	}
 
@@ -844,7 +840,7 @@ public:
 	vBase *clone()	{return new vCMethod(f, this_v);}
 
 	vBase *substitution(Variable *v)	{
-		if (v->type() == CMETHOD)
+		if (v->type() == CMETHOD || v->type() == METHOD)
 		{
 			vBase *x = v->bclone();
 			x->push(this_v);

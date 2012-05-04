@@ -79,32 +79,23 @@ public:
 	virtual void dump(int d = 0){};
 };
 
-#ifdef PSL_WARNING_POP_EMPTY_STACK
-	#define PSL_RW_PES 4
-#else
-	#define PSL_RW_PES 0
-#endif
-#ifdef PSL_WARNING_STACK_REMAINED
-	#define PSL_RW_SR 1
-#else
-	#define PSL_RW_SR 0
-#endif
-#ifdef PSL_WARNING_UNDECLARED_IDENTIFIER
-	#define PSL_RW_UI 2
-#else
-	#define PSL_RW_UI 0
-#endif
-#ifdef PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST
-	#define PSL_RW_DIAE 8
-#else
-	#define PSL_RW_DIAE 0
-#endif
-#define PSL_ENVIRONMENT_WARNING (PSL_RW_PES | PSL_RW_SR | PSL_RW_UI | PSL_RW_DIAE)
-
 class Scope;
 class Environment
 {
-	const static unsigned long WARNING = PSL_ENVIRONMENT_WARNING;
+	const static unsigned long WARNING = 0
+	#ifdef PSL_WARNING_POP_EMPTY_STACK
+		|4
+	#endif
+	#ifdef PSL_WARNING_STACK_REMAINED
+		|1
+	#endif
+	#ifdef PSL_WARNING_UNDECLARED_IDENTIFIER
+		|2
+	#endif
+	#ifdef PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST
+		|8
+	#endif
+	;
 	void warning(const int n, const string &s = "")
 	{
 		if (WARNING & (1 << n))
@@ -183,7 +174,6 @@ public:
 	void Return()		{scope = scope->Return();}
 	void Break()		{scope = scope->Break();}
 	void Continue()		{scope = scope->Continue();}
-	void Yield()		{scope = scope->Yield();}
 	void Goto(const string &label)	{Scope *s = scope->Goto(label);if (s)scope = s;}
 	OpCode::MNEMONIC::mnemonic getNext()		{return scope->getNext();}
 	void push(const rsv &v)	{stack.push(v);}
@@ -349,7 +339,7 @@ public:
 			}
 			b.push(OpCode::MNEMONIC::END);
 		}
-		b.push(OpCode::MNEMONIC::END);	// END‚ÍŠÖ”‚¾‚¯‚¶‚á‚È‚­ƒ‹[ƒv‚É‚à‚ ‚é‚Ì‚Å‚â‚Á‚Ï‚è‚±‚±‚É
+		b.push(OpCode::MNEMONIC::END);
 	};
 private:
 	#ifdef PSL_USE_STL_VECTOR
@@ -493,7 +483,6 @@ public:
 	virtual Scope *Return() = 0;
 	virtual Scope *Break() = 0;
 	virtual Scope *Continue() = 0;
-	virtual Scope *Yield()	{return this;}	// ‚Á‚Ä‰½‚à‚·‚é‚±‚Æ‚È‚­‚ËH
 	virtual Scope *Goto(const string &label)
 	{
 		if (code->Goto(label, line))

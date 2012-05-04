@@ -96,7 +96,7 @@ private:
 		if (l)
 		{
 			oc = new Variable::JF(l);
-			v.pushcode(oc);	// 取り敢えず足す
+			v.pushcode(oc);
 		}
 		else
 		{
@@ -182,7 +182,7 @@ private:
 		if (l)
 		{
 			oc = new Variable::JF(l);
-			v.pushcode(oc);	// 取り敢えず足す
+			v.pushcode(oc);
 		}
 		else
 			Error(TINSC, 0, "while");
@@ -203,18 +203,17 @@ private:
 	void ParseStatement(variable &g, variable &c)
 	{
 		int n = t->checkNext();
-		if (n == ';')
+		if (n == ';')	// empty
 		{
 			t->getNext();
-			return;	// 空行
+			return;
 		}
 		#ifdef PSL_DEBUG
 		c.pushlabel(t->getFile() + " " + t->getLine());
 		#endif
-		if (n == '{'/*'}'*/)
+		if (n == '{'/*'}'*/)	// anonymouse scope
 		{
 			t->getNext();
-			// 無名スコープ
 			variable v;
 			ParseBlock(g, v);
 			if (v.codelength())
@@ -290,7 +289,7 @@ private:
 				c.pushlabel(name);
 				return;
 			}
-			if (n == '{'/*'}'*/)	// クラス定義
+			if (n == '{'/*'}'*/)	// class definition
 			{
 				t->getNext();
 				if (g.exist(name))
@@ -308,7 +307,7 @@ private:
 				else
 					arg.pushcode(new Variable::PUSH_NULL);
 				n = t->checkNext();
-				if (n == '{'/*'}'*/ || n == Tokenizer::IDENTIFIER)	// 関数定義
+				if (n == '{'/*'}'*/ || n == Tokenizer::IDENTIFIER)	// function definition
 				{
 					if (g.exist(name))
 						Error(IIAE, 0, name, line);
@@ -324,7 +323,7 @@ private:
 						ParseStatement(m, m);
 					return;
 				}
-				else	// 関数呼び出し
+				else	// call
 				{
 					c.pushcode(new Variable::POP);
 					c.pushcode(new Variable::VARIABLE(name));
@@ -389,7 +388,7 @@ private:
 				}
 				else
 				{
-					t->getNext();	// 引数無し
+					t->getNext();	// no argument
 					c.pushcode(new Variable::PUSH_NULL);
 				}
 				c.pushcode(new Variable::CALL);
@@ -436,7 +435,7 @@ private:
 				ParseBlock(v, v);
 				c.pushcode(new Variable::PUSH_CODE(v));
 			}
-			else	// 式内の括弧
+			else
 			{
 				if (v.codelength())
 				{

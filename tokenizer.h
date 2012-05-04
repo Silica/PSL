@@ -6,34 +6,17 @@ public:
 		UNSET = -1,
 		NONE = 0,
 		IDENTIFIER = 1,
-		INT,
-		HEX,
-		NUMBER,
-		STRING,
+		INT,HEX,NUMBER,STRING,
 		ASSIGN,
-		INC,
-		DEC,
-		EQ,
-		NE,
-		LE,
-		GE,
+		INC,DEC,
+		EQ,NE,LE,GE,
 
-		SADD,
-		SSUB,
-		SMUL,
-		SDIV,
-		SMOD,
-		SAND,
-		SOR,
-		SXOR,
+		SADD,SSUB,SMUL,SDIV,SMOD,
+		SAND,SOR,SXOR,
 
-		SHL,
-		SHR,
-		SSHL,
-		SSHR,
+		SHL,SHR,SSHL,SSHR,
 
-		BAND,
-		BOR,
+		BAND,BOR,
 	};
 	static Tokenizer *New(const string &fn, table *dl = NULL)
 	{
@@ -134,7 +117,6 @@ private:
 	Tokenizer *including;
 	table *definelist;
 #ifdef PSL_USE_TOKENIZER_DEFINE
-//	std::map<string,string> definelist;	// これやるとでかいんだ…
 	bool dlnew;
 	int ifdefcount;
 	int ifdefstatus;
@@ -143,7 +125,7 @@ private:
 	{
 		for (; i < len; ++i)
 		{
-			if (s[i] == ' ' || s[i] == '\t')			// 空白を飛ばす
+			if (s[i] == ' ' || s[i] == '\t')
 				continue;
 			break;
 		}
@@ -211,8 +193,6 @@ private:
 				else if (s[j] == 'v')	nstr += '\v';*/
 /*				else if (s[j] == 'x')
 				{
-					// これは後の課題
-					// バイナリ列をどう扱うかも決めていないので
 					char c = 0;
 					nstr += c;
 				}*/
@@ -394,7 +374,7 @@ private:
 		}
 		for (; i < len; ++i)
 		{
-			if (s[i] == ' ' || s[i] == '\t')			// 空白を飛ばす
+			if (s[i] == ' ' || s[i] == '\t')
 				continue;
 			if (s[i] == '\n')
 			{
@@ -456,8 +436,7 @@ private:
 				nnum = std::strtod(s+i-1, &e);
 				i = e-s;
 				return NUMBER;
-			}	// 小数点から始まる数字の場合もある
-										return '.';
+			}							return '.';
 		case ',':						return ',';
 		case ';':						return ';';
 		case '[':						return '[';
@@ -469,12 +448,11 @@ private:
 		case '?':						return '?';
 		case ':':	if (s[i] == '='){++i;return ASSIGN;}
 										return ':';
-		case '"':string_literal();		return STRING;	// "を見付けるまでスキップする
+		case '"':string_literal();		return STRING;
 		case '$':						return '$';
 		case '@':						return '@';
 
-//		case '\'':						return '\'';	// 保留
-			// 未使用予定
+//		case '\'':						return '\'';
 //		case '\\':						return '\\';
 //		case '`':						return '`';
 
