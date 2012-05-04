@@ -81,6 +81,7 @@ public:
 	string(const string &s)			{buf = s.buf ? s.buf->inc() : NULL;}
 	string(const char *s)			{buf = empty(s) ? NULL : new SharedBuffer(s);}
 	string(const char *s, size_t t)	{buf = (empty(s)||t==0) ? NULL : new SharedBuffer(s, t);}
+	string(size_t t, char *&s)		{buf = new SharedBuffer(t);buf->setlen(t);s = buf->buffer();}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
 #ifdef PSTRING_USE_DOUBLE

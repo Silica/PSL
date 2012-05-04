@@ -33,23 +33,21 @@ public:
 		using namespace std;
 		fseek(fp, 0, SEEK_END);
 		len = ftell(fp);
-		s = new char[len+1];
+		char *p;
+		string buf(len, p);
 		fseek(fp, 0, SEEK_SET);
-		len = fread(s, 1, len, fp);
-		s[len] = 0;
+		len = fread(p, 1, len, fp);
+		s = str = buf;
 		Init(fn, 1, dl);
 	}
-	Tokenizer(const char *str, const string &fn, int l, table *dl = NULL)
+	Tokenizer(const string &st, const string &fn, int l, table *dl = NULL)
 	{
-		using namespace std;
-		len = strlen(str);
-		s = new char[len+1];
-		strcpy(s, str);
+		s = str = st;
+		len = str.length();
 		Init(fn, l, dl);
 	}
 	~Tokenizer()
 	{
-		delete[] s;
 		delete including;
 #ifdef PSL_USE_TOKENIZER_DEFINE
 		if (dlnew)
@@ -110,7 +108,8 @@ private:
 	string filename;
 	int line;
 	int pline;
-	char *s;
+	string str;
+	const char *s;
 	int len;
 	int i;
 	int next;
