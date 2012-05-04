@@ -135,10 +135,7 @@ private:
 		if (size)
 		{
 			for (int i = 0; i < size; ++i)
-			{
-				variable a = l[i];
-				f(a);
-			}
+				f(l[i]);
 			return size;
 		}
 		else
@@ -280,19 +277,13 @@ private:
 				variable array = v[0];
 				size = array.length();
 				for (int i = 0; i < size; ++i)
-				{
-					variable a = array[i];
-					v[1](a);
-				}
+					v[1](array[i]);
 			}
 			else
 			{
 				size = this_v.length();
 				for (int i = 0; i < size; ++i)
-				{
-					variable a = this_v[i];
-					v(a);
-				}
+					v(this_v[i]);
 			}
 			return size;
 		}
