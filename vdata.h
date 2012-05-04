@@ -184,57 +184,18 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (x)	x->finalize();
 		if (v->type() == POINTER)
 		{
+			if (x)	x->finalize();
 			if (v->toBool())	x = v->deref()->ref();
 			else				x = NULL;
 		}
+		else if (x)				x->substitution(v);
 		else					x = v->ref();
 		return this;
 	}
 
-	bool eq(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return true ;return x == v->deref();}
-	bool ne(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return false;return x != v->deref();}
-	Variable *deref()	{return x;}
-
-	bool toBool()		const {return x ? true : false;}
-	int toInt()			const {return x ? 1 : 0;}
-	double toDouble()	const {return x ? 1 : 0;}
-	string toString()	const {return x ? "[pointer]" : "[nullptr]";}
-
-	size_t length()		const {return x ? x->length() : 0;}
-	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
-	Variable *index(size_t t)			{return x ? x->index(t) : NULL;}
-	Variable *child(const string &s)	{return x ? x->child(s) : NULL;}
-	Variable *keys()					{return x ? x->keys() : new Variable();}
-	bool set(const string &s, const variable &v)	{return x ? x->set(s, v) : false;}
-	void del(const string &s)	{if(x)x->del(s);}
-
-	void prepare(Environment &env, Variable *v)	{if(x)x->prepare(env);}
-	rsv call(Environment &env, variable &arg, Variable *v)	{return x ? x->call(env, arg) : variable(NIL);}
-
-	PSL_DUMP((){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();})
-private:
-	Variable *x;
-};
-
-class vReference : public vBase
-{
-public:
-	PSL_MEMORY_MANAGER(vReference)
-	vReference(Variable *v)	{Variable *z = v->x->referenceTo();x = (z ? z : v)->ref();}
-	~vReference()			{x->finalize();}
-	Type type()	const	{return x->type();}
-	vBase *clone()	{return x->x->clone();}
-	Variable *referenceTo()	{return x;}
-	void searchcount(Variable *v, int &c){x->searchcount(v, c);}
-	void mark(){x->mark();}
-
-	vBase *substitution(Variable *v)	{x->substitution(v);return this;}
-	vBase *assignment(Variable *v)		{x->assignment(v);return this;}
-
-	#define OP(n) void n(Variable *v)	{x->n(v);}
+	#define OP(n) void n(Variable *v)	{if (x)x->n(v);}
 	OP(add)
 	OP(sub)
 	OP(mul)
@@ -246,67 +207,39 @@ public:
 	OP(shl)
 	OP(shr)
 	#undef OP
-	#define CMP(n) bool n(Variable *v)	{return x->n(v);}
-	CMP(eq)
-	CMP(ne)
+	#define CMP(n) bool n(Variable *v)	{if (x)return x->n(v);return false;}
 	CMP(le)
 	CMP(ge)
 	CMP(lt)
 	CMP(gt)
 	#undef CMP
-	void neg()	{x->neg();}
-	Variable *deref()	{return x->deref();}
+	void neg()	{if (x)x->neg();}
 
-	bool toBool()		const {return x->toBool();}
-	int toInt()			const {return x->toInt();}
-	double toDouble()	const {return x->toDouble();}
-	string toString()	const {return x->toString();}
-	void *toPointer()	const {return x->toPointer();;}
+	bool eq(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return true ;return x == v->deref();}
+	bool ne(Variable *v)	{if (!x && v->type() == POINTER && !v->toBool())return false;return x != v->deref();}
+	Variable *deref()	{return x;}
 
-	size_t length()				const {return x->length();}
-	bool exist(const string &s)	const {return x->exist(s);}
-	Variable *index(size_t t)			{return x->index(t);}
-	Variable *child(const string &s)	{return x->child(s);}
-	void push(Variable *v)				{return x->push(v);}
-	Variable *keys()					{return x->keys();}
-	bool set(const string &s, const variable &v)	{return x->set(s, v);}
-	void del(const string &s)	{x->del(s);}
+	bool toBool()		const {return x ? true : false;}
+	int toInt()			const {return x ? x->toInt() : 0;}
+	double toDouble()	const {return x ? x->toDouble() : 0;}
+	string toString()	const {return x ? x->toString() : string("[nullptr]");}
 
-	void prepare(Environment &env, Variable *v)			{x->prepare(env);}
-	void prepareInstance(Environment &env, Variable *v)	{x->prepareInstance(env);}
-	rsv instance(Environment &env, Variable *v)	{return x->instance(env);}
-	rsv call(Environment &env, variable &arg, Variable *v)	{return x->call(env, arg);}
+	size_t length()		const {return x ? x->length() : 0;}
+	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
+	Variable *index(size_t t)			{return x ? x->index(t) : NULL;}
+	Variable *child(const string &s)	{return x ? x->child(s) : NULL;}
+	Variable *keys()					{return x ? x->keys() : new Variable();}
+	bool set(const string &s, const variable &v)	{return x ? x->set(s, v) : false;}
+	void del(const string &s)	{if(x)x->del(s);}
 
-	// ƒ‰ƒCƒuƒ‰ƒŠŠÖ”‚ÅŽg‚¤‚©‚à‚µ‚ê‚È‚¢‚Ì‚Åˆê‰ž
-	size_t codelength()			{return x->codelength();}
-	Code *getcode()				{return x->getcode();}
-	void pushcode(OpCode *c)	{x->pushcode(c);}
-	void pushlabel(const string &s){x->pushlabel(s);}
-	void write(const string &s, bytecode &b){x->write(s, b);}
-	PSL_DUMP((){PSL_PRINTF(("vReference:\n"));x->dump();})
+	void prepare(Environment &env, Variable *v)	{if(x)x->prepare(env);else{variable a = env.pop();env.push(a.pointer());}}
+	rsv call(Environment &env, variable &arg, Variable *v)	{return x ? x->call(env, arg) : variable(NIL);}
+	void prepareInstance(Environment &env, Variable *v)	{if (x)x->prepareInstance(env);else env.push(rsv(v->clone(), 0));}
+	rsv instance(Environment &env, Variable *v)	{if (x)return x->instance(env);else return v->clone();}
+
+	PSL_DUMP((){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();})
 private:
 	Variable *x;
-};
-
-class vNReference : public vBase
-{
-public:
-	vNReference(){}
-	Type type()	const	{return REFERENCE;}
-	vBase *clone()	{return new vNReference();}
-
-	vBase *substitution(Variable *v)
-	{
-		if (v->type() == REFERENCE)
-		{
-			delete this;
-			return new vObject();
-		}
-		delete this;
-		return new vReference(v);
-	}
-
-	PSL_DUMP((){PSL_PRINTF(("vNReference\n"));})
 };
 
 class vRArray : public vBase
@@ -360,7 +293,7 @@ public:
 		int vsize = v->length();
 		for (int i = 0; i < size && i < vsize; ++i)
 		{
-			if (x[i].get()->type() == POINTER || x[i].get()->type() == REFERENCE)
+			if (x[i].get()->type() == POINTER)
 				x[i].get()->substitution(o->index(i));
 			else
 				x[i].get()->substitution(v->index(i));
@@ -378,12 +311,7 @@ public:
 		int size = x.size();
 		int vsize = v->length();
 		for (int i = 0; i < size && i < vsize; ++i)
-		{
-			if (x[i].get()->type() == POINTER || x[i].get()->type() == REFERENCE)
-				x[i].get()->assignment(o->index(i));
-			else
-				x[i].get()->assignment(v->index(i));
-		}
+			x[i].get()->assignment((x[i].get()->type() == POINTER ? o : v)->index(i));
 
 		return this;
 	}
@@ -533,10 +461,7 @@ public:
 		for (size_t i = 0; i < size; ++i)
 		{
 			Variable *z = array[i].get();
-			if (z->type() == POINTER || z->type() == REFERENCE)
-				z->substitution(o->index(i));
-			else
-				z->substitution(v->index(i));
+			z->substitution((z->type() == POINTER ? o : v)->index(i));
 		}
 
 		kcopy(v);
@@ -562,10 +487,7 @@ public:
 		for (size_t i = 0; i < size; ++i)
 		{
 			Variable *z = array[i].get();
-			if (z->type() == POINTER || z->type() == REFERENCE)
-				z->assignment(o->index(i));
-			else
-				z->assignment(v->index(i));
+			z->assignment((z->type() == POINTER ? o : v)->index(i));
 		}
 
 		rsv k(v->keys());

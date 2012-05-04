@@ -114,7 +114,6 @@ public:
 		FLOAT,
 		STRING,
 		POINTER,
-		REFERENCE,
 		RARRAY,
 		OBJECT,
 		METHOD,
@@ -290,7 +289,6 @@ private:
 			case FLOAT:		x = new vFloat(0);break;
 			case STRING:	x = new vString("");break;
 			case POINTER:	x = new vPointer();break;
-			case REFERENCE: x = new vNReference();break;
 			case RARRAY:	x = new vRArray();break;
 			case THREAD:	x = new vThread();break;
 			default:		x = new vObject();break;

@@ -11,7 +11,7 @@ public:
 		v.set("false", 0);
 		v.set("nil", NIL);
 		v.set("hex", HEX);
-		v.set("ref", REFERENCE);
+		v.set("ref", POINTER);
 		v.set("pointer", POINTER);
 		v.set("nullptr", POINTER);
 		v.set("thread", THREAD);
@@ -71,7 +71,6 @@ private:
 		case FLOAT:		return "float";
 		case STRING:	return "string";
 		case POINTER:	return "pointer";
-		case REFERENCE:	return "ref";
 		case RARRAY:	return "tuple";
 		case OBJECT:	return "object";
 		case METHOD:	return "method";
