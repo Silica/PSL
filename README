@@ -12,3 +12,5 @@ PSLからC++の関数を呼び出したり出来ます
 
 includeするだけで使えるよ！
 BCC(古い)とVC(ちょっと前)とgcc(新しい)でコンパイル確認済み
+
+https://github.com/Silica/PSL/wiki/_pages

@@ -198,7 +198,7 @@ public:
 	bool operator!()	const {return !x->toBool();}
 	variable &operator++();
 	variable &operator--();
-	variable operator++(int i);	// Œã’u
+	variable operator++(int i);	// suf
 	variable operator--(int i);
 
 	operator int()		const	{return x->toInt();}
@@ -272,11 +272,9 @@ private:
 	{
 	public:
 		Variable()					{rc = 1;x = new vObject();}
-//		Variable()					{rc = 1;x = new vBase();}
 		Variable(int i)				{rc = 1;x = new vInt(i);}
 		Variable(hex h)				{rc = 1;x = new vHex(h);}
 		Variable(double d)			{rc = 1;x = new vFloat(d);}
-//		Variable(const char *s)		{rc = 1;x = new vString(s);}
 		Variable(const string &s)	{rc = 1;x = new vString(s);}
 		Variable(function f)		{rc = 1;x = new vCFunction(f);}
 		Variable(method f)			{rc = 1;x = new vCMethod(f, NULL);}

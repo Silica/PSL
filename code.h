@@ -144,10 +144,7 @@ class PLUS : public OpCode
 {
 public:
 	CLONE(PLUS)
-	EXEC
-	{
-		return RC::NONE;
-	}
+	EXEC{return RC::NONE;}
 	GET(PLUS)
 	PSL_DUMP((int d){PSL_PRINTF(("PLUS\n"));})
 	WRITE(PLUS,)
@@ -196,14 +193,14 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("COMPL\n"));})
 	WRITE(COMPL,)
 };
-class INC : public OpCode	// 後置
+class INC : public OpCode	// suf
 {
 public:
 	CLONE(INC)
 	EXEC
 	{
 		variable v = env.pop();
-		variable c = v;	// 値をコピー
+		variable c = v;	// copy
 		env.push(c);
 		v += 1;
 		return RC::NONE;
@@ -212,7 +209,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("INC\n"));})
 	WRITE(INC,)
 };
-class PINC : public OpCode	// 前置
+class PINC : public OpCode	// pre
 {
 public:
 	CLONE(PINC)
@@ -226,14 +223,14 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("PINC\n"));})
 	WRITE(PINC,)
 };
-class DEC : public OpCode	// 後置
+class DEC : public OpCode	// suf
 {
 public:
 	CLONE(DEC)
 	EXEC
 	{
 		variable v = env.pop();
-		variable c = v;	// 値をコピー
+		variable c = v;	// copy
 		env.push(c);
 		v -= 1;
 		return RC::NONE;
@@ -242,7 +239,7 @@ public:
 	PSL_DUMP((int d){PSL_PRINTF(("DEC\n"));})
 	WRITE(DEC,)
 };
-class PDEC : public OpCode	// 前置
+class PDEC : public OpCode	// pre
 {
 public:
 	CLONE(PDEC)
@@ -293,7 +290,6 @@ OOC(SOR,|=);
 OOC(SXOR,^=);
 OOC(SSHL,<<=);
 OOC(SSHR,>>=);
-//OOC(MOV,=);
 #undef OOC
 #define OOC(n,o) class n:public OpCode{public:CLONE(n)EXEC{variable r=env.pop();variable l=env.pop();variable x(l o r);env.push(x);return RC::NONE;}GET(BINARY)PSL_DUMP((int d){PSL_PRINTF((#n"\n"));})WRITE(n,)}
 OOC(ADD,+);
@@ -374,8 +370,8 @@ public:
 	CLONE(PUSH_CODE(x))
 	EXEC
 	{
-		variable v = x;		// 一旦受け取り
-		variable c = v;		// コピー作成
+		variable v = x;
+		variable c = v;	// copy
 		env.push(c);
 		return RC::NONE;
 	}
@@ -394,7 +390,7 @@ public:
 		#ifdef PSL_CLOSURE_REFERENCE
 		env.setLocal(v);
 		#else
-		v = env.getLocal();	// ローカル変数受け取り
+		v = env.getLocal();
 		#endif
 		return RC::NONE;
 	}
@@ -623,11 +619,7 @@ class YIELD : public OpCode
 {
 public:
 	CLONE(YIELD)
-	EXEC
-	{
-//		env.Yield();	// ってすることなくね？
-		return RC::YIELD;
-	}
+	EXEC{return RC::YIELD;}
 	PSL_DUMP((int d){PSL_PRINTF(("YIELD\n"));})
 	WRITE(YIELD,)
 };
