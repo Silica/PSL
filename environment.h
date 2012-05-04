@@ -553,7 +553,7 @@ public:
 		{
 			string s = k[i];
 			rsv z = l[s];
-			if (v.get() != z.get() && z.get()->type() != REFERENCE)
+			if (v.get() != z.get() && (z.get()->type() != POINTER || z.get()->toBool()))
 				x.set(s, l[s]);
 		}
 		return v;
