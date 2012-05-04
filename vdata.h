@@ -234,6 +234,12 @@ public:
 	void prepareInstance(Environment &env, Variable *v)	{if (x)x->prepareInstance(env);else env.push(rsv(v->clone(), 0));}
 	rsv instance(Environment &env, Variable *v)	{if (x)return x->instance(env);else return v->clone();}
 
+	size_t codelength()							{return x ? x->codelength() : 0;}
+	Code *getcode()								{return x ? x->getcode() : NULL;}
+	void pushcode(OpCode *c)					{if (x)x->pushcode(c);}
+	void pushlabel(const string &s)				{if (x)x->pushlabel(s);}
+	void write(const string &s, bytecode &b)	{if (x)x->write(s, b);}
+
 	PSL_DUMP((){PSL_PRINTF(("vPointer:%s\n", x ? "" : "NULL"));if(x)x->dump();})
 private:
 	Variable *x;
