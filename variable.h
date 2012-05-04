@@ -30,20 +30,13 @@
 #define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
 #define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない(短絡評価)
 #define PSL_OPTIMIZE_PARENTHESES			// 計算順序を変える為だけの()を演算子にしない
-// その他簡単に可能な最適化は
-// ジャンプ条件が定数の場合(パーサの都合で楽じゃなかった…関数完成後にやるならいいんだが)
-// デッドコードの削除(return/break/continue後のコード、上の定数評価ジャンプの考慮)
-// 代入も関数呼び出しもない式文は無視しても構わない？インクリメントもか
+
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
 #define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
 #define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 
-#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ
-/*	速度は未知数
-	PSLライブラリ関数GarbageCollectionを利用可能になる
-	循環参照を起こしたVariableの持つvBase派生をアプリケーション終了時には開放出来る
-	→PSLクラスのデストラクタを確実に呼べる、様な気がする	*/
+#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ PSLライブラリ関数GarbageCollectionを利用可能になる
 #define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
