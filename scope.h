@@ -185,24 +185,3 @@ public:
 		return s;
 	}
 };
-
-// GlobalScopeってのもあっていいのでは？
-// 一番外側
-// デフォでglobal変数として作成する
-
-// switch
-/*
-	switchは
-	breakで親を返す
-	continueは親に投げる
-	returnは親に投げる
-
-	table[label]を作ってそこに飛ばす形式か
-*/
-
-// try
-/*
-	tryは
-	大体は親に投げる
-	throwでcatchに移って(continueみたいなジャンプか？)自分を返す
-*/

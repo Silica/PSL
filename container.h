@@ -1,4 +1,4 @@
-class rsv	// 要はスマートポインタ
+class rsv
 {
 public:
 	rsv(Variable *v)	{x = v->ref();}
@@ -67,7 +67,7 @@ private:
 	#define PSL_USE_STL_STACK
 typedef std::vector<rsv> rlist;
 #else
-template<typename T> class vector	// std::vectorのresizeが2つ目以降、コピーコンストラクタを呼ぶ為都合が悪い
+template<typename T> class vector
 {
 public:
 	vector()	{res = len = 0;x = NULL;}
@@ -98,12 +98,7 @@ public:
 			reserve(res*2+1);
 		x[len++] = v;
 	}
-	T &operator[](size_t t) const
-	{
-//			if (t >= len)
-//				resize(t+1);
-		return x[t];
-	}
+	T &operator[](size_t t) const	{return x[t];}
 	size_t size() const	{return len;}
 	bool empty() const	{return !len;}
 protected:
@@ -250,16 +245,6 @@ private:
 		for (size_t i = reserve+h; i < max; ++i)
 			if (d[i] && d[i]->first == s)
 				return i;
-		// 頻繁にアクセスする値が奧に追いやられるのを防ぐ
-		// 交互にアクセスする様な値が衝突すると、毎回交換する為に非常に非効率
-		// カウント等をして、ある程度の閾値を設けておく方が正しいのだが
-		// そういうことをするコスト自体が？
-/*			{
-				data *temp = d[h];
-				d[h] = d[i];
-				d[i] = temp;
-				return h;
-			}*/
 		max = reserve + h;
 		for (size_t i = reserve; i < max; ++i)
 			if (d[i] && d[i]->first == s)
@@ -366,12 +351,6 @@ public:
 			#endif
 		}
 	}
-	// 当然ながら、一々reserveまで回さなくても
-	// 最大値を記録しておきそこまで回せばいいのだが
-	// pushする度に最大値を記録するコストとどっちが高いか？
-
-	// 実行するのはどこか
-	// Environment::endScopeの中あたりかと思うが…保留
 	#endif
 };
 #endif
