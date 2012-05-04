@@ -15,12 +15,12 @@ public:
 		PARSE_ERROR,
 		NOT_COMPILED_CODE,
 	};
-	error LoadString(const char *text)
+	error LoadString(const string &str)
 	{
-		variable::Tokenizer t(text, "LoadString", 0);
+		variable::Tokenizer t(str, "LoadString", 0);
 		return parse(&t) ? PARSE_ERROR : NONE;
 	}
-	error LoadScript(const char *filename)
+	error LoadScript(const string &filename)
 	{
 		if (!LoadCompiledCode(filename))
 			return NONE;
@@ -44,7 +44,7 @@ public:
 		fwrite(b.get(), 1, b.size(), fp);
 		return NONE;
 	}
-	error WriteCompiledCode(const char *filename)
+	error WriteCompiledCode(const string &filename)
 	{
 		using namespace std;
 		FILE *fp = fopen(filename, "wb");
@@ -70,7 +70,7 @@ public:
 		g.prepare(*this);
 		return NONE;
 	}
-	error LoadCompiledCode(const char *filename)
+	error LoadCompiledCode(const string &filename)
 	{
 		using namespace std;
 		FILE *fp = fopen(filename, "rb");
