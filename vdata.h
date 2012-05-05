@@ -1001,3 +1001,4 @@ private:
 		x->prepare(*e);
 	}
 };
+#include "binder.h"

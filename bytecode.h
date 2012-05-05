@@ -28,7 +28,7 @@ class bcreader
 		byte += s.length()+1;
 		return s;
 	}
-	template<typename T>
+	template<class T>
 	static T read(bytecode::byte *&byte)
 	{
 		T x = *reinterpret_cast<T*>(byte);

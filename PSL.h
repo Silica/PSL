@@ -91,10 +91,10 @@ public:
 		if (!init)
 		#endif
 		push(arg);
-		variable::Variable::Environment::Run();
+		variable::Environment::Run();
 		return pop();
 	}
-	PSL() : variable::Variable::Environment(1)
+	PSL() : variable::Environment(1)
 	#ifndef PSL_DEBUG
 	{std::setlocale(LC_ALL, "");}
 	#else
@@ -112,7 +112,7 @@ public:
 			init = true;
 			push(rsv());
 		}
-		variable::Variable::Environment::StepExec();
+		variable::Environment::StepExec();
 		return rsv();
 	}
 	#endif
@@ -141,7 +141,14 @@ private:
 	#ifdef PSL_DEBUG
 	bool init;
 	#endif
-	#include "binder.h"
+public:
+	template<typename F>
+	void addFunction(const string &s, F f)
+	{
+		variable g = global;
+		variable v(variable::Function(), f);
+		g.set(s, v);
+	}
 };
 
 #endif
