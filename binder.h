@@ -1,84 +1,49 @@
-private:
-	#define ARG(n) A##n a##n = v[n];
-	#define TMV(a,b) static variable tmv(variable &this_v, variable &v){F t = this_v[0];a t b;return v;}
-	template<typename F>
-	TMV(,())
-	template<typename F, typename A0>
-	TMV(ARG(0),(a0))
-	template<typename F, typename A0, typename A1>
-	TMV(ARG(0)ARG(1),(a0,a1))
-	template<typename F, typename A0, typename A1, typename A2>
-	TMV(ARG(0)ARG(1)ARG(2),(a0,a1,a2))
-	template<typename F, typename A0, typename A1, typename A2, typename A3>
-	TMV(ARG(0)ARG(1)ARG(2)ARG(3),(a0,a1,a2,a3))
-	template<typename F, typename A0, typename A1, typename A2, typename A3, typename A4>
-	TMV(ARG(0)ARG(1)ARG(2)ARG(3)ARG(4),(a0,a1,a2,a3,a4))
-	template<typename F, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-	TMV(ARG(0)ARG(1)ARG(2)ARG(3)ARG(4)ARG(5),(a0,a1,a2,a3,a4,a5))
-	#undef TMV
-
-	#define TMR(a,b) static variable tmr(variable &this_v, variable &v){F t = this_v[0];a R r = t b;return r;}
-	template<typename F, typename R>
-	TMR(,())
-	template<typename F, typename R, typename A0>
-	TMR(ARG(0),(a0))
-	template<typename F, typename R, typename A0, typename A1>
-	TMR(ARG(0)ARG(1),(a0,a1))
-	template<typename F, typename R, typename A0, typename A1, typename A2>
-	TMR(ARG(0)ARG(1)ARG(2),(a0,a1,a2))
-	template<typename F, typename R, typename A0, typename A1, typename A2, typename A3>
-	TMR(ARG(0)ARG(1)ARG(2)ARG(3),(a0,a1,a2,a3))
-	template<typename F, typename R, typename A0, typename A1, typename A2, typename A3, typename A4>
-	TMR(ARG(0)ARG(1)ARG(2)ARG(3)ARG(4),(a0,a1,a2,a3,a4))
-	template<typename F, typename R, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
-	TMR(ARG(0)ARG(1)ARG(2)ARG(3)ARG(4)ARG(5),(a0,a1,a2,a3,a4,a5))
-	#undef TMR
-	#undef ARG
-
-	#define F2T(n) variable f(n);variable v;v["m"] = f;variable i = v.instance();i.push(func);i.push(i.pointer());return i["m"];
-	#ifdef __BORLANDC__
-	static rsv f2tv(void (*func)(void)){F2T((tmv<void (*)(void)>));}
-	#endif
-	template<typename F>
-	static rsv f2t(void (*func)(void)){F2T((tmv<F>));}
-	template<typename F, typename A1>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1>));}
-	template<typename F, typename A1, typename A2>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1,A2>));}
-	template<typename F, typename A1, typename A2, typename A3>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1,A2,A3>));}
-	template<typename F, typename A1, typename A2, typename A3, typename A4>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1,A2,A3,A4>));}
-	template<typename F, typename A1, typename A2, typename A3, typename A4, typename A5>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1,A2,A3,A4,A5>));}
-	template<typename F, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-	static rsv f2t(void (*func)(A1)){F2T((tmv<F,A1,A2,A3,A4,A5,A6>));}
-	template<typename F, typename R>
-	static rsv f2t(R (*func)(void)){F2T((tmr<F,R>));}
-	template<typename F, typename R, typename A1>
-	static rsv f2t(R (*func)(A1)){F2T((tmr<F,R,A1>));}
-	template<typename F, typename R, typename A1, typename A2>
-	static rsv f2t(R (*func)(A1,A2)){F2T((tmr<F,R,A1,A2>));}
-	template<typename F, typename R, typename A1, typename A2, typename A3>
-	static rsv f2t(R (*func)(A1,A2)){F2T((tmr<F,R,A1,A2,A3>));}
-	template<typename F, typename R, typename A1, typename A2, typename A3, typename A4>
-	static rsv f2t(R (*func)(A1,A2)){F2T((tmr<F,R,A1,A2,A3,A4>));}
-	template<typename F, typename R, typename A1, typename A2, typename A3, typename A4, typename A5>
-	static rsv f2t(R (*func)(A1,A2)){F2T((tmr<F,R,A1,A2,A3,A4,A5>));}
-	template<typename F, typename R, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-	static rsv f2t(R (*func)(A1,A2)){F2T((tmr<F,R,A1,A2,A3,A4,A5,A6>));}
-	#undef TEMPLATE
-public:
-	template<typename F>
-	void addFunction(const string &s, F f)
-	{
-		variable g = global;
-		g.set(s, f2t<F>(f));
-	}
-	#ifdef __BORLANDC__
-	void addFunction(const string &s, void(*f)())
-	{
-		variable g = global;
-		g.set(s, f2tv(f));
-	}
-	#endif
+#define FV(n,t,g) class vBCFunctionV##n:public vBase{void(*x)t;public:vBCFunctionV##n(void(*f)t){x=f;}\
+	void prepare(Environment &env, Variable *v){variable a = env.pop();x g;env.push(a);}\
+	rsv call(Environment &env, variable &a, Variable *v){x g;return a;}};
+FV(0,(),())
+template<class A0>FV(1,(A0),(a))
+template<class A0,class A1>FV(2,(A0,A1),(a[0],a[1]))
+template<class A0,class A1,class A2>FV(3,(A0,A1,A2),(a[0],a[1],a[2]))
+template<class A0,class A1,class A2,class A3>FV(4,(A0,A1,A2,A3),(a[0],a[1],a[2],a[3]))
+template<class A0,class A1,class A2,class A3,class A4>FV(5,(A0,A1,A2,A3,A4),(a[0],a[1],a[2],a[3],a[4]))
+template<class A0,class A1,class A2,class A3,class A4,class A5>FV(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
+#undef FV
+#define FR(n,t,g) class vBCFunctionR##n:public vBase{R(*x)t;public:vBCFunctionR##n(R(*f)t){x=f;}\
+	void prepare(Environment &env, Variable *v){variable a = env.pop();variable r = x g;env.push(r);}\
+	rsv call(Environment &env, variable &a, Variable *v){variable r = x g;return r;}};
+template<class R>FR(0,(),())
+template<class R, class A0>FR(1,(A0),(a))
+template<class R, class A0,class A1>FR(2,(A0,A1),(a[0],a[1]))
+template<class R, class A0,class A1,class A2>FR(3,(A0,A1,A2),(a[0],a[1],a[2]))
+template<class R, class A0,class A1,class A2,class A3>FR(4,(A0,A1,A2,A3),(a[0],a[1],a[2],a[3]))
+template<class R, class A0,class A1,class A2,class A3,class A4>FR(5,(A0,A1,A2,A3,A4),(a[0],a[1],a[2],a[3],a[4]))
+template<class R, class A0,class A1,class A2,class A3,class A4,class A5>FR(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
+#undef FR
+static vBase *BCFunction(void(*f)()){return new vBCFunctionV0(f);}
+template<class A0>
+static vBase *BCFunction(void(*f)(A0)){return new vBCFunctionV1<A0>(f);}
+template<class A0, class A1>
+static vBase *BCFunction(void(*f)(A0,A1)){return new vBCFunctionV2<A0,A1>(f);}
+template<class A0, class A1, class A2>
+static vBase *BCFunction(void(*f)(A0,A1,A2)){return new vBCFunctionV3<A0,A1,A2>(f);}
+template<class A0, class A1, class A2, class A3>
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3)){return new vBCFunctionV4<A0,A1,A2,A3>(f);}
+template<class A0, class A1, class A2, class A3, class A4>
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4)){return new vBCFunctionV5<A0,A1,A2,A3,A4>(f);}
+template<class A0, class A1, class A2, class A3, class A4, class A5>
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionV6<A0,A1,A2,A3,A4,A5>(f);}
+template<class R>
+static vBase *BCFunction(R(*f)()){return new vBCFunctionR0<R>(f);}
+template<class R, class A0>
+static vBase *BCFunction(R(*f)(A0)){return new vBCFunctionR1<R,A0>(f);}
+template<class R, class A0, class A1>
+static vBase *BCFunction(R(*f)(A0,A1)){return new vBCFunctionR2<R,A0,A1>(f);}
+template<class R, class A0, class A1, class A2>
+static vBase *BCFunction(R(*f)(A0,A1,A2)){return new vBCFunctionR3<R,A0,A1,A2>(f);}
+template<class R, class A0, class A1, class A2, class A3>
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3)){return new vBCFunctionR4<R,A0,A1,A2,A3>(f);}
+template<class R, class A0, class A1, class A2, class A3, class A4>
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4)){return new vBCFunctionR5<R,A0,A1,A2,A3,A4>(f);}
+template<class R, class A0, class A1, class A2, class A3, class A4, class A5>
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0,A1,A2,A3,A4,A5>(f);}

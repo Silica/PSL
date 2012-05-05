@@ -67,7 +67,7 @@ private:
 	#define PSL_USE_STL_STACK
 typedef std::vector<rsv> rlist;
 #else
-template<typename T> class vector
+template<class T> class vector
 {
 public:
 	vector()	{res = len = 0;x = NULL;}

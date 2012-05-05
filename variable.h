@@ -115,7 +115,9 @@ public:
 		CPOINTER,
 		THREAD,
 	};
-
+	class Function{};
+	class Class{};
+	class Method{};
 private:
 	class Variable;
 	#include "container.h"
@@ -212,8 +214,8 @@ public:
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
 	operator void*()		const	{return x->toPointer();}
-	template<typename T>	T *toPointer()	const	{return static_cast<T*>(x->toPointer());}
-	template<typename T>	operator T*()	const	{return static_cast<T*>(x->toPointer());}
+	template<class T>	T *toPointer()	const	{return static_cast<T*>(x->toPointer());}
+	template<class T>	operator T*()	const	{return static_cast<T*>(x->toPointer());}
 	#ifndef PSL_THREAD_SAFE
 		#ifdef __BORLANDC__
 		template<>
@@ -482,9 +484,8 @@ private:
 #endif
 	private:
 		#include "vdata.h"
-		friend class PSL;
 		friend class vRArray;
-		friend class vReference;
+		template<class F>Variable(Function z, F f)	{rc = 1;x = BCFunction(f);}
 	} *x;
 #ifdef __GNUC__
 public:
@@ -542,6 +543,8 @@ public:
 	#undef cva
 	#undef ap
 	#undef CALL
+
+	template<class F>variable(Function z, F f)	{x = new Variable(z, f);}
 
 	PSL_DUMP((){x->dump();})
 };
