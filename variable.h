@@ -114,10 +114,11 @@ public:
 		CMETHOD,
 		CPOINTER,
 		THREAD,
+		BCFUNCTION,
+		CCMETHOD,
 	};
 	class Function{};
-	class Class{};
-	class Method{};
+	template<class C>class Method{};
 private:
 	class Variable;
 	#include "container.h"
@@ -486,6 +487,7 @@ private:
 		#include "vdata.h"
 		friend class vRArray;
 		template<class F>Variable(Function z, F f)	{rc = 1;x = BCFunction(f);}
+		template<class C, class M>Variable(Method<C> z, M m)	{rc = 1;x = CCMethod<C>(m);}
 	} *x;
 #ifdef __GNUC__
 public:
@@ -545,6 +547,7 @@ public:
 	#undef CALL
 
 	template<class F>variable(Function z, F f)	{x = new Variable(z, f);}
+	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}
 
 	PSL_DUMP((){x->dump();})
 };

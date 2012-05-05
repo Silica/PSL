@@ -141,13 +141,63 @@ private:
 	#ifdef PSL_DEBUG
 	bool init;
 	#endif
+	class addf
+	{
+		PSL *p;
+	public:
+		addf(PSL *x){p = x;}
+		template<class F>addf &operator()(const string &s, F f)
+		{
+			p->addFunction(s, f);
+			return *this;
+		}
+	};
+	template<class C>class addc
+	{
+		rsv g;
+		rsv r;
+	public:
+		addc(rsv &gl, variable &v){g = gl;r = v;}
+		template<class M>addc &operator()(const string &s, M m)
+		{
+			variable c = r;
+			variable v(variable::Method<C>(), m);
+			c.set(s, v);
+			return *this;
+		}
+		addc &instance(const string &s, C *p)
+		{
+			variable c = r;
+			variable i = c.instance();
+			i.push(p);
+			variable n = g;
+			n.set(s, i);
+			return *this;
+		}
+	};
 public:
-	template<typename F>
-	void addFunction(const string &s, F f)
+	template<class F>addf addFunction(const string &s, F f)
 	{
 		variable g = global;
 		variable v(variable::Function(), f);
 		g.set(s, v);
+		return addf(this);
+	}
+	template<class C>addc<C> addClass(const string &s)
+	{
+		variable g = global;
+		variable v;
+		g.set(s, v);
+		return addc<C>(global, v);
+	}
+	template<class C>addc<C> addInstance(const string &classname, const string &s, C *p)
+	{
+		variable g = global;
+		variable v = g[classname];
+		variable i = v.instance();
+		i.push(p);
+		g.set(s, i);
+		return addc<C>(global, v);
 	}
 };
 

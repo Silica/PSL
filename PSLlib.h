@@ -53,6 +53,8 @@ private:
 		case FLOAT:		PSL_PRINTF(("%f", static_cast<double>(v)));break;
 		case RARRAY:	PSL_PRINTF(("[tuple:%d]", v.length()));break;
 		case THREAD:	PSL_PRINTF(("[thread:%s]", static_cast<bool>(v) ? "alive" : "dead"));break;
+		case BCFUNCTION:PSL_PRINTF(("[bind function]"));break;
+		case CCMETHOD:	PSL_PRINTF(("[bind method]"));break;
 		default:
 			{
 				PSL_PRINTF(("%s", v.toString().c_str()));
@@ -78,6 +80,8 @@ private:
 		case CMETHOD:	return "Cmethod";
 		case CPOINTER:	return "Cpointer";
 		case THREAD:	return "thread";
+		case BCFUNCTION:return "bind function";
+		case CCMETHOD:	return "bind method";
 		}
 		return "";
 	}

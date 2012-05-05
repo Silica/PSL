@@ -406,7 +406,7 @@ public:
 		PSL_CONST_STATIC string destructor = "destructor";
 		#endif
 		Type t;
-		if (member.count(destructor) && ((t = member[destructor].get()->type()) == METHOD || t == CMETHOD))
+		if (member.count(destructor) && ((t = member[destructor].get()->type()) == METHOD || t == CMETHOD || t == CCMETHOD))
 		{
 			PSL_TEMPORARY_ENV(env);
 			variable arg;
@@ -593,12 +593,14 @@ public:
 		int size = array.size();
 		for (int i = 0; i < size; ++i)
 		{
-			if (array[i].get()->type() == METHOD || array[i].get()->type() == CMETHOD)
+			Type t = array[i].get()->type();
+			if (t == METHOD || t == CMETHOD || t == CCMETHOD)
 				array[i].get()->push(v);
 		}
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
-			if (it->second.get()->type() == METHOD || it->second.get()->type() == CMETHOD)
+			Type t = it->second.get()->type();
+			if (t == METHOD || t == CMETHOD || t == CCMETHOD)
 				it->second.get()->push(v);
 		}
 	}
@@ -700,7 +702,8 @@ private:
 
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
-			if (it->second.get()->type() == CMETHOD || it->second.get()->type() == METHOD)
+			Type t = it->second.get()->type();
+			if (t == CMETHOD || t == METHOD || t == CCMETHOD)
 			{
 				rsv z(it->second.get()->clone(), 0);
 				z.get()->push(x);
@@ -742,23 +745,24 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (v->type() == METHOD)
+		Type t = v->type();
+		if (t == METHOD)
 		{
 			function->finalize();
 			function = v->index(0)->ref();
 		}
-		else if (v->type() == OBJECT && v->getcode())
+		else if (t == OBJECT && v->getcode())
 		{
 			function->finalize();
 			function = v->ref();
 		}
-		else if (v->type() == CFUNCTION)
+		else if (t == CFUNCTION)
 		{
 			vBase *x = v->bclone();
 			delete this;
 			return x;
 		}
-		else if (v->type() == CMETHOD)
+		else if (t == CMETHOD)
 		{
 			vBase *x = v->bclone();
 			x->push(this_v);
