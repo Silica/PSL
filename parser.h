@@ -272,10 +272,9 @@ private:
 					Error(TINLAG);
 				else
 				{
-					string label = t->nstr;
+					c.pushcode(new Variable::GOTO(t->nstr));
 					if (!t->getNextIf(';'))
 						Error(TINA, ';', "goto");
-					c.pushcode(new Variable::GOTO(label));
 				}
 				return;
 			}
@@ -311,9 +310,9 @@ private:
 				{
 					if (g.exist(name))
 						Error(IIAE, 0, name, line);
-					g[name] = arg;
 					variable m = g[name];
-					g[name].pushcode(new Variable::ARGUMENT);
+					m = arg;
+					m.pushcode(new Variable::ARGUMENT);
 					if (n == '{'/*'}'*/)
 					{
 						t->getNext();
@@ -412,8 +411,7 @@ private:
 					Error(TINIA, 0, "member access (.)");
 				}
 			}
-			else
-				break;
+			else break;
 		}
 	}
 	#define PRE_OP(m,o) if(n==m){t->getNext();getTerm(c);c.pushcode(new Variable::o);}
@@ -491,8 +489,7 @@ private:
 			EXP0('*', Term, MUL)
 			else EXP0('/', Term, DIV)
 			else EXP0('%', Term, MOD)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp2(variable &c, bool l = false)
@@ -502,8 +499,7 @@ private:
 		{
 			EXP('+', 1, ADD)
 			else EXP('-', 1, SUB)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp3(variable &c, bool l = false)
@@ -513,8 +509,7 @@ private:
 		{
 			EXP(Tokenizer::SHL, 2, SHL)
 			else EXP(Tokenizer::SHR, 2, SHR)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp4(variable &c, bool l = false)
@@ -523,8 +518,7 @@ private:
 		while (int n = t->checkNext())
 		{
 			EXP('&', 3, AND)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp5(variable &c, bool l = false)
@@ -533,8 +527,7 @@ private:
 		while (int n = t->checkNext())
 		{
 			EXP('^', 4, XOR)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp6(variable &c, bool l = false)
@@ -543,8 +536,7 @@ private:
 		while (int n = t->checkNext())
 		{
 			EXP('|', 5, OR)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp7(variable &c, bool l = false)
@@ -556,8 +548,7 @@ private:
 			else EXP(Tokenizer::LE, 6, LE)
 			else EXP('>', 6, GT)
 			else EXP(Tokenizer::GE, 6, GE)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp8(variable &c, bool l = false)
@@ -567,8 +558,7 @@ private:
 		{
 			EXP(Tokenizer::EQ, 7, EQ)
 			else EXP(Tokenizer::NE, 7, NEQ)
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp9(variable &c, bool l = false)
@@ -591,8 +581,7 @@ private:
 			#else
 			EXP(Tokenizer::BAND, 8, BAND)
 			#endif
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp10(variable &c, bool l = false)
@@ -615,8 +604,7 @@ private:
 			#else
 			EXP(Tokenizer::BOR, 9, BOR)
 			#endif
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp11(variable &c, bool l = false)
@@ -723,8 +711,7 @@ private:
 					c.pushcode(new Variable::LIST);
 				}
 			}
-			else
-				break;
+			else break;
 		}
 	}
 	void getexp13(variable &c, bool l = false)
@@ -754,8 +741,7 @@ private:
 			else EXP(Tokenizer::SXOR, 13, SXOR)
 			else EXP(Tokenizer::SSHL, 13, SSHL)
 			else EXP(Tokenizer::SSHR, 13, SSHR)
-			else
-				break;
+			else break;
 		}
 	}
 	void ParseExpression(variable &c, char e, bool l = false)
