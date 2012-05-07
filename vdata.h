@@ -274,16 +274,6 @@ public:
 			v->push(x[i].get());
 		return v;
 	}
-	Variable *referenceTo()
-	{
-		if (x.size() == 1)
-		{
-			Variable *v = x[0].get();
-			Variable *r = v->x->referenceTo();
-			return r ? r : v;
-		}
-		return NULL;
-	}
 
 	vBase *substitution(Variable *v)
 	{
