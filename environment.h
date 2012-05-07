@@ -468,11 +468,7 @@ public:
 		if (Variable *v = local.get()->getifexist(name))return v;
 		else											return owner->getVariable(name);
 	}
-	void set(Scope *s)
-	{
-		if (!owner)	owner = s;
-		else		owner->set(s);
-	}
+	void set(Scope *s)	{owner = s;}
 	void Jump(int l)	{line = l;}
 	void RJump(int l)	{line += l;}
 	bool Run(Environment &env)	{return code->Run(env, line);}

@@ -56,10 +56,8 @@ private:
 		case BCFUNCTION:PSL_PRINTF(("[bind function]"));break;
 		case CCMETHOD:	PSL_PRINTF(("[bind method]"));break;
 		default:
-			{
-				PSL_PRINTF(("%s", v.toString().c_str()));
-				break;
-			}
+			PSL_PRINTF(("%s", v.toString().c_str()));
+			break;
 		}
 		return v;
 	}

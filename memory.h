@@ -172,7 +172,7 @@ class StaticObject
 			delete rsvnull_p();
 		}
 	};
-	friend class sobj;
+	friend struct sobj;
 	static sobj &so()
 	{
 		static sobj o;
@@ -214,29 +214,13 @@ public:
 	{
 		static const string &destructor()		{return so().destructor;}
 	};
-	friend class String;
+	friend struct String;
 };
 
-
-class VMemoryManager
-{
-public:
-	static void *Next()				{return StaticObject::vpool().nextptr();}
-	static void Release(void *ptr)	{StaticObject::vpool().release(ptr);}
-};
-
-class SMemoryManager
-{
-public:
-	static void *Next()				{return StaticObject::spool().nextptr();}
-	static void Release(void *ptr)	{StaticObject::spool().release(ptr);}
-};
-
-template<size_t S> class MemoryManager
-{
-public:
-	static void *Next()				{return (StaticObject::pool(OverLoad<S>())).nextptr();}
-	static void Release(void *ptr)	{(StaticObject::pool(OverLoad<S>())).release(ptr);}
-};
+#define MM(p) public:static void *Next(){return StaticObject::p.nextptr();}static void Release(void *ptr){StaticObject::p.release(ptr);}
+class VMemoryManager{MM(vpool())};
+class SMemoryManager{MM(spool())};
+template<size_t S> class MemoryManager{MM(pool(OverLoad<S>()))};
+#undef MM
 
 #undef OBJECT_SIZE

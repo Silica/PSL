@@ -284,9 +284,7 @@ private:
 			if (!getIdentifier())
 				PSL_PRINTF(("warning %s %d: undef syntax error\n", filename.c_str(), line));
 			else
-			{
 				definelist->erase(nstr);
-			}
 		}
 		else if (directive == "ifdef")
 		{
