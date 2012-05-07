@@ -222,7 +222,8 @@ private:
 			return 0;
 		if (!getIdentifier())
 		{
-			PSL_PRINTF(("warning %s %d: tokenizer directive syntax error\n", filename.c_str(), line));
+			if (s[i] != '!')
+				PSL_PRINTF(("warning %s %d: tokenizer directive syntax error\n", filename.c_str(), line));
 			lcomment();
 			return doNext();
 		}
