@@ -405,7 +405,6 @@ private:
 			virtual ~vBase(){}
 			virtual Type type()	const	{return NIL;}
 			virtual vBase *clone()	{return new vBase();}
-			virtual Variable *referenceTo()	{return NULL;}
 			virtual void searchcount(Variable *v, int &c){}
 			virtual void mark(){}
 			virtual void destructor(){}
