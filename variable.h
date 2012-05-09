@@ -146,6 +146,7 @@ public:
 	Type type()			const	{return x->type();}
 	bool type(Type t)	const	{return x->type() == t;}
 
+	variable clone()	const	{variable v = *this;return v;}
 	variable &substitution(const variable &v)	{x->substitution(v.x);return *this;}
 	variable &assignment(const variable &v)		{x->assignment(v.x);return *this;}
 	variable &operator=(const variable &v)		{x->substitution(v.x);return *this;}
@@ -463,7 +464,7 @@ private:
 
 			virtual size_t codelength()	{return 0;}
 			virtual Code *getcode()		{return NULL;}
-			virtual void pushcode(OpCode *c){}
+			virtual void pushcode(OpCode *c){delete c;}
 			virtual void pushlabel(const string &s){}
 			virtual void write(const string &s, bytecode &b){}
 
