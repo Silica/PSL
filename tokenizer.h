@@ -456,7 +456,7 @@ private:
 
 		case '#':						return preprocessor();
 		}
-		i--;
+		--i;
 
 		if (getIdentifier())
 		{
