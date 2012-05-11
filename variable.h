@@ -489,13 +489,7 @@ private:
 		template<class F>Variable(Function z, F f)	{rc = 1;x = BCFunction(f);}
 		template<class C, class M>Variable(Method<C> z, M m)	{rc = 1;x = CCMethod<C>(m);}
 	} *x;
-#ifdef __GNUC__
-public:
-#else
-private:
-#endif
 	typedef Variable::Environment Environment;
-private:
 	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
 	#include "memory.h"
 	#endif
