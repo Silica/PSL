@@ -110,6 +110,7 @@ class Environment
 		}
 	}
 public:
+	PSL_MEMORY_MANAGER(Environment)
 	#if defined(PSL_SHARED_GLOBAL) && defined(PSL_USE_VARIABLE_MEMORY_MANAGER)
 	Environment():global(StaticObject::global())		{scope = NULL;}
 	Environment(int i):global(StaticObject::global())	{scope = NULL;if (i){PSLlib::Basic(global);PSLlib::Standard(global);}}
@@ -206,10 +207,11 @@ public:
 		return stack.top();
 	}
 	bool Runable()	{return scope;}
-protected:
+private:
 	rsv global;
 	rstack stack;
 	Scope *scope;
+	friend class PSL;
 };
 
 class Code

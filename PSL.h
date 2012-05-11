@@ -4,9 +4,10 @@
 #include "variable.h"
 #include <clocale>
 
-class PSL : private variable::Environment
+class PSL
 {
 	typedef variable::rsv rsv;
+	variable::Environment env;
 public:
 	enum error
 	{
@@ -38,7 +39,7 @@ public:
 	error WriteCompiledCode(std::FILE *fp)
 	{
 		variable::Variable::bytecode b;
-		global.get()->write("", b);
+		env.global.get()->write("", b);
 		unsigned long l = 0xBCDEF01A;
 		fwrite(&l, 1, sizeof(l), fp);
 		fwrite(b.get(), 1, b.size(), fp);
@@ -65,9 +66,9 @@ public:
 		variable::Variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
 		variable::Variable::bcreader::read(b, cc);
-		variable g = global;
+		variable g = env.global;
 		g.gset(cc);
-		g.prepare(*this);
+		g.prepare(env);
 		return NONE;
 	}
 	error LoadCompiledCode(const string &filename)
@@ -85,43 +86,43 @@ public:
 	}
 	rsv Run(const variable &arg = 0)
 	{
-		if (!Runable())
+		if (!env.Runable())
 			return rsv();
 		#ifdef PSL_DEBUG
 		if (!init)
 		#endif
-		push(arg);
-		variable::Environment::Run();
-		return pop();
+		env.push(arg);
+		env.Run();
+		return env.pop();
 	}
-	PSL() : variable::Environment(1)
+	PSL() : env(1)
 	#ifndef PSL_DEBUG
 	{std::setlocale(LC_ALL, "");}
 	#else
 	{std::setlocale(LC_ALL, "");init = false;}
 	rsv StepExec()
 	{
-		if (!Runable())
+		if (!env.Runable())
 		{
 			if (stack.size())
-				return pop();
+				return env.pop();
 			return variable(1);
 		}
 		if (!init)
 		{
 			init = true;
-			push(rsv());
+			env.push(rsv());
 		}
-		variable::Environment::StepExec();
+		env.StepExec();
 		return rsv();
 	}
 	#endif
-	rsv get(const string &name)							{return global.get()->child(name);}
-	void add(const string &name, const variable &v)		{global.get()->set(name, v);}
-	void add(const string &name, variable::function f)	{global.get()->set(name, variable(f));}
-	void add(const string &name, variable::method f)	{global.get()->set(name, variable(f));}
+	rsv get(const string &name)							{return env.global.get()->child(name);}
+	void add(const string &name, const variable &v)		{env.global.get()->set(name, v);}
+	void add(const string &name, variable::function f)	{env.global.get()->set(name, variable(f));}
+	void add(const string &name, variable::method f)	{env.global.get()->set(name, variable(f));}
 	#ifndef PSL_SHARED_GLOBAL
-	operator variable::Variable::Environment&()			{return *this;}
+	operator variable::Environment&()	{return env;}
 	#endif
 private:
 	bool parse(variable::Tokenizer *t)
@@ -133,9 +134,9 @@ private:
 		if (p.getErrorNum())
 			return true;
 
-		variable gl = global;
+		variable gl = env.global;
 		gl.gset(g);
-		gl.prepare(*this);
+		gl.prepare(env);
 		return false;
 	}
 	#ifdef PSL_DEBUG
@@ -178,26 +179,26 @@ private:
 public:
 	template<class F>addf addFunction(const string &s, F f)
 	{
-		variable g = global;
+		variable g = env.global;
 		variable v(variable::Function(), f);
 		g.set(s, v);
 		return addf(this);
 	}
 	template<class C>addc<C> addClass(const string &s)
 	{
-		variable g = global;
+		variable g = env.global;
 		variable v;
 		g.set(s, v);
-		return addc<C>(global, v);
+		return addc<C>(env.global, v);
 	}
 	template<class C>addc<C> addInstance(const string &classname, const string &s, C *p)
 	{
-		variable g = global;
+		variable g = env.global;
 		variable v = g[classname];
 		variable i = v.instance();
 		i.push(p);
 		g.set(s, i);
-		return addc<C>(global, v);
+		return addc<C>(env.global, v);
 	}
 };
 
