@@ -116,7 +116,6 @@ class table
 {
 	typedef unsigned long hash;
 	static hash gethash(const string &s, hash max)	{return s.hash() & (max-1);}
-public:
 	struct data
 	{
 		PSL_MEMORY_MANAGER(data)
@@ -125,6 +124,7 @@ public:
 		string first;
 		rsv second;
 	};
+public:
 	class iterator
 	{
 	public:
