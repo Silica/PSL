@@ -1,60 +1,3 @@
-#ifndef VARIABLE_H
-#define VARIABLE_H
-
-#include <ctime>
-#include <cmath>
-
-#include "pstring.h"
-
-//#include <vector>
-//#include <map>
-//#include <stack>
-
-// 設定項目
-//#define PSL_USE_STL_VECTOR
-//#define PSL_USE_STL_STACK
-//#define PSL_USE_STL_MAP
-//#define PSL_NULL_RSV		// rsvはNULLを許容する、STL_VECTORを使う場合は必須
-
-//#define PSL_DEBUG		// 行番号の埋め込みとステップ実行のサポート
-
-#define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
-#define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
-//#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
-//#define PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST	// 宣言済みの名前を更に宣言した場合に通知する
-
-#define PSL_OPTIMIZE_TAILCALL				// 末尾呼び出しの最適化
-#define PSL_OPTIMIZE_IN_COMPILE				// コンパイル時最適化(これ以下)を利用する
-#define PSL_OPTIMIZE_IMMEDIATELY_POP		// PUSHして即POPするコードの最適化(a;の様な文)
-#define PSL_OPTIMIZE_CONSTANT_CALCULATION	// 定数計算の最適化(簡易)
-#define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
-#define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない(短絡評価)
-#define PSL_OPTIMIZE_PARENTHESES			// 計算順序を変える為だけの()を演算子にしない
-
-#define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
-#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
-#define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
-//#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
-
-#define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ PSLライブラリ関数GarbageCollectionを利用可能になる
-#define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする
-
-#define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
-#define PSL_USE_CONSOLE						// std::printfを使う
-#define PSL_USE_DESTRUCTOR					// PSL内のクラスのデストラクタを使う
-
-#define PSL_CLOSURE_REFERENCE				// クロージャをコピーではなく参照にする
-
-//#define PSL_THREAD_SAFE						// メモリマネージャ使わない、global共有しない、static変数を使わない
-// ここまで
-
-
-
-#ifdef PSL_USE_CONSOLE
-	#define PSL_PRINTF(x) std::printf x
-#else
-	#define PSL_PRINTF(x)
-#endif
 #ifdef PSL_DEBUG
 	#define PSL_DUMP(x) void dump x
 #else
@@ -80,14 +23,13 @@
 	#define PSL_TEMPORARY_ENV0(x) Environment x(0)
 #endif
 
-
 class variable
 {
-	typedef unsigned int size_t;
 	#ifndef _WIN32
 	typedef long long __int64;
 	#endif
 public:
+	#include "pstring.h"
 	struct PSLException
 	{
 		enum ErrorCode
@@ -506,7 +448,7 @@ private:
 	Variable::Code *getcode()			{return x->getcode();}
 	void pushcode(Variable::OpCode *c)	{return x->pushcode(c);}
 	void pushlabel(const string &s)		{return x->pushlabel(s);}
-	friend class PSL;
+	friend class PSLVM;
 	friend class PSLlib;
 	friend class Parser;
 	friend class Variable::vBase;
@@ -545,5 +487,3 @@ public:
 
 	PSL_DUMP((){x->dump();})
 };
-
-#endif

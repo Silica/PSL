@@ -6,10 +6,11 @@
 #include <conio.h>
 
 typedef unsigned long dword;
+using namespace PSL;
 
 void compile(FILE *exe, const char *filename)
 {
-	PSL p;
+	PSLVM p;
 	if (p.LoadScript(filename))
 		return;
 
@@ -52,7 +53,7 @@ void execute(FILE *exe, variable &arg)
 	int end = ftell(exe);
 	fread(&l, 1, sizeof(dword), exe);
 	fseek(exe, l, SEEK_SET);
-	PSL p;
+	PSLVM p;
 	if (p.LoadCompiledCode(exe, end - l))
 		return;
 	p.Run(arg);
