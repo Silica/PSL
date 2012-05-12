@@ -344,6 +344,7 @@ private:
 		class vBase
 		{
 		public:
+			PSL_MEMORY_MANAGER(vBase)
 			vBase()	{}
 			virtual ~vBase(){}
 			virtual Type type()	const	{return NIL;}

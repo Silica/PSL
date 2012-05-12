@@ -152,6 +152,7 @@ class StaticObject
 	struct sobj
 	{
 		#define pool(s,n) MemoryPool<s> pool##n;
+		pool(4,4)
 		pool(8,8)
 		pool(12,12)
 		pool(16,16)
@@ -202,6 +203,7 @@ public:
 	#endif
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	#define pool(s,n) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##n;}
+	pool(4,4)
 	pool(8,8)
 	pool(12,12)
 	pool(16,16)

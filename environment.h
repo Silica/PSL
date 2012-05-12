@@ -70,6 +70,7 @@ public:
 			SCOPE,IF,LOOP,
 		};
 	};
+	PSL_MEMORY_MANAGER(OpCode)
 	virtual ~OpCode(){}
 	virtual RC::RETURNCODE Execute(Environment &env) = 0;
 	virtual OpCode *clone() = 0;
