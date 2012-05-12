@@ -14,11 +14,12 @@ int main(int argc, char **argv)
 	if (argc < 2)
 		return 0;
 
-	PSL p;
-	PSL::error e = p.LoadScript(argv[1]);
+	using namespace PSL;
+	PSLVM p;
+	PSLVM::error e = p.LoadScript(argv[1]);
 	if (e)
 	{
-		if (e == PSL::FOPEN_ERROR)
+		if (e == PSLVM::FOPEN_ERROR)
 		{
 			string input = argv[1];
 			for (int i = 2; i < argc; ++i)

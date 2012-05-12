@@ -1,19 +1,5 @@
-#ifndef PSTRING_H
-#define PSTRING_H
-
-#define PSTRING_USE_DOUBLE
-
-#include <cstring>
-#include <cstdio>
-#include <cstdarg>
-#include <cwchar>
-#ifdef PSTRING_USE_DOUBLE
-#include <cstdlib>
-#endif
-
 class string
 {
-	typedef unsigned int size_t;
 public:
 	static int min(int x, int y)	{return (x < y) ? x : y;}
 	static bool empty(const char *s){return s == NULL || s[0] == 0;}
@@ -84,13 +70,11 @@ public:
 	string(size_t t, char *&s)		{buf = new SharedBuffer(t);buf->setlen(t);s = buf->buffer();}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
-#ifdef PSTRING_USE_DOUBLE
 	string(double d)
 	{
 		buf = new SharedBuffer(DOUBLE_L);
 		buf->setlen(std::sprintf(buf->buffer(), "%f", d));
 	};
-#endif
 	~string()	{if (buf)buf->finalize();}
 
 	string &operator=(const string &s)
@@ -296,7 +280,6 @@ public:
 		if (buf)	return buf->c_str();
 		else		return "";
 	}
-#ifdef PSTRING_USE_DOUBLE
 	string &operator=(double d)
 	{
 		string s(d);
@@ -315,7 +298,6 @@ public:
 		return *this + s;
 	}
 	operator double() const	{return std::strtod(c_str(), NULL);}
-#endif
 	bool operator==(const string &s) const
 	{
 		if (buf == s.buf)					return true;
@@ -651,5 +633,3 @@ public:
 	}
 	wstring w_str()	{return buf ? buf->c_str() : "";}
 };
-
-#endif

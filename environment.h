@@ -211,7 +211,7 @@ private:
 	rsv global;
 	rstack stack;
 	Scope *scope;
-	friend class PSL;
+	friend class PSLVM;
 };
 
 class Code
