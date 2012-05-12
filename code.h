@@ -5,6 +5,7 @@
 class PUSH_INT : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(PUSH_INT)
 	PUSH_INT(int i):x(new Variable(i),0){}
 	CLONE(PUSH_INT(x.get()->toInt()))
 	EXEC
@@ -21,6 +22,7 @@ private:
 class PUSH_HEX : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(PUSH_HEX)
 	PUSH_HEX(hex l):x(new Variable(new vHex(l)),0){}
 	CLONE(PUSH_HEX(x.get()->toInt()))
 	EXEC
@@ -37,6 +39,7 @@ private:
 class PUSH_FLOAT : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(PUSH_FLOAT)
 	PUSH_FLOAT(double d):x(new Variable(d),0){}
 	CLONE(PUSH_FLOAT(x.get()->toDouble()))
 	EXEC
@@ -53,6 +56,7 @@ private:
 class PUSH_STRING : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(PUSH_STRING)
 	PUSH_STRING(const string &s):x(new Variable(s),0){}
 	CLONE(PUSH_STRING(x.get()->toString()))
 	EXEC
@@ -313,6 +317,7 @@ OOC(GT,>);
 class VARIABLE : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(VARIABLE)
 	VARIABLE(string &s)	{name = s;}
 	CLONE(VARIABLE(name))
 	EXEC
@@ -366,6 +371,7 @@ public:
 class PUSH_CODE : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(PUSH_CODE)
 	PUSH_CODE(const rsv &v):x(v){}
 	CLONE(PUSH_CODE(x))
 	EXEC
@@ -402,6 +408,7 @@ public:
 class JMP : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(JMP)
 	JMP(int i)	{j = i;}
 	CLONE(JMP(j))
 	void set(int s){j = s;}
@@ -412,15 +419,14 @@ public:
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JMP %d\n", j));})
 	WRITE(JMP,b.push(&j, sizeof(j));)
-private:
+protected:
 	int j;
 };
-class JT : public OpCode
+class JT : public JMP
 {
 public:
-	JT(int i)	{j = i;}
+	JT(int i):JMP(i){}
 	CLONE(JT(j))
-	void set(int s){j = s;}
 	EXEC
 	{
 		variable v = env.pop();
@@ -430,15 +436,12 @@ public:
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JT %d\n", j));})
 	WRITE(JT,b.push(&j, sizeof(j));)
-private:
-	int j;
 };
-class JF : public OpCode
+class JF : public JMP
 {
 public:
-	JF(int i)	{j = i;}
+	JF(int i):JMP(i){}
 	CLONE(JF(j))
-	void set(int s){j = s;}
 	EXEC
 	{
 		variable v = env.pop();
@@ -448,15 +451,12 @@ public:
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JF %d\n", j));})
 	WRITE(JF,b.push(&j, sizeof(j));)
-private:
-	int j;
 };
-class JR : public OpCode		// 相対ジャンプ、行は実行時には次を指していることに注意
+class JR : public JMP		// 相対ジャンプ、行は実行時には次を指していることに注意
 {
 public:
-	JR(int i)	{j = i;}
+	JR(int i):JMP(i){}
 	CLONE(JR(j))
-	void set(int s){j = s;}
 	EXEC
 	{
 		env.RJump(j);
@@ -465,15 +465,12 @@ public:
 	GET(JR)
 	PSL_DUMP((int d){PSL_PRINTF(("JR %d\n", j));})
 	WRITE(JR,b.push(&j, sizeof(j));)
-private:
-	int j;
 };
-class JRT : public OpCode
+class JRT : public JMP
 {
 public:
-	JRT(int i)	{j = i;}
+	JRT(int i):JMP(i){}
 	CLONE(JRT(j))
-	void set(int s){j = s;}
 	EXEC
 	{
 		variable v = env.pop();
@@ -483,15 +480,12 @@ public:
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JRT %d\n", j));})
 	WRITE(JRT,b.push(&j, sizeof(j));)
-private:
-	int j;
 };
-class JRF : public OpCode
+class JRF : public JMP
 {
 public:
-	JRF(int i)	{j = i;}
+	JRF(int i):JMP(i){}
 	CLONE(JRF(j))
-	void set(int s){j = s;}
 	EXEC
 	{
 		variable v = env.pop();
@@ -501,8 +495,6 @@ public:
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JRF %d\n", j));})
 	WRITE(JRF,b.push(&j, sizeof(j));)
-private:
-	int j;
 };
 
 class LIST : public OpCode
@@ -626,6 +618,7 @@ public:
 class GOTO : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(GOTO)
 	GOTO(string &s)	{label = s;}
 	CLONE(GOTO(label))
 	EXEC
@@ -642,6 +635,7 @@ private:
 class SCOPE : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(SCOPE)
 	SCOPE(Code *c)	{statement = c->inc();}
 	CLONE(SCOPE(statement))
 	~SCOPE()	{statement->finalize();}
@@ -659,6 +653,7 @@ protected:
 class LOOP : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(LOOP)
 	LOOP(Code *c, int l)	{statement = c->inc();cline = l;}
 	CLONE(LOOP(statement, cline))
 	~LOOP()	{statement->finalize();}
@@ -688,6 +683,7 @@ public:
 class LOCAL : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(LOCAL)
 	LOCAL(string &s)	{name = s;}
 	CLONE(LOCAL(name))
 	EXEC
@@ -704,6 +700,7 @@ private:
 class GLOBAL : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(GLOBAL)
 	GLOBAL(string &s)	{name = s;}
 	CLONE(GLOBAL(name))
 	EXEC
@@ -720,6 +717,7 @@ private:
 class STATIC : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(STATIC)
 	STATIC(string &s)	{name = s;}
 	CLONE(STATIC(name))
 	EXEC
@@ -737,6 +735,7 @@ private:
 class DECLARATION : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(DECLARATION)
 	DECLARATION(string &s)	{name = s;}
 	CLONE(DECLARATION(name))
 	EXEC
@@ -768,6 +767,7 @@ public:
 class MEMBER : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(MEMBER)
 	MEMBER(string &s)	{name = s;}
 	CLONE(MEMBER(name))
 	EXEC
@@ -798,6 +798,7 @@ public:
 class LOCALINDEX : public OpCode
 {
 public:
+	PSL_MEMORY_MANAGER(LOCALINDEX)
 	LOCALINDEX(int i)	{x = i;}
 	CLONE(LOCALINDEX(x))
 	EXEC
