@@ -7,6 +7,7 @@ private:
 	class SharedBuffer
 	{
 	public:
+		PSL_MEMORY_MANAGER(SharedBuffer)
 		SharedBuffer(size_t t)	{Init(t);}
 		SharedBuffer(const char *s)				{size_t t = std::strlen(s);Init(t, t);fcopy(s, t);}
 		SharedBuffer(const char *s, size_t t)	{Init(t, t);copy(s);}
