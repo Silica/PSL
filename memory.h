@@ -151,7 +151,6 @@ class StaticObject
 {
 	struct sobj
 	{
-		const string destructor;
 		#define pool(s,n) MemoryPool<s> pool##n;
 		pool(8,8)
 		pool(12,12)
@@ -161,7 +160,6 @@ class StaticObject
 		#undef pool
 		SMemoryPool poolScope;
 		VMemoryPool vpool;
-		sobj():destructor("destructor"){}
 		~sobj()
 		{
 			vpool.GarbageCollection();
@@ -171,6 +169,7 @@ class StaticObject
 			delete envtemp_p();
 			#endif
 			delete rsvnull_p();
+			delete string_p();
 		}
 	};
 	friend struct sobj;
@@ -201,7 +200,6 @@ public:
 public:
 	static Environment &envtemp()	{return *envtemp_p();}
 	#endif
-public:
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	#define pool(s,n) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##n;}
 	pool(8,8)
@@ -214,9 +212,17 @@ public:
 	static VMemoryPool &vpool()		{return so().vpool;}
 	struct String
 	{
-		static const string &destructor()		{return so().destructor;}
+		const string d;
+		String():d("destructor"){}
+		static const string &destructor()		{return string_p()->d;}
 	};
 	friend struct String;
+private:
+	static String *string_p()
+	{
+		static String *str = new String;
+		return str;
+	}
 };
 
 #define MM(p) public:static void *Next(){return StaticObject::p.nextptr();}static void Release(void *ptr){StaticObject::p.release(ptr);}
