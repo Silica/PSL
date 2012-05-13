@@ -13,7 +13,7 @@ Luaとの比較>http://sky.geocities.jp/lordreamon/PSL/lua.htm
 
 includeするだけで使えるよ！
 BCC(古い)とVC(ちょっと前)とgcc(新しい)でコンパイル確認済み
-WindowでもLinuxでも使えます
+WindowsでもLinuxでも使えます
 
 ・C系構文
 ・動的型っぽいようなそうでもない様な
@@ -35,6 +35,8 @@ WindowでもLinuxでも使えます
 
 詳しい解説はwikiにて
 https://github.com/Silica/PSL/wiki/_pages
+またはWindows用バイナリと共にメモ的なtxtがあります
+https://skydrive.live.com/?cid=85BB9456A2A8D41D&id=85BB9456A2A8D41D!1939
 
 STG01はPSLを組み込みスクリプトとして活用したサンプルゲームです
 C++コードの一部も公開しています
