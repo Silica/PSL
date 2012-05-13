@@ -609,7 +609,8 @@ public:
 	public:
 		wstring(const wchar_t *ws)
 		{
-			int l = std::wcslen(ws);
+            using namespace std;
+			int l = wcslen(ws);
 			buf = new wsbuffer(l);
 			std::memcpy(buf->ws, ws, l*sizeof(wchar_t));
 			buf->setlen(l);
@@ -628,9 +629,10 @@ public:
 	};
 	string(const wchar_t *ws)
 	{
-		int l = std::wcslen(ws)*sizeof(wchar_t);
+        using namespace std;
+		int l = wcslen(ws)*sizeof(wchar_t);
 		buf = new SharedBuffer(l);
-		buf->setlen(std::wcstombs(buf->buffer(), ws, l));
+		buf->setlen(wcstombs(buf->buffer(), ws, l));
 	}
 	wstring w_str()	{return buf ? buf->c_str() : "";}
 };
