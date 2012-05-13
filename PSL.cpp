@@ -1,5 +1,5 @@
 
-#include "PSL.h"
+#include "PSL/PSL.h"
 
 #include <stdio.h>
 #ifdef _WIN32
@@ -42,23 +42,19 @@ int main(int argc, char **argv)
 	{
 		printf(" - compiled\n");
 
-	if (argc > 2)
-		p.WriteCompiledCode(argv[2]);
+		if (argc > 2)
+			p.WriteCompiledCode(argv[2]);
 
 #ifdef PSL_DEBUG
 		variable r;
 		while (!(r = p.StepExec())) if (getch() == 'q')break;
 #endif
-	clock_t start,end;
-	start = clock();
 		variable v = p.Run(argv[1]);
-	end = clock();
-	printf("PSL:%.2fsec\n",(double)(end-start)/CLOCKS_PER_SEC);
-//		printf(" - dump returned:\n");
-//		v.dump();
 	}
 
+	#ifdef _WIN32
 	printf("end - press any key\n");
 	getch();
+	#endif
 	return 0;
 }

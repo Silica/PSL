@@ -117,7 +117,7 @@ public:
 	void neg()	{x = -x;}
 
 	bool toBool()		const {return x;}
-	int toInt()			const {return x;}
+	int toInt()			const {return static_cast<int>(x);}
 	double toDouble()	const {return x;}
 	string toString()	const {return x;}
 
@@ -423,7 +423,7 @@ public:
 		for (int i = 0; i < size; ++i)
 			array[i].get()->searchcount(v, c);
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
-			member[it->first].get()->searchcount(v, c);
+			it->second.get()->searchcount(v, c);
 	}
 	void mark()
 	{
@@ -431,7 +431,7 @@ public:
 		for (int i = 0; i < size; ++i)
 			array[0].get()->mark();
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
-			member[it->first].get()->mark();
+			it->second.get()->mark();
 	}
 
 	vBase *substitution(Variable *v)

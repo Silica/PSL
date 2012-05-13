@@ -1,10 +1,13 @@
 // 詐欺コンパイラ
 // インタプリタ(これ自身)の後ろにバイトコードを埋め込む
-#include "PSL.h"
+#include "PSL/PSL.h"
 
 #include <stdio.h>
 #if _WIN32
 #include <conio.h>
+#define EXT ".exe"
+#else
+#define EXT ".out"
 #endif
 
 typedef unsigned long dword;
@@ -20,7 +23,7 @@ void compile(FILE *exe, const char *filename)
 	int period = exename.rfind('.');
 	if (period > 0)
 		exename /= period;
-	exename += ".exe";
+	exename += EXT;
 	FILE *fp = fopen(exename, "wb");
 	if (!fp)
 		return;
