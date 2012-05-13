@@ -3,7 +3,9 @@
 #include "PSL.h"
 
 #include <stdio.h>
+#if _WIN32
 #include <conio.h>
+#endif
 
 typedef unsigned long dword;
 using namespace PSL;
@@ -76,7 +78,9 @@ int main(int argc, char **argv)
 		for (int i = 0; i < argc; i++)
 			arg[i] = argv[i];
 		execute(exe, arg);
+#if _WIN32
 		getch();
+#endif
 	}
 
 	fclose(exe);
