@@ -218,6 +218,7 @@ private:
 class Code
 {
 public:
+	PSL_MEMORY_MANAGER(Code)
 	Code()	{rc = 1;}
 	~Code()
 	{

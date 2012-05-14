@@ -156,7 +156,8 @@ class StaticObject
 		pool(8,8)
 		pool(12,12)
 		pool(16,16)
-		pool(sizeof(Variable::Environment),Env)
+		pool(sizeof(Variable::Code),Co)
+		pool(sizeof(Environment),Env)
 		pool(sizeof(Variable::vObject),VO)
 		#undef pool
 		SMemoryPool poolScope;
@@ -207,7 +208,8 @@ public:
 	pool(8,8)
 	pool(12,12)
 	pool(16,16)
-	pool(sizeof(Variable::Environment),Env)
+	pool(sizeof(Variable::Code),Co)
+	pool(sizeof(Environment),Env)
 	pool(sizeof(Variable::vObject),VO)
 	#undef pool
 	static SMemoryPool &spool()		{return so().poolScope;}
