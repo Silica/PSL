@@ -51,7 +51,7 @@ private:
 		case INT:		PSL_PRINTF(("%d", static_cast<int>(v)));break;
 		case HEX:		PSL_PRINTF(("%X", static_cast<int>(v)));break;
 		case FLOAT:		PSL_PRINTF(("%f", static_cast<double>(v)));break;
-		case RARRAY:	PSL_PRINTF(("[tuple:%lu]", v.length()));break;
+		case RARRAY:	PSL_PRINTF(("[tuple:%u]", v.length()));break;
 		case THREAD:	PSL_PRINTF(("[thread:%s]", static_cast<bool>(v) ? "alive" : "dead"));break;
 		case BCFUNCTION:PSL_PRINTF(("[bind function]"));break;
 		case CCMETHOD:	PSL_PRINTF(("[bind method]"));break;

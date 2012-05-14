@@ -318,7 +318,7 @@ class VARIABLE : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(VARIABLE)
-	VARIABLE(string &s)	{name = s;}
+	VARIABLE(const string &s)	{name = s;}
 	CLONE(VARIABLE(name))
 	EXEC
 	{
@@ -619,7 +619,7 @@ class GOTO : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(GOTO)
-	GOTO(string &s)	{label = s;}
+	GOTO(const string &s)	{label = s;}
 	CLONE(GOTO(label))
 	EXEC
 	{
@@ -684,7 +684,7 @@ class LOCAL : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(LOCAL)
-	LOCAL(string &s)	{name = s;}
+	LOCAL(const string &s)	{name = s;}
 	CLONE(LOCAL(name))
 	EXEC
 	{
@@ -701,7 +701,7 @@ class GLOBAL : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(GLOBAL)
-	GLOBAL(string &s)	{name = s;}
+	GLOBAL(const string &s)	{name = s;}
 	CLONE(GLOBAL(name))
 	EXEC
 	{
@@ -718,7 +718,7 @@ class STATIC : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(STATIC)
-	STATIC(string &s)	{name = s;}
+	STATIC(const string &s)	{name = s;}
 	CLONE(STATIC(name))
 	EXEC
 	{
@@ -736,7 +736,7 @@ class DECLARATION : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(DECLARATION)
-	DECLARATION(string &s)	{name = s;}
+	DECLARATION(const string &s)	{name = s;}
 	CLONE(DECLARATION(name))
 	EXEC
 	{
@@ -768,7 +768,7 @@ class MEMBER : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(MEMBER)
-	MEMBER(string &s)	{name = s;}
+	MEMBER(const string &s)	{name = s;}
 	CLONE(MEMBER(name))
 	EXEC
 	{

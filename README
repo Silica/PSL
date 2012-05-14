@@ -12,7 +12,7 @@ C++側のコードを極めて簡単に書けるのが特徴
 Luaとの比較>http://sky.geocities.jp/lordreamon/PSL/lua.htm
 
 includeするだけで使えるよ！
-BCC(古い)とVC(ちょっと前)とgcc(新しい)でコンパイル確認済み
+BCC(古い)とVC(ちょっと前)とgcc(新しい)とclang(微妙)でコンパイル確認済み
 WindowsでもLinuxでも使えます
 
 ・C系構文

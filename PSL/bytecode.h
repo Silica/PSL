@@ -48,7 +48,7 @@ class bcreader
 		case OpCode::MNEMONIC::END:			return true;
 		case OpCode::MNEMONIC::PUSH_HEX:	v.pushcode(new PUSH_HEX(read<hex>(byte)));break;
 		case OpCode::MNEMONIC::PUSH_FLOAT:	v.pushcode(new PUSH_FLOAT(read<double>(byte)));break;
-		#define OPC_I(n) case OpCode::MNEMONIC::n:{v.pushcode(new n(read<int>(byte)));}break;
+		#define OPC_I(n) case OpCode::MNEMONIC::n:v.pushcode(new n(read<int>(byte)));break;
 			OPC_I(PUSH_INT)
 			OPC_I(JMP)
 			OPC_I(JT)
@@ -58,7 +58,7 @@ class bcreader
 			OPC_I(JRF)
 			OPC_I(LOCALINDEX)
 		#undef OPC_I
-		#define OPC_S(n) case OpCode::MNEMONIC::n:{string s = readString(byte);v.pushcode(new n(s));}break;
+		#define OPC_S(n) case OpCode::MNEMONIC::n:v.pushcode(new n(readString(byte)));break;
 			OPC_S(PUSH_STRING)
 			OPC_S(VARIABLE)
 			OPC_S(GOTO)
