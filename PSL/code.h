@@ -89,8 +89,7 @@ public:
 	CLONE(PUSH_NULL)
 	EXEC
 	{
-		variable v;
-		env.push(v);
+		env.push(variable());
 		return RC::NONE;
 	}
 	GET(CONSTANT)
@@ -173,8 +172,7 @@ public:
 	CLONE(NOT)
 	EXEC
 	{
-		variable v = env.pop();
-		variable x = !static_cast<bool>(v);
+		variable x = !env.pop().get()->toBool();
 		env.push(x);
 		return RC::NONE;
 	}
@@ -203,8 +201,7 @@ public:
 	EXEC
 	{
 		variable v = env.pop();
-		variable c = v;	// copy
-		env.push(c);
+		env.push(v.clone());
 		v += 1;
 		return RC::NONE;
 	}
@@ -233,8 +230,7 @@ public:
 	EXEC
 	{
 		variable v = env.pop();
-		variable c = v;	// copy
-		env.push(c);
+		env.push(v.clone());
 		v -= 1;
 		return RC::NONE;
 	}
@@ -321,8 +317,7 @@ public:
 	CLONE(VARIABLE(name))
 	EXEC
 	{
-		variable v = env.getVariable(name);
-		env.push(v);
+		env.push(env.getVariable(name));
 		return RC::NONE;
 	}
 	GET(VARIABLE)
@@ -365,8 +360,6 @@ public:
 	WRITE(BOR,)
 };
 
-
-
 class PUSH_CODE : public OpCode
 {
 public:
@@ -375,9 +368,7 @@ public:
 	CLONE(PUSH_CODE(x))
 	EXEC
 	{
-		variable v = x;
-		variable c = v;	// copy
-		env.push(c);
+		env.push(x.get()->clone());
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH CODE\n"));if (!d){x.get()->dump();PSL_PRINTF(("CODE END\n"));}})
@@ -403,7 +394,6 @@ public:
 	WRITE(CLOSURE,)
 };
 
-
 class JMP : public OpCode
 {
 public:
@@ -428,8 +418,7 @@ public:
 	CLONE(JT(j))
 	EXEC
 	{
-		variable v = env.pop();
-		if (static_cast<bool>(v))
+		if (env.pop().get()->toBool())
 			env.Jump(j);
 		return RC::NONE;
 	}
@@ -443,8 +432,7 @@ public:
 	CLONE(JF(j))
 	EXEC
 	{
-		variable v = env.pop();
-		if (!v)
+		if (!env.pop().get()->toBool())
 			env.Jump(j);
 		return RC::NONE;
 	}
@@ -472,8 +460,7 @@ public:
 	CLONE(JRT(j))
 	EXEC
 	{
-		variable v = env.pop();
-		if (static_cast<bool>(v))
+		if (env.pop().get()->toBool())
 			env.RJump(j);
 		return RC::NONE;
 	}
@@ -487,8 +474,7 @@ public:
 	CLONE(JRF(j))
 	EXEC
 	{
-		variable v = env.pop();
-		if (!v)
+		if (!env.pop().get()->toBool())
 			env.RJump(j);
 		return RC::NONE;
 	}
@@ -511,10 +497,7 @@ public:
 		}
 		else
 		{
-			variable ref(variable::RARRAY);
-			ref.push(l);
-			ref.push(r);
-			env.push(ref);
+			env.push(variable(l, r));
 		}
 		return RC::NONE;
 	}
@@ -640,8 +623,7 @@ public:
 	~SCOPE()	{statement->finalize();}
 	EXEC
 	{
-		Scope *s = new AnonymousScope(statement);
-		env.addScope(s);
+		env.addScope(new AnonymousScope(statement));
 		return RC::SCOPE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("SCOPE\n"));if (!d){statement->dump();PSL_PRINTF(("SCOPE END\n"));}})
@@ -658,8 +640,7 @@ public:
 	~LOOP()	{statement->finalize();}
 	EXEC
 	{
-		Scope *s = new LoopScope(statement, cline);
-		env.addScope(s);
+		env.addScope(new LoopScope(statement, cline));
 		return RC::LOOP;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("LOOP\n"));if (!d){statement->dump();PSL_PRINTF(("LOOP END\n"));}})
@@ -755,8 +736,7 @@ public:
 	CLONE(INSTANCE)
 	EXEC
 	{
-		variable v = env.pop();
-		v.prepareInstance(env);
+		env.pop().get()->prepareInstance(env);
 		return RC::CALL;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("INSTANCE\n"));})
@@ -771,8 +751,7 @@ public:
 	CLONE(MEMBER(name))
 	EXEC
 	{
-		variable v = env.pop();
-		env.push(v[name]);
+		env.push(env.pop().get()->child(name));
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("MEMBER %s\n", name.c_str()));})

@@ -451,6 +451,7 @@ private:
 		case '@':						return '@';
 
 //		case '\'':						return '\'';
+		case '\'':string_literal('\'');	return STRING;
 //		case '\\':						return '\\';
 //		case '`':						return '`';
 

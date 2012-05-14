@@ -222,6 +222,7 @@ private:
 		Variable(method f)			{rc = 1;x = new vCMethod(f, NULL);}
 		Variable(void *p)			{rc = 1;x = new vCPointer(p);}
 		Variable(Variable *v)		{rc = 1;x = new vPointer(v);}
+		Variable(Type t, int i)		{rc = 1;x = new vRArray(i);}
 		Variable(Type t){rc = 1;switch (t){
 			case NIL:		x = new vBase();break;
 			case INT:		x = new vInt(0);break;
@@ -478,15 +479,25 @@ public:
 	variable instance()										{PSL_TEMPORARY_ENV(env);return x->instance(env);}
 	#define cva(n) const variable &arg##n
 	#define ap(n) arg.push(arg##n);
-	#define CALL(z,y) variable operator()z{variable arg = RARRAY;y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
+	#define CALL(z,y) variable operator()z{variable arg(RARRAY);y PSL_TEMPORARY_ENV(env);return x->call(env, arg);}
 	CALL((cva(1),cva(2)),								ap(1)ap(2))
 	CALL((cva(1),cva(2),cva(3)),						ap(1)ap(2)ap(3))
 	CALL((cva(1),cva(2),cva(3),cva(4)),					ap(1)ap(2)ap(3)ap(4))
 	CALL((cva(1),cva(2),cva(3),cva(4),cva(5)),			ap(1)ap(2)ap(3)ap(4)ap(5))
 	CALL((cva(1),cva(2),cva(3),cva(4),cva(5),cva(6)),	ap(1)ap(2)ap(3)ap(4)ap(5)ap(6))
-	#undef cva
-	#undef ap
 	#undef CALL
+	#undef ap
+
+	#define ap(n) x->push(arg##n.x);
+	#define LIST(n,z,y) variable z{x = new Variable(RARRAY, n);y}
+	LIST(2,(cva(1),cva(2)),								ap(1)ap(2))
+	LIST(3,(cva(1),cva(2),cva(3)),						ap(1)ap(2)ap(3))
+	LIST(4,(cva(1),cva(2),cva(3),cva(4)),				ap(1)ap(2)ap(3)ap(4))
+	LIST(5,(cva(1),cva(2),cva(3),cva(4),cva(5)),		ap(1)ap(2)ap(3)ap(4)ap(5))
+	LIST(6,(cva(1),cva(2),cva(3),cva(4),cva(5),cva(6)),	ap(1)ap(2)ap(3)ap(4)ap(5)ap(6))
+	#undef LIST
+	#undef ap
+	#undef cva
 
 	template<class F>variable(Function z, F f)	{x = new Variable(z, f);}
 	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}

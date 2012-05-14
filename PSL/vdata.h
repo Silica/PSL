@@ -613,8 +613,7 @@ public:
 		else
 		{
 			env.addScope(new ConstructorScope(code, v, x.get()));
-			variable z;
-			env.push(z);
+			env.push(variable());
 		}
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
@@ -632,8 +631,7 @@ public:
 		if (!code)
 			return x;
 		env.addScope(new ConstructorScope(code, v, x.get()));
-		variable z;
-		env.push(z);
+		env.push(variable());
 		env.Run();
 		return env.pop();
 	}
