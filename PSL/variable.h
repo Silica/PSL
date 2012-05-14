@@ -152,7 +152,11 @@ public:
 	operator long()				const	{return x->toInt();}
 	operator unsigned long()	const	{return x->toInt();}
 	operator __int64()			const	{return x->toInt();}
+	#ifdef __clang__
+	operator unsigned long long()	const	{return x->toInt();}
+	#else
 	operator unsigned __int64()	const	{return x->toInt();}
+	#endif
 	operator float()		const	{return x->toDouble();}
 	operator long double()	const	{return x->toDouble();}
 	operator string()		const	{return x->toString();}
