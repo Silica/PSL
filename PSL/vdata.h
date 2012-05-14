@@ -31,6 +31,7 @@ public:
 	CMP(gt,>)
 	#undef CMP
 	void neg()	{x = -x;}
+	void Compl(){x = ~x;}
 
 	bool toBool()		const {return x;}
 	int toInt()			const {return x;}
@@ -77,6 +78,7 @@ public:
 	CMP(gt,>)
 	#undef CMP
 	void neg()	{x = ~x + 1;}
+	void Compl(){x = ~x;}
 
 	bool toBool()		const {return x;}
 	int toInt()			const {return x;}

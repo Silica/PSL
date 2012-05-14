@@ -189,8 +189,7 @@ public:
 	EXEC
 	{
 		variable v = env.pop();
-		variable x(~static_cast<int>(v));
-		env.push(x);
+		env.push(~v);
 		return RC::NONE;
 	}
 	GET(UNARY)

@@ -88,7 +88,7 @@ public:
 	Type type()			const	{return x->type();}
 	bool type(Type t)	const	{return x->type() == t;}
 
-	variable clone()	const	{variable v = *this;return v;}
+	variable clone()	const	{return *this;}
 	variable &substitution(const variable &v)	{x->substitution(v.x);return *this;}
 	variable &assignment(const variable &v)		{x->assignment(v.x);return *this;}
 	variable &operator=(const variable &v)		{x->substitution(v.x);return *this;}
@@ -132,8 +132,7 @@ public:
 	variable operator+();
 	variable operator-()	const {variable v = *this;v.x->neg();return v;}
 	variable operator*()	const {return x->deref();}
-//	variable operator&();	// vPointer‚Ìˆ×‚ÉŽg‚¢‚½‚¢‚ªA‚±‚ê‚ð‚â‚é‚Ì‚Í‚¿‚å‚Á‚Æc
-	variable operator~();
+	variable operator~()	const {variable v = *this;v.x->Compl();return v;}
 	bool operator!()	const {return !x->toBool();}
 	variable &operator++();
 	variable &operator--();
@@ -309,6 +308,7 @@ private:
 		CMP(gt)
 		#undef CMP
 		void neg()	{x->neg();}
+		void Compl(){x->Compl();}
 		Variable *deref()	{Variable *v = x->deref();return v ? v : this;}
 
 		bool toBool()		const {return x->toBool();}
@@ -381,6 +381,7 @@ private:
 			CMP(gt)
 			#undef CMP
 			virtual void neg()	{}
+			virtual void Compl(){}
 			virtual Variable *deref()	{return NULL;}
 
 			virtual bool toBool()		const {return false;}
