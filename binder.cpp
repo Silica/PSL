@@ -16,19 +16,10 @@ double rfunc(int i)
 class MyClass
 {
 public:
-	MyClass(int i){member = i;}
-	int getInt()
-	{
-		return member;
-	}
-	double getFloat()
-	{
-		return member;
-	}
-	void setMember(int i)
-	{
-		member = i;
-	}
+	MyClass(int i)			{member = i;}
+	int getInt()			{return member;}
+	double getFloat()		{return member;}
+	void setMember(int i)	{member = i;}
 private:
 	int member;
 };
@@ -37,15 +28,15 @@ int main(void)
 {
 	using namespace PSL;
 	PSLVM p;
-	if (PSLVM::error e = p.LoadScript("sample/binder.psl"))
+	if (p.LoadScript("sample/binder.psl"))
 	{
 		printf(" - compile error\n");
 		return 1;
 	}
 
 	MyClass instance(1024);
-	p.addFunction("cfunc", &cfunc);
-	p.addFunction("rfunc", &rfunc);
+	p.addFunction("cfunc", &cfunc)
+		("rfunc", &rfunc);
 	p.addClass<MyClass>("MyClass")
 		("getInt", &MyClass::getInt)
 		("getFloat", &MyClass::getFloat)
