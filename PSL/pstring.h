@@ -1,7 +1,7 @@
 class string
 {
 public:
-	static int min(int x, int y)	{return (x < y) ? x : y;}
+	static int min_i(int x, int y)	{return (x < y) ? x : y;}
 	static bool empty(const char *s){return s == NULL || s[0] == 0;}
 private:
 	class SharedBuffer
@@ -16,7 +16,7 @@ private:
 		SharedBuffer *clone(size_t t)
 		{
 			SharedBuffer *c = new SharedBuffer(t);
-			c->fcopy(buf, min(len, t));
+			c->fcopy(buf, min_i(len, t));
 			return c;
 		}
 		void copy(const char *s)
@@ -328,7 +328,7 @@ public:
 		if (buf == s.buf)	return true;
 		if (!buf)			return true;
 		if (!s.buf)			return false;
-		size_t max = min(buf->length(), s.buf->length());
+		size_t max = min_i(buf->length(), s.buf->length());
 		for (size_t t = 0; t < max; ++t)
 		{
 			if (buf->at(t) < s.buf->at(t))	return true;
@@ -342,7 +342,7 @@ public:
 		if (buf == s.buf)	return true;
 		if (!buf)			return false;
 		if (!s.buf)			return true;
-		size_t max = min(buf->length(), s.buf->length());
+		size_t max = min_i(buf->length(), s.buf->length());
 		for (size_t t = 0; t < max; ++t)
 		{
 			if (buf->at(t) < s.buf->at(t))	return false;
