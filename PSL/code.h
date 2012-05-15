@@ -368,7 +368,8 @@ public:
 	CLONE(PUSH_CODE(x))
 	EXEC
 	{
-		env.push(x.get()->clone());
+		variable v = x;
+		env.push(v.clone());
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH CODE\n"));if (!d){x.get()->dump();PSL_PRINTF(("CODE END\n"));}})
