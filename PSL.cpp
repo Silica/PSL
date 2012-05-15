@@ -7,7 +7,6 @@
 #else
 #define getch getchar
 #endif
-#include <time.h>
 
 int main(int argc, char **argv)
 {
@@ -16,8 +15,7 @@ int main(int argc, char **argv)
 
 	using namespace PSL;
 	PSLVM p;
-	PSLVM::error e = p.LoadScript(argv[1]);
-	if (e)
+	if (PSLVM::error e = p.LoadScript(argv[1]))
 	{
 		if (e == PSLVM::FOPEN_ERROR)
 		{

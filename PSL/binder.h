@@ -1,4 +1,5 @@
 #define FV(n,t,g) class vBCFunctionV##n:public vBase{void(*x)t;public:vBCFunctionV##n(void(*f)t){x=f;}\
+	PSL_MEMORY_MANAGER(vBCFunctionV##n)\
 	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionV##n(x);}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
 	void prepare(Environment &env, Variable *v){variable a = env.pop();x g;env.push(a);}\
@@ -12,6 +13,7 @@ template<class A0,class A1,class A2,class A3,class A4>FV(5,(A0,A1,A2,A3,A4),(a[0
 template<class A0,class A1,class A2,class A3,class A4,class A5>FV(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
 #undef FV
 #define FR(n,t,g) class vBCFunctionR##n:public vBase{R(*x)t;public:vBCFunctionR##n(R(*f)t){x=f;}\
+	PSL_MEMORY_MANAGER(vBCFunctionR##n)\
 	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionR##n(x);}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
 	void prepare(Environment &env, Variable *v){variable a = env.pop();variable r = x g;env.push(r);}\
@@ -53,6 +55,7 @@ template<class R, class A0, class A1, class A2, class A3, class A4, class A5>
 static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0,A1,A2,A3,A4,A5>(f);}
 
 #define MV(n,t,g) class vCCMethodV##n : public vBase{void(C::*x)t;Variable *this_v;public:\
+	PSL_MEMORY_MANAGER(vCCMethodV##n)\
 	vCCMethodV##n(void(C::*m)t){x=m;this_v=NULL;}vBase *clone(){return new vCCMethodV##n(x);}\
 	Type type()const{return CCMETHOD;}void push(Variable *v){this_v=v;}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
@@ -67,6 +70,7 @@ template<class C, class A0, class A1, class A2, class A3, class A4>MV(5,(A0,A1,A
 template<class C, class A0, class A1, class A2, class A3, class A4, class A5>MV(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
 #undef MV
 #define MR(n,t,g) class vCCMethodR##n : public vBase{R(C::*x)t;Variable *this_v;public:\
+	PSL_MEMORY_MANAGER(vCCMethodR##n)\
 	vCCMethodR##n(R(C::*m)t){x=m;this_v=NULL;}vBase *clone(){return new vCCMethodR##n(x);}\
 	Type type()const{return CCMETHOD;}void push(Variable *v){this_v=v;}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
