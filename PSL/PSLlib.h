@@ -561,6 +561,10 @@ private:
 			v["sin"] = Sin;
 			v["cos"] = Cos;
 			v["tan"] = Tan;
+			v["asin"] = ASin;
+			v["acos"] = ACos;
+			v["atan"] = ATan;
+			v["atan2"] = ATan2;
 		}
 	private:
 		static variable Abs(variable &v)	{return std::abs(static_cast<int>(v));}
@@ -571,5 +575,9 @@ private:
 		static variable Sin(variable &v)	{return std::sin(static_cast<double>(v));}
 		static variable Cos(variable &v)	{return std::cos(static_cast<double>(v));}
 		static variable Tan(variable &v)	{return std::tan(static_cast<double>(v));}
+		static variable ASin(variable &v)	{return std::asin(static_cast<double>(v));}
+		static variable ACos(variable &v)	{return std::acos(static_cast<double>(v));}
+		static variable ATan(variable &v)	{return std::atan(static_cast<double>(v));}
+		static variable ATan2(variable &v)	{return std::atan2(static_cast<double>(v[0]), static_cast<double>(v[1]));}
 	};
 };
