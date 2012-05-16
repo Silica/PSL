@@ -93,6 +93,7 @@ public:
 	variable &assignment(const variable &v)		{x->assignment(v.x);return *this;}
 	variable &operator=(const variable &v)		{x->substitution(v.x);return *this;}
 	variable &operator->*(const variable &v)	{x->assignment(v.x);return *this;}		// ‰½‚¹—]‚Á‚Ä‚é‰‰ŽZŽq‚ª‚±‚ê‚È‚Ì‚Åc
+	variable &operator=(const rsv &v)			{x->finalize();x = v.get()->ref();return *this;}
 
 	variable &operator=(function f)		{
 		if (f == NULL)
