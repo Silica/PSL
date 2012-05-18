@@ -166,7 +166,7 @@ private:
 		PSL_PRINTF(("error %s %d: comment not closed from %d\n", filename.c_str(), line, l));
 		++i;
 	}
-	void string_literal(char end = '"')
+	void string_literal(char end = '"', bool escape = true)
 	{
 		int h = i;
 		nstr = "";
@@ -178,7 +178,7 @@ private:
 				++i;
 				return;
 			}
-			if (s[i] == '\\')
+			if (escape && s[i] == '\\')
 			{
 				nstr += string(s+h, i-h);
 				h = i;
@@ -450,8 +450,7 @@ private:
 		case '$':						return '$';
 		case '@':						return '@';
 
-//		case '\'':						return '\'';
-		case '\'':string_literal('\'');	return STRING;
+		case '\'':string_literal('\'', false);	return STRING;
 //		case '\\':						return '\\';
 //		case '`':						return '`';
 
