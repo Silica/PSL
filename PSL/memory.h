@@ -152,9 +152,14 @@ class StaticObject
 	struct sobj
 	{
 		#define pool(s,n) MemoryPool<s> pool##n;
+		#if defined(__x86_64__) || defined(_WIN64)
+		pool(24,24)
+		pool(32,32)
+		#else
 		pool(4,4)
-		pool(8,8)
 		pool(12,12)
+		#endif
+		pool(8,8)
 		pool(16,16)
 		pool(sizeof(Variable::Code),Co)
 		pool(sizeof(Environment),Env)
@@ -204,9 +209,14 @@ public:
 	#endif
 	static rsv &rsvnull()			{return *rsvnull_p();}
 	#define pool(s,n) static MemoryPool<s> &pool(OverLoad<s> x)	{return so().pool##n;}
+	#if defined(__x86_64__) || defined(_WIN64)
+	pool(24,24)
+	pool(32,32)
+	#else
 	pool(4,4)
-	pool(8,8)
 	pool(12,12)
+	#endif
+	pool(8,8)
 	pool(16,16)
 	pool(sizeof(Variable::Code),Co)
 	pool(sizeof(Environment),Env)
