@@ -1,5 +1,3 @@
-#define OBJECT_SIZE 32
-
 template<size_t S> class OverLoad{};
 template<size_t S, int poolsize = 256> class MemoryPool
 {
@@ -244,5 +242,3 @@ class VMemoryManager{MM(vpool())};
 class SMemoryManager{MM(spool())};
 template<size_t S> class MemoryManager{MM(pool(OverLoad<S>()))};
 #undef MM
-
-#undef OBJECT_SIZE

@@ -597,9 +597,7 @@ private:
 				c.pushcode(oc);
 				int b = c.codelength();
 				getexp9(c);
-				c.pushcode(new Variable::JR(1));
 				oc->set(c.codelength() - b);
-				c.pushcode(new Variable::PUSH_INT(1));
 			}
 			#else
 			EXP(Tokenizer::BOR, 9, BOR)
