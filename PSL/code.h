@@ -461,11 +461,10 @@ public:
 	CLONE(JRT(j))
 	EXEC
 	{
-		if (variable v = env.pop())
-		{
-			env.push(v);
+		if (env.top().get()->toBool())
 			env.RJump(j);
-		}
+		else
+			env.pop();
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("JRT %d\n", j));})
