@@ -397,8 +397,10 @@ public:
 			#endif
 		PSL_CONST_STATIC string destructor = "destructor";
 		#endif
-		Type t;
-		if (member.count(destructor) && ((t = member[destructor].get()->type()) == METHOD || t == CMETHOD || t == CCMETHOD))
+		if (!member.count(destructor))
+			return;
+		Type t = member[destructor].get()->type();
+		if (t == METHOD || t == CMETHOD || (t == CCMETHOD && array.size()))
 		{
 			PSL_TEMPORARY_ENV(env);
 			variable arg;
@@ -441,6 +443,7 @@ public:
 		if (!toBool())
 		{
 			vBase *x = v->bclone();
+			destructor();
 			delete this;
 			return x;
 		}
@@ -467,6 +470,7 @@ public:
 		if (!toBool() || (v->type() != OBJECT && v->type() != RARRAY))
 		{
 			vBase *x = v->bclone();
+			destructor();
 			delete this;
 			return x;
 		}
