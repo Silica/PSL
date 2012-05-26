@@ -5,7 +5,56 @@ public:
 	MemoryPool()	{current = p.ptr;}
 	void *nextptr()
 	{
-		if (current == NULL)
+		if (!current)
+			current = p.add();
+		DATA *c = current;
+		current = c->next;
+		return c;
+	}
+	void release(void *x)
+	{
+		DATA *c = static_cast<DATA*>(x);
+		c->next = current;
+		current = c;
+	}
+private:
+	union DATA
+	{
+		char s[S];
+		DATA *next;
+	};
+	DATA *current;
+	struct pool
+	{
+		DATA ptr[poolsize];
+		pool *next;
+		pool()	{next = NULL;
+			for (DATA *p = ptr; p != ptr+poolsize;)
+			{
+				DATA *c = p;
+				c->next = ++p;
+			}
+			ptr[poolsize-1].next = NULL;
+		}
+		~pool()	{delete next;}
+		DATA *add()
+		{
+			pool *n = new pool;
+			if (next)
+				n->next = next;
+			next = n;
+			return next->ptr;
+		}
+	} p;
+};
+class VMemoryPool
+{
+public:
+	const static int poolsize = 256;
+	VMemoryPool()	{current = p.ptr;}
+	void *nextptr()
+	{
+		if (!current)
 			current = p.add();
 		DATA *c = current;
 		current = c->next;
@@ -18,11 +67,23 @@ public:
 		c->next = current;
 		current = c;
 	}
-protected:
-	const static int psize = poolsize;
+	void GarbageCollection()
+	{
+		#ifdef PSL_SHARED_GLOBAL
+		StaticObject::global().get()->mark();
+		#endif
+		Mark();
+		#ifdef PSL_USE_DESTRUCTOR
+		Destructor();
+		#endif
+		Delete();
+		UnMark();
+		ReleaseEmpty();
+	}
+private:
 	union DATA
 	{
-		char s[S];
+		char s[sizeof(Variable)];
 		struct
 		{
 			int x;
@@ -59,25 +120,7 @@ protected:
 			return true;
 		}
 	} p;
-};
-class VMemoryPool : public MemoryPool<sizeof(Variable)>
-{
-public:
-	void GarbageCollection()
-	{
-		#ifdef PSL_SHARED_GLOBAL
-		StaticObject::global().get()->mark();
-		#endif
-		Mark();
-		#ifdef PSL_USE_DESTRUCTOR
-		Destructor();
-		#endif
-		Delete();
-		UnMark();
-		ReleaseEmpty();
-	}
-private:
-	#define POOLOOP for (pool *pl = &p; pl != NULL; pl = pl->next)for (int i = 0; i < psize; ++i)if (pl->ptr[i].x)
+	#define POOLOOP for (pool *pl = &p; pl != NULL; pl = pl->next)for (int i = 0; i < poolsize; ++i)if (pl->ptr[i].x)
 	void searchcount(Variable *v, int &c)
 	{
 		POOLOOP
@@ -134,7 +177,7 @@ class SMemoryPool : public MemoryPool<sizeof(Variable::MethodScope),256>
 public:
 	void *nextptr()
 	{
-		if (current == NULL)
+		if (!current)
 			throw PSLException(PSLException::Scope);
 		DATA *c = current;
 		current = c->next;

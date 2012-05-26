@@ -82,12 +82,10 @@ public:
 	{
 		if (t > res)
 		{
-			if (res*2 > t)
-				t = res * 2;
-			T *n = new T[t];
+			res = (res*2 > t) ? res*2: t;
+			T *n = new T[res];
 			for (size_t i = 0; i < len; ++i)
 				n[i] = x[i];
-			res = t;
 			delete[] x;
 			x = n;
 		}

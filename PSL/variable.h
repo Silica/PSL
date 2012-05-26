@@ -236,7 +236,7 @@ private:
 			default:		x = new vObject();break;
 		}}
 		#ifdef PSL_USE_DESTRUCTOR
-		void finalize()		{if (!--rc)	{rc=0x80000000;x->destructor();delete this;}}
+		void finalize()		{if (rc==1)	{x->destructor();delete this;}else --rc;}
 		#else
 		void finalize()		{if (!--rc)	delete this;}
 		#endif
