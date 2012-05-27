@@ -450,24 +450,20 @@ private:
 	void gset(const variable &v)	{x->gset(v.x);}
 
 	void prepare(Environment &env)			{x->prepare(env);}
-	void prepareInstance(Environment &env)	{x->prepareInstance(env);}
 
 	size_t codelength()					{return x->codelength();}
 	Variable::Code *getcode()			{return x->getcode();}
 	void pushcode(Variable::OpCode *c)	{return x->pushcode(c);}
 	void pushlabel(const string &s)		{return x->pushlabel(s);}
 	friend class PSLVM;
-	friend class PSLlib;
 	friend class Parser;
 	friend class Variable::vBase;
 	friend class Variable::vCMethod;
 	friend class Variable::CALL;
-	friend class Variable::INSTANCE;
 	friend class Variable::bcreader;
 	friend class Variable::Code;
 public:
 	typedef Variable::bytecode buffer;
-	variable(variable::Variable::Code *c)	{x = new Variable(c);}
 	rsv ref()		const	{return x;}
 	rsv pointer()	const	{return variable(POINTER, x);}
 

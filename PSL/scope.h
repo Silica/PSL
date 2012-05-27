@@ -2,7 +2,6 @@ class AnonymousScope : public Scope
 {
 public:
 	AnonymousScope(Code *statement) : Scope(statement)	{}
-	virtual Type getType()	{return ANONYMOUS;}
 	virtual Scope *clone()
 	{
 		AnonymousScope *s = new AnonymousScope(code);
@@ -36,7 +35,6 @@ class LoopScope : public Scope
 {
 public:
 	LoopScope(Code *statement, int c) : Scope(statement)	{cline = c;}
-	virtual Type getType()	{return LOOP;}
 	virtual Scope *clone()
 	{
 		LoopScope *s = new LoopScope(code, cline);
@@ -70,7 +68,6 @@ class FunctionScope : public Scope
 {
 public:
 	FunctionScope(Code *statement, Variable *v) : Scope(statement),static_v(v)	{}
-	virtual Type getType()	{return FUNCTION;}
 	virtual Scope *clone()
 	{
 		FunctionScope *s = new FunctionScope(code, static_v.get());
@@ -147,7 +144,6 @@ class MethodScope : public FunctionScope
 {
 public:
 	MethodScope(Code *statement, Variable *s, Variable *t) : FunctionScope(statement, s),this_v(t)	{}
-	virtual Type getType()	{return METHOD;}
 	virtual Scope *clone()
 	{
 		MethodScope *s = new MethodScope(code, static_v.get(), this_v.get());
@@ -175,7 +171,6 @@ class ConstructorScope : public MethodScope
 {
 public:
 	ConstructorScope(Code *statement, Variable *s, Variable *t) : MethodScope(statement, s, t)	{}
-	virtual Type getType()	{return CONSTRUCTOR;}
 	Scope *End(Environment &env)
 	{
 		Scope *s = owner;

@@ -49,7 +49,6 @@ private:
 		size_t size;
 		size_t len;
 	public:
-		int reference()		const{return rc;}
 		bool shared()		const{return rc != 1;}
 		char *buffer()		const{return buf;}
 		char at(size_t t)	const{return buf[t];}
@@ -557,23 +556,23 @@ public:
 private:
 	void setint(int i, int c = 0)
 	{
-		char *b = buf->buffer();
+		char *b = buf->buffer() + c;
 		if (i < 0)
 		{
-			b[c++] = MINUS;
+			*b++ = MINUS;
 			i = -i;
 		}
-		if (i > 999999999)	b[c++] = (char)(i/1000000000 %10 + ZERO);
-		if (i > 99999999)	b[c++] = (char)(i/100000000  %10 + ZERO);
-		if (i > 9999999)	b[c++] = (char)(i/10000000   %10 + ZERO);
-		if (i > 999999)		b[c++] = (char)(i/1000000    %10 + ZERO);
-		if (i > 99999)		b[c++] = (char)(i/100000     %10 + ZERO);
-		if (i > 9999)		b[c++] = (char)(i/10000      %10 + ZERO);
-		if (i > 999)		b[c++] = (char)(i/1000       %10 + ZERO);
-		if (i > 99)			b[c++] = (char)(i/100        %10 + ZERO);
-		if (i > 9)			b[c++] = (char)(i/10         %10 + ZERO);
-							b[c++] = (char)(i            %10 + ZERO);
-		buf->setlen(c);
+		if (i > 999999999)	*b++ = (char)(i/1000000000 %10 + ZERO);
+		if (i > 99999999)	*b++ = (char)(i/100000000  %10 + ZERO);
+		if (i > 9999999)	*b++ = (char)(i/10000000   %10 + ZERO);
+		if (i > 999999)		*b++ = (char)(i/1000000    %10 + ZERO);
+		if (i > 99999)		*b++ = (char)(i/100000     %10 + ZERO);
+		if (i > 9999)		*b++ = (char)(i/10000      %10 + ZERO);
+		if (i > 999)		*b++ = (char)(i/1000       %10 + ZERO);
+		if (i > 99)			*b++ = (char)(i/100        %10 + ZERO);
+		if (i > 9)			*b++ = (char)(i/10         %10 + ZERO);
+							*b++ = (char)(i            %10 + ZERO);
+		buf->setlen(b-buf->buffer());
 	}
 	void only_and_extend(size_t t)
 	{

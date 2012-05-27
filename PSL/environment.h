@@ -454,18 +454,8 @@ public:
 	static void *operator new(size_t t)		{return SMemoryManager::Next();}
 	static void operator delete(void *ptr)	{SMemoryManager::Release(ptr);}
 #endif
-	enum Type
-	{
-		NONE,
-		ANONYMOUS,
-		LOOP,
-		FUNCTION,
-		CONSTRUCTOR,
-		METHOD,
-	};
 	Scope(Code *c)			{code = c->inc();line = 0;owner = NULL;}
 	virtual ~Scope()		{code->finalize();delete owner;}
-	virtual Type getType()	{return NONE;}
 	virtual Scope *clone() = 0;
 	virtual Variable *getVariable(const string &name)
 	{
