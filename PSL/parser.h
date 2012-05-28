@@ -150,7 +150,7 @@ private:
 			}
 		}
 		variable x;
-		if (!t->getNextIf( /*'('*/')'))
+		if (!t->getNextIf(/*'('*/')'))
 			ParseExpression(x, /*'('*/')');
 		ParseDangling(g, v);
 		int cline = v.codelength();

@@ -534,21 +534,30 @@ public:
 	{
 		variable r = env.pop();
 		variable v = env.pop();
-		rsv z;
+		env.push(r);
+		#ifdef PSL_OPTIMIZE_TAILCALL
 		Type t = v.type();
+		MNEMONIC::mnemonic n = env.getNext();
 		if (t == CMETHOD || t == METHOD)
-			z = v[1];
+		{
+			rsv z = v[1];
 /*		メソッドはthisを束縛しない為、メソッド呼び出しで末尾最適化がかかると
 		スコープに割り付けられたローカルオブジェクト(this)が破棄されながらメソッドが呼び出されてしまう
 		メソッドスコープはthisを束縛するので次のスコープを作ってしまえば問題ない
 		その為ここで一時的にthisを保持しておく */
-		env.push(r);
-		#ifdef PSL_OPTIMIZE_TAILCALL
-		MNEMONIC::mnemonic n = env.getNext();
-		if (n == MNEMONIC::RETURN)	env.Return();
-		else if (n == MNEMONIC::END)env.endScope();
+			if (n == MNEMONIC::RETURN)	env.Return();
+			else if (n == MNEMONIC::END)env.endScope();
+			v.prepare(env);
+		}
+		else
 		#endif
-		v.prepare(env);
+		{
+			#ifdef PSL_OPTIMIZE_TAILCALL
+			if (n == MNEMONIC::RETURN)	env.Return();
+			else if (n == MNEMONIC::END)env.endScope();
+			#endif
+			v.prepare(env);
+		}
 		return RC::CALL;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("CALL\n"));})
