@@ -95,8 +95,9 @@ private:
 		Variable::OpCode *oc = NULL;
 		if (l)
 		{
-			oc = new Variable::JF(l);
+			oc = new Variable::JRF(0);
 			v.pushcode(oc);
+			l = v.codelength();
 		}
 		else
 		{
@@ -107,16 +108,17 @@ private:
 		{
 			t->getNext();
 			if (oc)
-				oc->set(v.codelength()+1);
-			oc = new Variable::JMP(0);
+				oc->set(v.codelength()+1-l);
+			oc = new Variable::JR(0);
+			l = v.codelength();
 			v.pushcode(oc);
 			ParseDangling(g, v);
-			oc->set(v.codelength());
+			oc->set(v.codelength() - l);
 		}
 		else
 		{
 			if (oc)
-				oc->set(v.codelength());
+				oc->set(v.codelength()-l);
 		}
 		if (Variable::Code *x = v.getcode())
 		{

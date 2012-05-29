@@ -443,7 +443,9 @@ public:
 		if (!toBool())
 		{
 			vBase *x = v->bclone();
+			#ifdef PSL_USE_DESTRUCTOR
 			destructor();
+			#endif
 			delete this;
 			return x;
 		}
@@ -470,7 +472,9 @@ public:
 		if (!toBool() || (v->type() != OBJECT && v->type() != RARRAY))
 		{
 			vBase *x = v->bclone();
+			#ifdef PSL_USE_DESTRUCTOR
 			destructor();
+			#endif
 			delete this;
 			return x;
 		}

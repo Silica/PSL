@@ -161,6 +161,8 @@ private:
 		Tokenizer t(s.c_str(), "eval", 0);
 		Parser p(&t);
 		p.Parse(g);
+		if (p.getErrorNum())
+			return variable();
 		return g;
 	}
 	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER

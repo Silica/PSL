@@ -166,7 +166,7 @@ public:
 	{
 		if (!env.Runable())
 		{
-			if (stack.size())
+			if (env.stack.size())
 				return env.pop();
 			return variable(1);
 		}
