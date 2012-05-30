@@ -556,23 +556,25 @@ public:
 private:
 	void setint(int i, int c = 0)
 	{
-		char *b = buf->buffer() + c;
+		char *b = buf->buffer();
 		if (i < 0)
 		{
-			*b++ = MINUS;
+			b[c++] = MINUS;
 			i = -i;
 		}
-		if (i > 999999999)	*b++ = (char)(i/1000000000 %10 + ZERO);
-		if (i > 99999999)	*b++ = (char)(i/100000000  %10 + ZERO);
-		if (i > 9999999)	*b++ = (char)(i/10000000   %10 + ZERO);
-		if (i > 999999)		*b++ = (char)(i/1000000    %10 + ZERO);
-		if (i > 99999)		*b++ = (char)(i/100000     %10 + ZERO);
-		if (i > 9999)		*b++ = (char)(i/10000      %10 + ZERO);
-		if (i > 999)		*b++ = (char)(i/1000       %10 + ZERO);
-		if (i > 99)			*b++ = (char)(i/100        %10 + ZERO);
-		if (i > 9)			*b++ = (char)(i/10         %10 + ZERO);
-							*b++ = (char)(i            %10 + ZERO);
-		buf->setlen(b-buf->buffer());
+		#define C(n) if (i >= n)b[c++] = (char)(i/n%10+ZERO);
+		C(1000000000)
+		C(100000000)
+		C(10000000)
+		C(1000000)
+		C(100000)
+		C(10000)
+		C(1000)
+		C(100)
+		C(10)
+		#undef C
+		b[c++] = (char)(i%10 + ZERO);
+		buf->setlen(c);
 	}
 	void only_and_extend(size_t t)
 	{
