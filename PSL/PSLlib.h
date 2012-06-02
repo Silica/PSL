@@ -214,7 +214,8 @@ private:
 			{
 				if ((i = s.find(c, i)) < 0)
 					break;
-				r.push(s.substr(prev, i-prev));
+				if (i-prev)	r.push(s.substr(prev, i-prev));
+				else		r.push(string());
 				prev = i+1;
 			}
 			r.push(s.substr(prev));
