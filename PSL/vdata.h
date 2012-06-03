@@ -967,7 +967,8 @@ public:
 	string toString()	const {return "[Thread]";}
 
 	size_t length()		const {return x ? 1 : 0;}
-	Variable *child(const string &s)	{return e ? e->getVariable(s).get() : NULL;}
+	Variable *index(size_t t)			{return t ? x : NULL;}
+	Variable *child(const string &s)	{return (e && e->Runable()) ? e->getVariable(s).get() : NULL;}
 
 	void prepare(Environment &env, Variable *v)
 	{
