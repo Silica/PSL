@@ -208,6 +208,9 @@ public:
 		return stack.top();
 	}
 	bool Runable()	{return scope;}
+	#ifdef PSL_MEMBER_REGISTER
+	rsv reg;
+	#endif
 private:
 	rsv global;
 	rstack stack;

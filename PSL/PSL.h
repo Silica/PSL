@@ -39,6 +39,7 @@
 #define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
 #define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
+//#define PSL_MEMBER_REGISTER		// メンバアクセスした際に親をレジスタに保存する(メソッドチェーン用)
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ PSLライブラリ関数GarbageCollectionを利用可能になる
 #define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする

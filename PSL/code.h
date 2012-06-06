@@ -76,7 +76,11 @@ public:
 	CLONE(POP)
 	EXEC
 	{
+		#ifdef PSL_MEMBER_REGISTER
+		env.reg = env.pop();
+		#else
 		env.pop();
+		#endif
 		return RC::NONE;
 	}
 	GET(POP)
@@ -763,7 +767,13 @@ public:
 	CLONE(MEMBER(name))
 	EXEC
 	{
+		#ifdef PSL_MEMBER_REGISTER
+		variable v = env.pop();
+		env.reg = v;
+		env.push(v[name]);
+		#else
 		env.push(env.pop().get()->child(name));
+		#endif
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("MEMBER %s\n", name.c_str()));})
