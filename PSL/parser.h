@@ -122,11 +122,17 @@ private:
 		}
 		if (Variable::Code *x = v.getcode())
 		{
+		#ifdef PSL_IF_STATEMENT_NOT_SCOPE
+			Variable::Code *code = c.getcode();
+			if (!code)	c = v;
+			else		code->push(x);
+		#else
 			#ifdef PSL_DEBUG
 			c.pushcode(new Variable::IF(x));
 			#else
 			c.pushcode(new Variable::SCOPE(x));
 			#endif
+		#endif
 		}
 	}
 	void ParseFor(variable &g, variable &c)

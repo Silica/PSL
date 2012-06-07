@@ -41,6 +41,8 @@
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 //#define PSL_MEMBER_REGISTER		// メンバアクセスした際に親をレジスタに保存する(メソッドチェーン用)
 
+#define PSL_IF_STATEMENT_NOT_SCOPE			// if文がスコープを作らない
+
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ PSLライブラリ関数GarbageCollectionを利用可能になる
 #define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする
 
