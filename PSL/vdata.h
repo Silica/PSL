@@ -879,7 +879,7 @@ public:
 		}
 		else
 		{
-			variable z;
+			variable z(NIL);
 			env.push(f(z, x));
 		}
 	}
@@ -892,7 +892,7 @@ public:
 		}
 		else
 		{
-			variable z;
+			variable z(NIL);
 			return f(z, arg);
 		}
 	}
