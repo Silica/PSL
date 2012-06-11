@@ -446,13 +446,13 @@ private:
 		case '?':						return '?';
 		case ':':	if (s[i] == '='){++i;return ASSIGN;}
 										return ':';
-		case '"':string_literal();		return STRING;
 		case '$':						return '$';
 		case '@':						return '@';
+		case '`':						return '`';
 
+		case '"':string_literal();		return STRING;
 		case '\'':string_literal('\'', false);	return STRING;
 //		case '\\':						return '\\';
-//		case '`':						return '`';
 
 		case '#':						return preprocessor();
 		}

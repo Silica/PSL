@@ -419,6 +419,12 @@ private:
 					Error(TINIA, 0, "member access (.)");
 				}
 			}
+			else if (n == '`')
+			{
+				t->getNext();
+				getexp13(c);
+				c.pushcode(new Variable::CALL);
+			}
 			else break;
 		}
 	}
