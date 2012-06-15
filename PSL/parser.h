@@ -110,10 +110,10 @@ private:
 			if (oc)
 				oc->set(v.codelength()+1-l);
 			oc = new Variable::JR(0);
-			l = v.codelength();
 			v.pushcode(oc);
+			l = v.codelength();
 			ParseDangling(g, v);
-			oc->set(v.codelength() - l);
+			oc->set(v.codelength()-l);
 		}
 		else
 		{
