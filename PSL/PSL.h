@@ -86,14 +86,14 @@ public:
 		PARSE_ERROR,
 		NOT_COMPILED_CODE,
 	};
-	error LoadString(const string &str)
+	error loadString(const string &str)
 	{
-		variable::Tokenizer t(str, "LoadString", 0);
+		variable::Tokenizer t(str, "loadString", 0);
 		return parse(&t) ? PARSE_ERROR : NONE;
 	}
-	error LoadScript(const string &filename)
+	error loadScript(const string &filename)
 	{
-		if (!LoadCompiledCode(filename))
+		if (!loadCompiledCode(filename))
 			return NONE;
 		variable::Tokenizer *t = variable::Tokenizer::New(filename);
 		if (!t)
@@ -106,7 +106,7 @@ public:
 			return PARSE_ERROR;
 		return NONE;
 	}
-	error WriteCompiledCode(std::FILE *fp)
+	error writeCompiledCode(std::FILE *fp)
 	{
 		variable::Variable::bytecode b;
 		env.global.get()->write("", b);
@@ -115,17 +115,17 @@ public:
 		fwrite(b.get(), 1, b.size(), fp);
 		return NONE;
 	}
-	error WriteCompiledCode(const string &filename)
+	error writeCompiledCode(const string &filename)
 	{
 		using namespace std;
 		FILE *fp = fopen(filename, "wb");
 		if (!fp)
 			return FOPEN_ERROR;
-		WriteCompiledCode(fp);
+		writeCompiledCode(fp);
 		fclose(fp);
 		return NONE;
 	}
-	error LoadCompiledCode(std::FILE *fp, unsigned long size)
+	error loadCompiledCode(std::FILE *fp, unsigned long size)
 	{
 		variable cc;
 		unsigned long l;
@@ -141,7 +141,7 @@ public:
 		g.prepare(env);
 		return NONE;
 	}
-	error LoadCompiledCode(const string &filename)
+	error loadCompiledCode(const string &filename)
 	{
 		using namespace std;
 		FILE *fp = fopen(filename, "rb");
@@ -150,11 +150,11 @@ public:
 		fseek(fp, 0, SEEK_END);
 		int size = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
-		error e = LoadCompiledCode(fp, size);
+		error e = loadCompiledCode(fp, size);
 		fclose(fp);
 		return e;
 	}
-	rsv Run(const variable &arg = 0)
+	rsv run(const variable &arg = 0)
 	{
 		if (!env.Runable())
 			return rsv();
@@ -170,7 +170,7 @@ public:
 	{std::setlocale(LC_ALL, "");}
 	#else
 	{std::setlocale(LC_ALL, "");init = false;}
-	rsv StepExec()
+	rsv stepExec()
 	{
 		if (!env.Runable())
 		{

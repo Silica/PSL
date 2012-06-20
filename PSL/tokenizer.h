@@ -68,11 +68,9 @@ public:
 	}
 	int checkNext()
 	{
-		if (next > 0)
-			return next;
 		if (next < 0)
 			return next = doNext();
-		return 0;
+		return next;
 	}
 	bool getNextIf(int t)
 	{

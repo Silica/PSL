@@ -28,7 +28,7 @@ int main(void)
 {
 	using namespace PSL;
 	PSLVM p;
-	if (p.LoadScript("sample/binder.psl"))
+	if (p.loadScript("sample/binder.psl"))
 	{
 		printf(" - compile error\n");
 		return 1;
@@ -42,7 +42,7 @@ int main(void)
 		("getFloat", &MyClass::getFloat)
 		("setMember", &MyClass::setMember)
 		.instance("instance", &instance);
-	p.Run();
+	p.run();
 
 	return 0;
 }

@@ -16,7 +16,7 @@ using namespace PSL;
 void compile(FILE *exe, const char *filename)
 {
 	PSLVM p;
-	if (p.LoadScript(filename))
+	if (p.loadScript(filename))
 		return;
 
 	string exename = filename;
@@ -33,7 +33,7 @@ void compile(FILE *exe, const char *filename)
 	fseek(exe, 0, SEEK_SET);
 	fread(byte.get(), 1, end, exe);
 	fwrite(byte.get(), 1, end, fp);
-	p.WriteCompiledCode(fp);
+	p.writeCompiledCode(fp);
 	dword l = 0xDEADC0DE;
 	fwrite(&end, 1, sizeof(dword), fp);
 	fwrite(&l, 1, sizeof(dword), fp);
@@ -59,9 +59,9 @@ void execute(FILE *exe, variable &arg)
 	fread(&l, 1, sizeof(dword), exe);
 	fseek(exe, l, SEEK_SET);
 	PSLVM p;
-	if (p.LoadCompiledCode(exe, end - l))
+	if (p.loadCompiledCode(exe, end - l))
 		return;
-	p.Run(arg);
+	p.run(arg);
 }
 
 int main(int argc, char **argv)
