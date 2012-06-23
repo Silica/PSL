@@ -87,10 +87,10 @@ private:
 	void ParseIf(variable &g, variable &c)
 	{
 		variable v;
-		if (t->getNext() != '('/*')'*/)
-			Error(TINA, '('/*')'*/, "if");
-		else
+		if (t->getNextIf('('/*')'*/))
 			ParseExpression(v, /*'('*/')');
+		else
+			Error(TINA, '('/*')'*/, "if");
 		int l = v.codelength();
 		Variable::OpCode *oc = NULL;
 		if (l)
@@ -139,7 +139,7 @@ private:
 	{
 		variable v;
 		int l = 0;
-		if (t->getNext() != '('/*')'*/)
+		if (!t->getNextIf('('/*')'*/))
 			Error(TINA, '('/*')'*/, "for");
 		if (!t->getNextIf(';'))
 		{
@@ -181,10 +181,10 @@ private:
 	void ParseWhile(variable &g, variable &c)
 	{
 		variable v;
-		if (t->getNext() != '('/*')'*/)
-			Error(TINA, '('/*')'*/, "while");
-		else
+		if (t->getNextIf('('/*')'*/))
 			ParseExpression(v, /*'('*/')');
+		else
+			Error(TINA, '('/*')'*/, "while");
 		int l = v.codelength();
 		Variable::OpCode *oc = NULL;
 		if (l)
@@ -389,15 +389,10 @@ private:
 			else if (n == '('/*')'*/)
 			{
 				t->getNext();
-				if (t->checkNext() != /*'('*/')')
-				{
-					ParseExpression(c, /*'('*/')');
-				}
-				else
-				{
-					t->getNext();	// no argument
+				if (t->getNextIf(/*'('*/')'))
 					c.pushcode(new Variable::PUSH_NULL);
-				}
+				else
+					ParseExpression(c, /*'('*/')');
 				c.pushcode(new Variable::CALL);
 			}
 			else if (n == '[')
@@ -409,15 +404,10 @@ private:
 			else if (n == '.')
 			{
 				t->getNext();
-				if (t->checkNext() == Tokenizer::IDENTIFIER)
-				{
-					t->getNext();
+				if (t->getNextIf(Tokenizer::IDENTIFIER))
 					c.pushcode(new Variable::MEMBER(t->nstr));
-				}
 				else
-				{
 					Error(TINIA, 0, "member access (.)");
-				}
 			}
 			else if (n == '`')
 			{
