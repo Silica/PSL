@@ -361,16 +361,16 @@ private:
 	void ParseBlock(variable &g, variable &c)
 	{
 		int line = t->getLine();
-		int n;
-		while ((n = t->checkNext()) != 0)
+		while (int n = t->checkNext())
 		{
 			if (n == /*'{'*/'}')
-				break;
+			{
+				t->getNext();
+				return;
+			}
 			ParseStatement(g, c);
 		}
-		if (!n)
-			Error(BINC, line);
-		t->getNext();
+		Error(BINC, line);
 	}
 	void getSuffOp(variable &c)
 	{
