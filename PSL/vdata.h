@@ -775,11 +775,7 @@ public:
 	string toString()	const {return "[Method]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{this_v = v;}
-	Variable *index(size_t t)
-	{
-		if (t)	return this_v;
-		else	return function;
-	}
+	Variable *index(size_t t)	{return t ? this_v : function;}
 
 	void prepare(Environment &env, Variable *v)
 	{
@@ -863,11 +859,7 @@ public:
 	string toString()	const {return "[CMethod]";}
 	size_t length()		const {return 1;}
 	void push(Variable *v)	{this_v = v;}
-	Variable *index(size_t t)
-	{
-		if (t)	return this_v;
-		else	return NULL;
-	}
+	Variable *index(size_t t)	{return t ? this_v : NULL;}
 
 	void prepare(Environment &env, Variable *v)
 	{

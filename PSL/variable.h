@@ -500,4 +500,22 @@ public:
 	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}
 
 	PSL_DUMP((){x->dump();})
+
+	class iterator
+	{
+		variable *v;
+		int index;
+	public:
+		iterator(variable *x, int i){v = x;index = i;}
+		variable operator*()		{return (*v)[index];}
+		bool operator!=(iterator i)	{return index != i.index;}
+		iterator &operator++()
+		{
+			if (++index >= static_cast<int>(v->length()))
+				index = -1;
+			return *this;
+		}
+	};
+	iterator begin(){return iterator(this, length() ? 0 : -1);}
+	iterator end()	{return iterator(this, -1);}
 };
