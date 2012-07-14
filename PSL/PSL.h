@@ -6,18 +6,6 @@ Permission is granted to anyone to use this software for any purpose, including 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.*/
-#include <cstdio>
-#include <cstdarg>
-#include <cstdlib>
-#include <cstring>
-#include <cwchar>
-#include <clocale>
-#include <ctime>
-#include <cmath>
-
-//#include <vector>
-//#include <stack>
-//#include <map>
 
 // 設定項目
 //#define PSL_USE_STL_VECTOR
@@ -60,13 +48,34 @@ Permission is granted to anyone to use this software for any purpose, including 
 //#define PSL_THREAD_SAFE						// メモリマネージャ使わない、global共有しない、static変数を使わない
 // ここまで
 
-
-
 #ifdef PSL_USE_CONSOLE
 	#define PSL_PRINTF(x) std::printf x
 #else
 	#define PSL_PRINTF(x)
 #endif
+
+
+
+#include <cstdio>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstring>
+#include <cwchar>
+#include <clocale>
+#include <ctime>
+#include <cmath>
+
+#ifdef PSL_USE_STL_VECTOR
+#include <vector>
+#include <stack>
+#endif
+#ifdef PSL_USE_STL_STACK
+#include <stack>
+#endif
+#ifdef PSL_USE_STL_MAP
+#include <map>
+#endif
+#include <iterator>
 
 namespace PSL {
 using std::size_t;

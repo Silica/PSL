@@ -501,21 +501,25 @@ public:
 
 	PSL_DUMP((){x->dump();})
 
-	class iterator
+	class iterator : public std::iterator<std::random_access_iterator_tag, variable, int, variable*, variable&>
 	{
-		variable *v;
+		Variable *v;
 		int index;
+		Variable *temp;
 	public:
-		iterator(variable *x, int i){v = x;index = i;}
-		variable operator*()		{return (*v)[index];}
+		iterator(Variable *x, int i){v = x;index = i;}
+		variable &operator*()		{temp = v->index(index);return *reinterpret_cast<variable*>(&temp);}
+		bool operator==(iterator i)	{return index == i.index;}
 		bool operator!=(iterator i)	{return index != i.index;}
-		iterator &operator++()
-		{
-			if (++index >= static_cast<int>(v->length()))
-				index = -1;
-			return *this;
-		}
+		bool operator<(iterator i)	{return index < i.index;}
+		iterator &operator++()		{++index;return *this;}
+		iterator &operator--()		{--index;return *this;}
+		iterator &operator+=(int i)	{index += i;return *this;}
+		iterator &operator-=(int i)	{index -= i;return *this;}
+		iterator operator+(int i)	{return iterator(v, index+i);}
+		iterator operator-(int i)	{return iterator(v, index-i);}
+		int operator-(iterator i)	{return index - i.index;}
 	};
-	iterator begin(){return iterator(this, length() ? 0 : -1);}
-	iterator end()	{return iterator(this, -1);}
+	iterator begin(){return iterator(x, 0);}
+	iterator end()	{return iterator(x, length());}
 };
