@@ -32,7 +32,8 @@ public:
 	{
 		using namespace std;
 		fseek(fp, 0, SEEK_END);
-		len = ftell(fp);
+		long r = ftell(fp);
+		len = r < 0 ? 0 : static_cast<size_t>(r);
 		char *p;
 		string buf(len, p);
 		fseek(fp, 0, SEEK_SET);
@@ -108,8 +109,8 @@ private:
 	int pline;
 	string str;
 	const char *s;
-	int len;
-	int i;
+	size_t len;
+	size_t i;
 	int next;
 	Tokenizer *including;
 	table *definelist;
@@ -166,7 +167,7 @@ private:
 	}
 	void string_literal(char end = '"', bool escape = true)
 	{
-		int h = i;
+		size_t h = i;
 		nstr = "";
 		for (; i < len; ++i)
 		{
@@ -180,7 +181,7 @@ private:
 			{
 				nstr += string(s+h, i-h);
 				h = i;
-				int j = i+1;
+				size_t j = i+1;
 				if (s[j] == 'n')		nstr += '\n';
 				else if (s[j] == '"')	nstr += '"';
 				else if (s[j] == 't')	nstr += '\t';
@@ -204,7 +205,7 @@ private:
 	{
 		if (!(s[i] == '_' || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z')))
 			return false;
-		int h = i;
+		size_t h = i;
 		for (++i; i < len; ++i)
 		{
 			if (s[i] == '_' || (s[i] >= 'A' && s[i] <= 'Z') || (s[i] >= 'a' && s[i] <= 'z') || (s[i] >= '0' && s[i] <= '9'))
@@ -232,7 +233,7 @@ private:
 		{
 			if (s[i] == '<' || s[i] == '"')
 			{
-				for (int h = ++i; i < len; ++i)
+				for (size_t h = ++i; i < len; ++i)
 				{
 					if (s[i] == '>' || s[i] == '"' || s[i] == '\r' || s[i] == '\n')
 					{
@@ -267,7 +268,7 @@ private:
 			{
 				if (whitespace())
 					return 0;
-				int h = i;
+				size_t h = i;
 				lcomment();
 				variable temp = string(s+h, i-h);
 				#ifdef PSL_USE_STL_MAP
@@ -430,7 +431,7 @@ private:
 		case '.':	if (s[i] >= '0' && s[i] <= '9'){
 				char *e;
 				nnum = std::strtod(s+i-1, &e);
-				i = e-s;
+				i = static_cast<size_t>(e-s);
 				return NUMBER;
 			}							return '.';
 		case ',':						return ',';
@@ -498,7 +499,7 @@ private:
 			}
 
 			nint = s[i] - '0';
-			int h = i;
+			size_t h = i;
 			for (++i; i < len; ++i)
 			{
 				if (s[i] >= '0' && s[i] <= '9')
@@ -511,7 +512,7 @@ private:
 				{
 					char *e;
 					nnum = std::strtod(s+h, &e);
-					i = e-s;
+					i = static_cast<size_t>(e-s);
 					return NUMBER;
 				}
 				break;

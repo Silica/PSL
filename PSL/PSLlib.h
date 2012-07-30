@@ -51,7 +51,7 @@ private:
 		case INT:		PSL_PRINTF(("%d", static_cast<int>(v)));break;
 		case HEX:		PSL_PRINTF(("%X", static_cast<int>(v)));break;
 		case FLOAT:		PSL_PRINTF(("%f", static_cast<double>(v)));break;
-		case RARRAY:	PSL_PRINTF(("[tuple:%u]", v.length()));break;
+		case RARRAY:	PSL_PRINTF(("[tuple:%d]", static_cast<int>(v.length())));break;
 		case THREAD:	PSL_PRINTF(("[thread:%s]", static_cast<bool>(v) ? "alive" : "dead"));break;
 		case BCFUNCTION:PSL_PRINTF(("[bind function]"));break;
 		case CCMETHOD:	PSL_PRINTF(("[bind method]"));break;
@@ -133,10 +133,10 @@ private:
 	{
 		variable l = v[0];
 		variable f = v[1];
-		int size = l.length();
+		size_t size = l.length();
 		if (size)
 		{
-			for (int i = 0; i < size; ++i)
+			for (size_t i = 0; i < size; ++i)
 				f(l[i]);
 			return size;
 		}
@@ -144,7 +144,7 @@ private:
 		{
 			variable k = l.keys();
 			size = k.length();
-			for (int i = 0; i < size; ++i)
+			for (size_t i = 0; i < size; ++i)
 				f(k[i], l[k[i]]);
 			return k;
 		}
@@ -208,15 +208,15 @@ private:
 			string s = v[0];
 			char c = v[1].toString().c_str()[0];
 			variable r;
-			int l = s.length();
-			int prev = 0;
+			int l = static_cast<int>(s.length());
+			size_t prev = 0;
 			for (int i = 0; i < l; ++i)
 			{
 				if ((i = s.find(c, i)) < 0)
 					break;
 				if (i-prev)	r.push(s.substr(prev, i-prev));
 				else		r.push(string());
-				prev = i+1;
+				prev = static_cast<size_t>(i+1);
 			}
 			r.push(s.substr(prev));
 			return r;
@@ -225,8 +225,8 @@ private:
 		{
 			string s;
 			using namespace std;
-			char c = getchar();
-			s = c;
+			int c = getchar();
+			s = static_cast<char>(c);
 			variable ch = s;
 			return ch;
 		}
@@ -276,18 +276,18 @@ private:
 		}
 		static variable Foreach(variable &this_v, variable &v)
 		{
-			int size;
+			size_t size;
 			if (!this_v)
 			{
 				variable array = v[0];
 				size = array.length();
-				for (int i = 0; i < size; ++i)
+				for (size_t i = 0; i < size; ++i)
 					v[1](array[i]);
 			}
 			else
 			{
 				size = this_v.length();
-				for (int i = 0; i < size; ++i)
+				for (size_t i = 0; i < size; ++i)
 					v(this_v[i]);
 			}
 			return size;
@@ -301,20 +301,20 @@ private:
 				variable array = v[0];
 				if (v[1])
 					s = v[1].toString();
-				int size = array.length();
+				size_t size = array.length();
 				if (size)
 					r = array[0].toString();
-				for (int i = 1; i < size; ++i)
+				for (size_t i = 1; i < size; ++i)
 					r += s + array[i].toString();
 			}
 			else
 			{
 				if (v)
 					s = v.toString();
-				int size = this_v.length();
+				size_t size = this_v.length();
 				if (size)
 					r = this_v[0].toString();
-				for (int i = 1; i < size; ++i)
+				for (size_t i = 1; i < size; ++i)
 					r += s + this_v[i].toString();
 			}
 			return r;
@@ -355,8 +355,8 @@ private:
 				variable l = v[0];
 				variable f = v[1];
 				variable k = l.keys();
-				int s = k.length();
-				for (int i = 0; i < s; ++i)
+				size_t s = k.length();
+				for (size_t i = 0; i < s; ++i)
 				{
 					string str = k[i];
 					if (!l[str].type(METHOD) && !l[str].type(CMETHOD))
@@ -367,8 +367,8 @@ private:
 			else
 			{
 				variable k = this_v.keys();
-				int s = k.length();
-				for (int i = 0; i < s; ++i)
+				size_t s = k.length();
+				for (size_t i = 0; i < s; ++i)
 				{
 					string str = k[i];
 					if (!this_v[str].type(METHOD) && !this_v[str].type(CMETHOD))
@@ -431,7 +431,7 @@ private:
 		static variable Read(variable &this_v, variable &v)
 		{
 			std::FILE *fp = this_v["$$__FILE*fp__$$"];
-			int size = v;
+			size_t size = v;
 			if (!fp || !size)
 				return "";
 			buffer vbuf(size+1);

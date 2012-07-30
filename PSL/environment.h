@@ -126,24 +126,24 @@ public:
 		Environment *e = new Environment(*this);
 		if (scope)
 			e->scope = scope->clone();
-		int s = stack.size();
+		size_t s = stack.size();
 		#ifdef PSL_USE_STL_STACK
 		if (s)
 		{
 			rlist l(s);
-			for (int i = s; i-- > 0;)
+			for (size_t i = s; i > 0;)
 			{
-				l[i] = stack.top();
+				l[--i] = stack.top();
 				stack.pop();
 			}
-			for (int i = 0; i < s; ++i)
+			for (size_t i = 0; i < s; ++i)
 			{
 				stack.push(l[i]);
 				e->stack.push(l[i]);
 			}
 		}
 		#else
-		for (int i = 0; i < s; ++i)
+		for (size_t i = 0; i < s; ++i)
 			e->stack[i] = stack[i];
 		#endif
 		return e;
@@ -158,7 +158,7 @@ public:
 		scope->addLocal(name, x);
 		return x;
 	}
-	rsv getLocalIndex(int i)	{return scope->getLocalIndex(i);}
+	rsv getLocalIndex(size_t i)	{return scope->getLocalIndex(i);}
 	rsv getLocal()				{return scope->getLocal();}
 	rsv setLocal(const rsv &v)	{return scope->setLocal(v);}
 	void addLocal(const string &name, variable &v)		{if (!scope->addLocal(name, v, this))warning(3, name);}
@@ -207,7 +207,7 @@ public:
 		#endif
 		return stack.top();
 	}
-	bool Runable()	{return scope;}
+	bool Runable()	{return scope != NULL;}
 	#ifdef PSL_MEMBER_REGISTER
 	rsv reg;
 	#endif
@@ -303,7 +303,7 @@ public:
 	{
 		if (!label.count(s))
 			return false;
-		line = label[s].get()->toInt();
+		line = static_cast<size_t>(label[s].get()->toInt());
 		return true;
 	}
 	void pushlabel(const string &s)			{variable v = code.size();label[s] = v;}
@@ -332,8 +332,8 @@ public:
 	})
 	void write(bytecode &b)
 	{
-		int size = code.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = code.size();
+		for (size_t i = 0; i < size; ++i)
 			code[i]->write(b);
 		if (label.size())
 		{
@@ -358,7 +358,7 @@ private:
 	bool optimize(OpCode *c)
 	{
 		OpCode::MNEMONIC::mnemonic cn = c->get();
-		int s = code.size();
+		size_t s = code.size();
 		#ifdef PSL_OPTIMIZE_PARENTHESES
 		if (cn != OpCode::MNEMONIC::LIST && s >= 1 && code[s-1]->get() == OpCode::MNEMONIC::PARENTHESES)
 		{
@@ -466,7 +466,7 @@ public:
 		else											return owner->getVariable(name);
 	}
 	void set(Scope *s)	{owner = s;}
-	void Jump(int l)	{line = l;}
+	void Jump(int l)	{line = static_cast<size_t>(l);}
 	void RJump(int l)	{line += l;}
 	bool Run(Environment &env)	{return code->Run(env, line);}
 	#ifdef PSL_DEBUG
@@ -515,7 +515,7 @@ public:
 		if (env)	env->push(v);
 		return r;
 	}
-	rsv getLocalIndex(int i)	{return local.get()->index(i);}
+	rsv getLocalIndex(size_t i)	{return local.get()->index(i);}
 	virtual rsv getLocal()
 	{
 		if (owner)

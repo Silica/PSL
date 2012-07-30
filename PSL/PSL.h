@@ -157,9 +157,11 @@ public:
 		if (!fp)
 			return FOPEN_ERROR;
 		fseek(fp, 0, SEEK_END);
-		int size = ftell(fp);
+		long size = ftell(fp);
+		if (size < 0)
+			size = 0;
 		fseek(fp, 0, SEEK_SET);
-		error e = loadCompiledCode(fp, size);
+		error e = loadCompiledCode(fp, static_cast<unsigned long>(size));
 		fclose(fp);
 		return e;
 	}

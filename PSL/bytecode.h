@@ -5,11 +5,11 @@ public:
 	bytecode(){}
 	bytecode(size_t t):code(t){code.resize(t);}
 	byte *get()			{return &code[0];}
-	size_t size()		{return code.size();}
+	size_t size()const	{return code.size();}
 	void push(byte b)	{code.push_back(b);}
 	void push(const void *p, size_t l)
 	{
-		int size = code.size();
+		size_t size = code.size();
 		code.resize(size + l);
 		std::memcpy(&code[size], p, l);
 	}
@@ -149,7 +149,7 @@ class bcreader
 			break;
 		case OpCode::MNEMONIC::LOOP:
 			{
-				int l = read<int>(byte);
+				size_t l = static_cast<size_t>(read<int>(byte));
 				variable x;
 				readcode(byte, end, x);
 				v.pushcode(new LOOP(x.getcode(), l));

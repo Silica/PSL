@@ -91,7 +91,7 @@ private:
 			ParseExpression(v, /*'('*/')');
 		else
 			Error(TINA, '('/*')'*/, "if");
-		int l = v.codelength();
+		size_t l = v.codelength();
 		Variable::OpCode *oc = NULL;
 		if (l)
 		{
@@ -108,17 +108,17 @@ private:
 		{
 			t->getNext();
 			if (oc)
-				oc->set(v.codelength()+1-l);
+				oc->set(static_cast<int>(v.codelength()+1-l));
 			oc = new Variable::JR(0);
 			v.pushcode(oc);
 			l = v.codelength();
 			ParseDangling(g, v);
-			oc->set(v.codelength()-l);
+			oc->set(static_cast<int>(v.codelength()-l));
 		}
 		else
 		{
 			if (oc)
-				oc->set(v.codelength()-l);
+				oc->set(static_cast<int>(v.codelength()-l));
 		}
 		if (Variable::Code *x = v.getcode())
 		{
@@ -138,7 +138,7 @@ private:
 	void ParseFor(variable &g, variable &c)
 	{
 		variable v;
-		int l = 0;
+		size_t l = 0;
 		if (!t->getNextIf('('/*')'*/))
 			Error(TINA, '('/*')'*/, "for");
 		if (!t->getNextIf(';'))
@@ -153,7 +153,7 @@ private:
 			ParseExpression(v, ';');
 			if (v.codelength() - l)
 			{
-				oc = new Variable::JF(v.codelength());
+				oc = new Variable::JF(static_cast<int>(v.codelength()));
 				v.pushcode(oc);
 			}
 		}
@@ -161,15 +161,15 @@ private:
 		if (!t->getNextIf(/*'('*/')'))
 			ParseExpression(x, /*'('*/')');
 		ParseDangling(g, v);
-		int cline = v.codelength();
+		size_t cline = v.codelength();
 		if (x.codelength())
 		{
 			v.pushcode(new Variable::POP);
 			v.getcode()->push(x.getcode());
 		}
-		v.pushcode(new Variable::JMP(l));
+		v.pushcode(new Variable::JMP(static_cast<int>(l)));
 		if (oc)
-			oc->set(v.codelength());
+			oc->set(static_cast<int>(v.codelength()));
 		if (t->checkNext() == Tokenizer::IDENTIFIER && t->nstr == "else")
 		{
 			t->getNext();
@@ -185,11 +185,11 @@ private:
 			ParseExpression(v, /*'('*/')');
 		else
 			Error(TINA, '('/*')'*/, "while");
-		int l = v.codelength();
+		size_t l = v.codelength();
 		Variable::OpCode *oc = NULL;
 		if (l)
 		{
-			oc = new Variable::JF(l);
+			oc = new Variable::JF(static_cast<int>(l));
 			v.pushcode(oc);
 		}
 		else
@@ -199,7 +199,7 @@ private:
 
 		v.pushcode(new Variable::JMP(0));
 		if (oc)
-			oc->set(v.codelength());
+			oc->set(static_cast<int>(v.codelength()));
 		if (t->checkNext() == Tokenizer::IDENTIFIER && t->nstr == "else")
 		{
 			t->getNext();
@@ -470,7 +470,7 @@ private:
 		else PRE_OP(Tokenizer::DEC, PDEC)
 		else TERM(Tokenizer::IDENTIFIER, VARIABLE(t->nstr))
 		else TERM(Tokenizer::INT, PUSH_INT(t->nint))
-		else TERM(Tokenizer::HEX, PUSH_HEX(t->nint))
+		else TERM(Tokenizer::HEX, PUSH_HEX(static_cast<hex>(t->nint)))
 		else TERM(Tokenizer::NUMBER, PUSH_FLOAT(t->nnum))
 		else TERM(Tokenizer::STRING, PUSH_STRING(t->nstr))
 		else
@@ -576,10 +576,10 @@ private:
 				t->getNext();
 				Variable::OpCode *oc = new Variable::JRF(0);
 				c.pushcode(oc);
-				int b = c.codelength();
+				size_t b = c.codelength();
 				getexp8(c);
 				c.pushcode(new Variable::JR(1));
-				oc->set(c.codelength() - b);
+				oc->set(static_cast<int>(c.codelength() - b));
 				c.pushcode(new Variable::PUSH_NULL);
 			}
 			#else
@@ -599,9 +599,9 @@ private:
 				t->getNext();
 				Variable::OpCode *oc = new Variable::JRT(0);
 				c.pushcode(oc);
-				int b = c.codelength();
+				size_t b = c.codelength();
 				getexp9(c);
-				oc->set(c.codelength() - b);
+				oc->set(static_cast<int>(c.codelength() - b));
 			}
 			#else
 			EXP(Tokenizer::BOR, 9, BOR)
@@ -677,11 +677,11 @@ private:
 		{
 			Variable::OpCode *oc = new Variable::JRF(0);
 			c.pushcode(oc);
-			int b = c.codelength();
+			size_t b = c.codelength();
 			getexp11(c);
 			Variable::OpCode *oc2 = new Variable::JR(0);
 			c.pushcode(oc2);
-			oc->set(c.codelength() - b);
+			oc->set(static_cast<int>(c.codelength() - b));
 			b = c.codelength();
 			if (!t->getNextIf(':'))	Error(TINCOT);
 			getexp11(c);
@@ -693,7 +693,7 @@ private:
 					b += 1;
 			}
 			#endif
-			oc2->set(c.codelength() - b);
+			oc2->set(static_cast<int>(c.codelength() - b));
 		}
 	}
 	void getexp12(variable &c, bool l = false)

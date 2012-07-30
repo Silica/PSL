@@ -34,7 +34,7 @@ public:
 class LoopScope : public Scope
 {
 public:
-	LoopScope(Code *statement, int c) : Scope(statement)	{cline = c;}
+	LoopScope(Code *statement, size_t c) : Scope(statement)	{cline = c;}
 	virtual Scope *clone()
 	{
 		LoopScope *s = new LoopScope(code, cline);
@@ -61,7 +61,7 @@ public:
 		return this;
 	}
 private:
-	int cline;
+	size_t cline;
 };
 
 class FunctionScope : public Scope

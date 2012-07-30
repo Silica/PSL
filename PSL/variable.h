@@ -27,6 +27,9 @@ class variable
 {
 	#ifndef _WIN32
 	typedef long long __int64;
+	typedef unsigned long long uint64;
+	#else
+	typedef unsigned __int64 uint64;
 	#endif
 public:
 	#include "pstring.h"
@@ -73,6 +76,8 @@ public:
 	variable(long i)			{x = new Variable(static_cast<int>(i));}
 	variable(unsigned u)		{x = new Variable(static_cast<int>(u));}
 	variable(hex h)				{x = new Variable(h);}
+	variable(__int64 i)			{x = new Variable(static_cast<int>(i));}
+	variable(uint64 i)			{x = new Variable(static_cast<int>(i));}
 	variable(double d)			{x = new Variable(d);}
 	variable(const char *s)		{x = new Variable(s);}
 	variable(const wchar_t *s)	{x = new Variable(s);}
@@ -143,21 +148,17 @@ public:
 	operator int()		const	{return x->toInt();}
 	operator double()	const	{return x->toDouble();}
 	operator bool()		const	{return x->toBool();}
-	operator char()				const	{return x->toInt();}
-	operator signed char()		const	{return x->toInt();}
-	operator unsigned char()	const	{return x->toInt();}
-	operator short()			const	{return x->toInt();}
-	operator unsigned short()	const	{return x->toInt();}
-	operator unsigned()			const	{return x->toInt();}
-	operator long()				const	{return x->toInt();}
-	operator unsigned long()	const	{return x->toInt();}
+	operator char()				const	{return static_cast<char>(x->toInt());}
+	operator signed char()		const	{return static_cast<signed char>(x->toInt());}
+	operator unsigned char()	const	{return static_cast<unsigned char>(x->toInt());}
+	operator short()			const	{return static_cast<short>(x->toInt());}
+	operator unsigned short()	const	{return static_cast<unsigned short>(x->toInt());}
+	operator unsigned()			const	{return static_cast<unsigned>(x->toInt());}
+	operator long()				const	{return static_cast<long>(x->toInt());}
+	operator unsigned long()	const	{return static_cast<unsigned long>(x->toInt());}
 	operator __int64()			const	{return x->toInt();}
-	#ifdef __clang__
-	operator unsigned long long()	const	{return x->toInt();}
-	#else
-	operator unsigned __int64()	const	{return x->toInt();}
-	#endif
-	operator float()		const	{return x->toDouble();}
+	operator uint64()			const	{return static_cast<unsigned>(x->toInt());}
+	operator float()		const	{return static_cast<float>(x->toDouble());}
 	operator long double()	const	{return x->toDouble();}
 	operator string()		const	{return x->toString();}
 	string toString()		const	{return x->toString();}
@@ -180,14 +181,14 @@ public:
 		if (v.type(STRING) || v.type(FLOAT))	return x->child(v);
 		if (v.type(RARRAY))
 		{
-			int s = minusindex(v.x->index(0)->toInt());
+			size_t s = minusindex(v.x->index(0)->toInt());
 			int l = v.x->index(1)->toInt();
 			variable r(RARRAY);
 			if (l < 0)	for (int i = 0; i > l; --i)	r.x->push(x->index(s+i));
 			else		for (int i = 0; i < l; ++i)	r.x->push(x->index(s+i));
 			return r.x;
 		}
-		int i = minusindex(v);
+		size_t i = minusindex(v);
 		return x->index(i);
 	}
 	size_t length() const				{return x->length();}
@@ -197,16 +198,16 @@ public:
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
 	void del(const string &s)						{return x->del(s);}
 private:
-	int minusindex(int i)
+	size_t minusindex(int i)
 	{
 		if (i < 0)
 		{
-			int l = x->length();
+			int l = static_cast<int>(x->length());
 			i = l + i;
 			if (i < 0)
 				i = 0;
 		}
-		return i;
+		return static_cast<size_t>(i);
 	}
 	#include "PSLlib.h"
 	#include "tokenizer.h"
@@ -223,7 +224,7 @@ private:
 		Variable(method f)			{rc = 1;x = new vCMethod(f, NULL);}
 		Variable(void *p)			{rc = 1;x = new vCPointer(p);}
 		Variable(Variable *v)		{rc = 1;x = new vPointer(v);}
-		Variable(Type t, int i)		{rc = 1;x = new vRArray(i);}
+		Variable(Type t, size_t i)		{rc = 1;x = new vRArray(i);}
 		Variable(Type t){rc = 1;switch (t){
 			case NIL:		x = new vBase();break;
 			case INT:		x = new vInt(0);break;
@@ -340,7 +341,7 @@ private:
 		variable call(Environment &env, variable &arg)	{return x->call(env, arg, this);}
 		rsv instance(Environment &env)			{return x->instance(env, this);}
 
-		Variable(Code *c)		{rc = 1;x = new vObject(c);}
+//		Variable(Code *c)		{rc = 1;x = new vObject(c);}
 		size_t codelength()		{return x->codelength();}
 		Code *getcode()			{return x->getcode();}
 		void pushcode(OpCode *c){return x->pushcode(c);}
@@ -504,10 +505,10 @@ public:
 	class iterator : public std::iterator<std::random_access_iterator_tag, variable, int, variable*, variable&>
 	{
 		Variable *v;
-		int index;
+		size_t index;
 		Variable *temp;
 	public:
-		iterator(Variable *x, int i){v = x;index = i;}
+		iterator(Variable *x, size_t i){v = x;index = i;}
 		variable &operator*()		{temp = v->index(index);return *reinterpret_cast<variable*>(&temp);}
 		bool operator==(iterator i)	{return index == i.index;}
 		bool operator!=(iterator i)	{return index != i.index;}
@@ -518,7 +519,7 @@ public:
 		iterator &operator-=(int i)	{index -= i;return *this;}
 		iterator operator+(int i)	{return iterator(v, index+i);}
 		iterator operator-(int i)	{return iterator(v, index-i);}
-		int operator-(iterator i)	{return index - i.index;}
+		int operator-(iterator i)	{return static_cast<int>(index) - static_cast<int>(i.index);}
 	};
 	iterator begin(){return iterator(x, 0);}
 	iterator end()	{return iterator(x, length());}

@@ -24,7 +24,7 @@ class PUSH_HEX : public OpCode
 public:
 	PSL_MEMORY_MANAGER(PUSH_HEX)
 	PUSH_HEX(hex l):x(new Variable(new vHex(l)),0){}
-	CLONE(PUSH_HEX(x.get()->toInt()))
+	CLONE(PUSH_HEX(static_cast<hex>(x.get()->toInt())))
 	EXEC
 	{
 		env.push(x);
@@ -32,7 +32,7 @@ public:
 	}
 	GET(CONSTANT)
 	PSL_DUMP((int d){PSL_PRINTF(("PUSH %X\n", x.get()->toInt()));})
-	WRITE(PUSH_HEX,hex w = x.get()->toInt();b.push(&w, sizeof(w));)
+	WRITE(PUSH_HEX,hex w = static_cast<hex>(x.get()->toInt());b.push(&w, sizeof(w));)
 private:
 	rsv x;
 };
@@ -651,7 +651,7 @@ class LOOP : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(LOOP)
-	LOOP(Code *c, int l)	{statement = c->inc();cline = l;}
+	LOOP(Code *c, size_t l)	{statement = c->inc();cline = l;}
 	CLONE(LOOP(statement, cline))
 	~LOOP()	{statement->finalize();}
 	EXEC
@@ -663,7 +663,7 @@ public:
 	WRITE(LOOP,b.push(&cline, sizeof(cline));statement->write(b);)
 private:
 	Code *statement;
-	int cline;	// continue line
+	size_t cline;	// continue line
 };
 #ifdef PSL_DEBUG
 class IF : public SCOPE
@@ -803,7 +803,7 @@ public:
 	CLONE(LOCALINDEX(x))
 	EXEC
 	{
-		env.push(env.getLocalIndex(x));
+		env.push(env.getLocalIndex(static_cast<size_t>(x)));
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("LOCALINDEX:%d\n", x));})

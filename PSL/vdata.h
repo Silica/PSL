@@ -33,7 +33,7 @@ public:
 	void neg()	{x = -x;}
 	void Compl(){x = ~x;}
 
-	bool toBool()		const {return x;}
+	bool toBool()		const {return x != 0;}
 	int toInt()			const {return x;}
 	double toDouble()	const {return x;}
 	string toString()	const {return x;}
@@ -53,7 +53,7 @@ public:
 	Type type()	const	{return HEX;}
 	vBase *clone()	{return new vHex(x);}
 
-	vBase *substitution(Variable *v)	{x = v->toInt();return this;}
+	vBase *substitution(Variable *v)	{x = static_cast<hex>(v->toInt());return this;}
 
 	#define OP(n,o) void n(Variable *v)	{x o v->toInt();}
 	OP(add,+=)
@@ -80,8 +80,8 @@ public:
 	void neg()	{x = ~x + 1;}
 	void Compl(){x = ~x;}
 
-	bool toBool()		const {return x;}
-	int toInt()			const {return x;}
+	bool toBool()		const {return x != 0;}
+	int toInt()			const {return static_cast<int>(x);}
 	double toDouble()	const {return x;}
 	string toString()	const {string s;return s.sprintf("%X", x);}
 
@@ -118,7 +118,7 @@ public:
 	#undef CMP
 	void neg()	{x = -x;}
 
-	bool toBool()		const {return x;}
+	bool toBool()		const {return x != 0;}
 	int toInt()			const {return static_cast<int>(x);}
 	double toDouble()	const {return x;}
 	string toString()	const {return x;}
@@ -141,7 +141,7 @@ public:
 	vBase *substitution(Variable *v)	{x = v->toString();return this;}
 
 	void add(Variable *v)	{x += v->toString();}
-	#define OP(n,o) void n(Variable *v)	{x o v->toInt();}
+	#define OP(n,o) void n(Variable *v)	{x o static_cast<size_t>(v->toInt());}
 	OP(sub,-=)
 	OP(mul,*=)
 	OP(div,/=)
@@ -157,7 +157,7 @@ public:
 	#undef CMP
 	void neg()	{x.reverse();}
 
-	bool toBool()		const {return x.length();}
+	bool toBool()		const {return x.length() != 0;}
 	int toInt()			const {return x;}
 	double toDouble()	const {return x;}
 	string toString()	const {return x;}
@@ -252,27 +252,27 @@ class vRArray : public vBase
 public:
 	PSL_MEMORY_MANAGER(vRArray)
 	vRArray():x(2){}
-	vRArray(int i):x(i){}
+	vRArray(size_t i):x(i){}
 	Type type()	const	{return RARRAY;}
 	void searchcount(Variable *v, int &c)
 	{
-		int size = x.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = x.size();
+		for (size_t i = 0; i < size; ++i)
 			x[i].get()->searchcount(v, c);
 	}
 	void mark()
 	{
-		int size = x.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = x.size();
+		for (size_t i = 0; i < size; ++i)
 			x[i].get()->mark();
 	}
 	vBase *clone()
 	{
-		int size = x.size();
+		size_t size = x.size();
 		if (size == 1)
 			return x[0].get()->x->clone();
 		vObject *v = new vObject(size);
-		for (int i = 0; i < size; ++i)
+		for (size_t i = 0; i < size; ++i)
 			v->push(x[i].get());
 		return v;
 	}
@@ -284,9 +284,9 @@ public:
 		if (v->type() == RARRAY)
 			temp = rsv(v = v->clone(), 0);
 
-		int size = x.size();
-		int vsize = v->length();
-		for (int i = 0; i < size && i < vsize; ++i)
+		size_t size = x.size();
+		size_t vsize = v->length();
+		for (size_t i = 0; i < size && i < vsize; ++i)
 		{
 			if (x[i].get()->type() == POINTER)
 				x[i].get()->substitution(o->index(i));
@@ -303,9 +303,9 @@ public:
 		if (v->type() == RARRAY)
 			temp = rsv(v = v->clone(), 0);
 
-		int size = x.size();
-		int vsize = v->length();
-		for (int i = 0; i < size && i < vsize; ++i)
+		size_t size = x.size();
+		size_t vsize = v->length();
+		for (size_t i = 0; i < size && i < vsize; ++i)
 			x[i].get()->assignment((x[i].get()->type() == POINTER ? o : v)->index(i));
 
 		return this;
@@ -345,8 +345,8 @@ public:
 	void neg()	{}
 	Variable *deref()	{if (x.size() == 1)return x[0].get()->deref();return NULL;}
 
-	bool toBool()		const {if (x.size() == 1)return x[0].get()->toBool();return x.size();}
-	int toInt()			const {if (x.size() == 1)return x[0].get()->toInt();return x.size();}
+	bool toBool()		const {if (x.size() == 1)return x[0].get()->toBool();return x.size() != 0;}
+	int toInt()			const {if (x.size() == 1)return x[0].get()->toInt();return static_cast<int>(x.size());}
 	double toDouble()	const {if (x.size() == 1)return x[0].get()->toDouble();return x.size();}
 	string toString()	const {if (x.size() == 1)return x[0].get()->toString();return "[tuple]";}
 	void *toPointer()	const {if (x.size() == 1)return x[0].get()->toPointer();return NULL;}
@@ -384,7 +384,7 @@ class vObject : public vBase
 public:
 	PSL_MEMORY_MANAGER(vObject)
 	vObject()				{code = NULL;}
-	vObject(int i):array(i)	{code = NULL;}
+	vObject(size_t i):array(i)	{code = NULL;}
 	vObject(Code *c)		{code = c->inc();}
 	~vObject()				{if (code)	code->finalize();}
 	void destructor()
@@ -412,9 +412,9 @@ public:
 	vBase *clone()	{return new vObject(this);}
 	vObject(vObject *v)
 	{
-		int size = v->array.size();
+		size_t size = v->array.size();
 		array.resize(size);
-		for (int i = 0; i < size; ++i)
+		for (size_t i = 0; i < size; ++i)
 			array[i].copy(v->array[i]);
 		for (table::iterator it = v->member.begin(); it != v->member.end(); ++it)
 			member[it->first].copy(it->second);
@@ -423,16 +423,16 @@ public:
 	}
 	void searchcount(Variable *v, int &c)
 	{
-		int size = array.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = array.size();
+		for (size_t i = 0; i < size; ++i)
 			array[i].get()->searchcount(v, c);
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			it->second.get()->searchcount(v, c);
 	}
 	void mark()
 	{
-		int size = array.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = array.size();
+		for (size_t i = 0; i < size; ++i)
 			array[0].get()->mark();
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 			it->second.get()->mark();
@@ -550,12 +550,12 @@ public:
 	bool ne(Variable *v)	{return !eq(v);}
 
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
-	int toInt()			const {return array.size();}
+	int toInt()			const {return static_cast<int>(array.size());}
 	double toDouble()	const {return array.size();}
 	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : code ? "[function]" : "[null]";}
 
 	size_t length()				const {return array.size();}
-	bool exist(const string &s)	const {return member.count(s);}
+	bool exist(const string &s)	const {return member.count(s) > 0;}
 	Variable *index(size_t t)			{if(t>=array.size())array.resize(t+1);return array[t].get();}
 	Variable *child(const string &s)	{return member[s].get();}
 	void push(Variable *v)	{rsv x(v->clone(),0);array.push_back(x);}
@@ -590,8 +590,8 @@ public:
 	void del(const string &s)	{member.erase(s);}
 	void method_this(Variable *v)
 	{
-		int size = array.size();
-		for (int i = 0; i < size; ++i)
+		size_t size = array.size();
+		for (size_t i = 0; i < size; ++i)
 		{
 			Type t = array[i].get()->type();
 			if (t == METHOD || t == CMETHOD || t == CCMETHOD)
@@ -693,9 +693,9 @@ private:
 		Variable *x = new Variable(o);
 		rsv temp(x, 0);
 
-		int size = array.size();
+		size_t size = array.size();
 		o->array.resize(size);
-		for (int i = 0; i < size; ++i)
+		for (size_t i = 0; i < size; ++i)
 			o->array[i].copy(array[i]);
 
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
@@ -918,7 +918,7 @@ public:
 	string toString()	const {return x ? "[cpointer]" : "NULL";}
 	void *toPointer()	const {return x;}
 
-	size_t length()		const {return x ? 1 : 0;}
+	size_t length()		const {return x ? static_cast<size_t>(1) : 0;}
 
 	PSL_DUMP((){PSL_PRINTF(("vCPointer:%X\n", x));})
 private:
@@ -952,13 +952,13 @@ public:
 	bool toBool() const
 	{
 		if (!x)	return false;
-		if (!e)	return x->getcode();
+		if (!e)	return x->getcode() != NULL;
 		return e->Runable();
 	}
 	int toInt()			const {return x ? 1 : 0;}
 	string toString()	const {return "[Thread]";}
 
-	size_t length()		const {return x ? 1 : 0;}
+	size_t length()		const {return x ? static_cast<size_t>(1) : 0;}
 	Variable *index(size_t t)			{return t ? x : NULL;}
 	Variable *child(const string &s)	{return (e && e->Runable()) ? e->getVariable(s).get() : NULL;}
 

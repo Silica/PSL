@@ -19,11 +19,6 @@ public:
 		if (x) x->finalize();
 		x = v.x ? v.x->clone() : NULL;
 	}
-	void copy(Variable *v)
-	{
-		if (x) x->finalize();
-		x = v->clone();
-	}
 	void set(Variable *v)
 	{
 		if (x) x->finalize();
@@ -47,11 +42,6 @@ private:
 		x->finalize();
 		x = v.x->clone();
 	}
-	void copy(Variable *v)
-	{
-		x->finalize();
-		x = v->clone();
-	}
 	void set(Variable *v)
 	{
 		x->finalize();
@@ -71,7 +61,7 @@ template<class T> class vector
 {
 public:
 	vector()	{res = len = 0;x = NULL;}
-	vector(int i)	{len = 0;res = i;x = new T[i];}
+	vector(size_t i)	{len = 0;res = i;x = new T[i];}
 	~vector()	{delete[] x;}
 	void resize(size_t t)
 	{
@@ -131,7 +121,7 @@ public:
 		data *operator->()			{return ta->d[n];}
 		void operator++()
 		{
-			int max = ta->reserve * 2;
+			int max = static_cast<int>(ta->reserve * 2);
 			while (++n < max)
 				if (ta->d[n])
 					return;
@@ -145,8 +135,8 @@ public:
 	table()		{reserve = len = 0;d = NULL;}
 	~table()
 	{
-		int max = reserve * 2;
-		for (int i = 0; i < max; ++i)
+		size_t max = reserve * 2;
+		for (size_t i = 0; i < max; ++i)
 			delete d[i];
 		delete[] d;
 	}
@@ -168,7 +158,7 @@ public:
 		if (len >= reserve)
 			resize();
 		hash h = gethash(s, reserve);
-		int i = getnextnull(h);
+		size_t i = getnextnull(h);
 		d[i] = new data(s);
 		++len;
 		return d[i]->second;
@@ -182,7 +172,7 @@ public:
 			return;
 		delete d[i];
 		if (i < static_cast<int>(reserve))
-			move(i);
+			move(static_cast<hash>(i));
 		else
 			d[i] = NULL;
 	}
@@ -195,7 +185,7 @@ public:
 		{
 			for (size_t i = 0; i < reserve; ++i)
 				if (d[i])
-					return iterator(this, i);
+					return iterator(this, static_cast<int>(i));
 		}
 		return iterator(this, -1);
 	}
@@ -225,7 +215,7 @@ public:
 		if (len >= reserve)
 			resize();
 		hash h = gethash(s, reserve);
-		int i = getnextnull(h);
+		size_t i = getnextnull(h);
 		d[i] = new data(s, v);
 		++len;
 		return true;
@@ -237,16 +227,16 @@ private:
 		if (!d[h])
 			return -1;
 		else if (d[h]->first == s)
-			return h;
+			return static_cast<int>(h);
 
 		size_t max = reserve*2;
 		for (size_t i = reserve+h; i < max; ++i)
 			if (d[i] && d[i]->first == s)
-				return i;
+				return static_cast<int>(i);
 		max = reserve + h;
 		for (size_t i = reserve; i < max; ++i)
 			if (d[i] && d[i]->first == s)
-				return i;
+				return static_cast<int>(i);
 		return -1;
 	}
 	size_t getnextnull(size_t t) const
@@ -291,7 +281,7 @@ private:
 			if (old[i])
 			{
 				hash h = gethash(old[i]->first, reserve);
-				int n = getnextnull(h);
+				size_t n = getnextnull(h);
 				d[n] = old[i];
 			}
 		}
