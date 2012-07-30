@@ -1,7 +1,7 @@
 class string
 {
 public:
-	static int min_i(int x, int y)	{return (x < y) ? x : y;}
+	static size_t min_s(size_t x, size_t y)	{return (x < y) ? x : y;}
 	static bool empty(const char *s){return s == NULL || s[0] == 0;}
 private:
 	class SharedBuffer
@@ -16,7 +16,7 @@ private:
 		SharedBuffer *clone(size_t t)
 		{
 			SharedBuffer *c = new SharedBuffer(t);
-			c->fcopy(buf, min_i(len, t));
+			c->fcopy(buf, min_s(len, t));
 			return c;
 		}
 		void copy(const char *s)
@@ -73,7 +73,7 @@ public:
 	string(double d)
 	{
 		buf = new SharedBuffer(DOUBLE_L);
-		buf->setlen(std::sprintf(buf->buffer(), "%f", d));
+		buf->setlen(static_cast<size_t>(std::sprintf(buf->buffer(), "%f", d)));
 	};
 	~string()	{if (buf)buf->finalize();}
 
@@ -327,7 +327,7 @@ public:
 		if (buf == s.buf)	return true;
 		if (!buf)			return true;
 		if (!s.buf)			return false;
-		size_t max = min_i(buf->length(), s.buf->length());
+		size_t max = min_s(buf->length(), s.buf->length());
 		for (size_t t = 0; t < max; ++t)
 		{
 			if (buf->at(t) < s.buf->at(t))	return true;
@@ -341,7 +341,7 @@ public:
 		if (buf == s.buf)	return true;
 		if (!buf)			return false;
 		if (!s.buf)			return true;
-		size_t max = min_i(buf->length(), s.buf->length());
+		size_t max = min_s(buf->length(), s.buf->length());
 		for (size_t t = 0; t < max; ++t)
 		{
 			if (buf->at(t) < s.buf->at(t))	return false;
@@ -359,10 +359,10 @@ public:
 	{
 		if (i >= 0 && buf)
 		{
-			for (size_t t = i; t < buf->length(); ++t)
+			for (size_t t = static_cast<size_t>(i); t < buf->length(); ++t)
 			{
 				if (buf->at(t) == c)
-					return t;
+					return static_cast<int>(t);
 			}
 		}
 		return -1;
@@ -371,10 +371,10 @@ public:
 	{
 		if (buf)
 		{
-			if (i < 0 || i >= static_cast<int>(buf->length())) i = buf->length()-1;
+			if (i < 0 || i >= static_cast<int>(buf->length())) i = static_cast<int>(buf->length())-1;
 			for (; i >= 0; --i)
 			{
-				if (buf->at(i) == c)
+				if (buf->at(static_cast<size_t>(i)) == c)
 					return i;
 			}
 		}
@@ -391,7 +391,7 @@ public:
 			l = m - i;
 		buf->fcopy(s, l, i);
 		buf->setlen(m);
-		return l;
+		return static_cast<int>(l);
 	}
 	string substr(size_t i = 0, size_t l = 0) const	/* i‚©‚çl•¶Žš‚ðØ‚èo‚µ‚½•¶Žš—ñ */
 	{
@@ -439,8 +439,8 @@ public:
 			size = vsnprintf(NULL, 0, format, arg);
 		if (size >= 0)
 		{
-			SharedBuffer *n = new SharedBuffer(size);
-			n->setlen(vsnprintf(n->buffer(), size+1, format, arg));
+			SharedBuffer *n = new SharedBuffer(static_cast<size_t>(size));
+			n->setlen(static_cast<size_t>(vsnprintf(n->buffer(), static_cast<size_t>(size)+1, format, arg)));
 			if (buf)
 				buf->finalize();
 			buf = n;
@@ -453,11 +453,12 @@ public:
 	{
 		if (buf)
 		{
-			int c = buf->length();
+			size_t c = buf->length();
 			only_and_extend(c);
-			c -= i;
-			if (c < 0)
+			if (c < i)
 				c = 0;
+			else
+				c -= i;
 			buf->setlen(c);
 		}
 		return *this;
@@ -534,7 +535,7 @@ public:
 		}
 		return *this;
 	}
-	string operator%(int i) const
+	string operator%(size_t i) const
 	{
 		string s = *this;
 		s %= i;
@@ -549,12 +550,12 @@ public:
 		unsigned long l = buf->length();
 		if (!l)
 			return 0;
-		unsigned char a = buf->at(0);
-		unsigned char b = buf->at(l-1);
+		unsigned char a = static_cast<unsigned char>(buf->at(0));
+		unsigned char b = static_cast<unsigned char>(buf->at(l-1));
 		return (b | (a<<8)) ^ (l<<4);
 	}
 private:
-	void setint(int i, int c = 0)
+	void setint(int i, size_t c = 0)
 	{
 		char *b = buf->buffer();
 		if (i < 0)
@@ -594,10 +595,10 @@ public:
 		{
 			~wsbuffer()	{delete[] ws;}
 			int rc;
-			int len;
+			size_t len;
 		public:
 			wchar_t *ws;
-			wsbuffer(int n)
+			wsbuffer(size_t n)
 			{
 				ws = new wchar_t[n+1];
 				rc = 1;
@@ -605,20 +606,20 @@ public:
 			}
 			void finalize()	{if (!--rc)	delete this;}
 			wsbuffer *ref()	{++rc;return this;}
-			void setlen(int l)	{ws[len=l] = 0;}
+			void setlen(size_t l)	{ws[len=l] = 0;}
 		} *buf;
 	public:
 		wstring(const wchar_t *ws)
 		{
 			using namespace std;
-			int l = wcslen(ws);
+			size_t l = wcslen(ws);
 			buf = new wsbuffer(l);
 			memcpy(buf->ws, ws, l*sizeof(wchar_t));
 			buf->setlen(l);
 		}
 		wstring(const char *s)
 		{
-			int l = std::strlen(s);
+			size_t l = std::strlen(s);
 			buf = new wsbuffer(l);
 			buf->setlen(std::mbstowcs(buf->ws, s, l));
 		}
@@ -631,7 +632,7 @@ public:
 	string(const wchar_t *ws)
 	{
 		using namespace std;
-		int l = wcslen(ws)*sizeof(wchar_t);
+		size_t l = wcslen(ws)*sizeof(wchar_t);
 		buf = new SharedBuffer(l);
 		buf->setlen(wcstombs(buf->buffer(), ws, l));
 	}
