@@ -553,6 +553,7 @@ public:
 	int toInt()			const {return static_cast<int>(array.size());}
 	double toDouble()	const {return array.size();}
 	string toString()	const {return !array.empty() || !member.empty() ? "[Object]" : code ? "[function]" : "[null]";}
+	void *toPointer()	const {return array.empty() ? NULL : array[0].get()->toPointer();}
 
 	size_t length()				const {return array.size();}
 	bool exist(const string &s)	const {return member.count(s) > 0;}
