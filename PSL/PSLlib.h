@@ -412,7 +412,7 @@ private:
 				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
-				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");
 				if (fp)	this_v["name"] = name;
 				else	this_v["name"] = "";
 				return this_v.pointer();
@@ -466,10 +466,10 @@ private:
 				if (!fp)
 					return 0;
 				variable f;
-				f["$$__FILE*fp__$$"] = fp;
-				f["name"] = name;
 				set(f);
 				variable r = f.instance();
+				r["$$__FILE*fp__$$"] = fp;
+				r["name"] = name;
 				return r.pointer();
 			}
 			else
@@ -477,7 +477,7 @@ private:
 				FILE *fp = this_v["$$__FILE*fp__$$"];
 				if (fp)
 					fclose(fp);
-				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "r");;
+				this_v["$$__FILE*fp__$$"] = fp = fopen(name, "rb");
 				if (fp)	this_v["name"] = name;
 				else	this_v["name"] = "";
 				return this_v.pointer();
@@ -525,7 +525,7 @@ private:
 			for (int i = 0; i < size; ++i)
 			{
 				hex h;
-				if (fread(&h, 1, sizeof(hex), fp) < sizeof(hex))
+				if (!fread(&h, sizeof(hex), 1, fp))
 				{
 					size = i;
 					break;
