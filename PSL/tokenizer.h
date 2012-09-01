@@ -519,8 +519,9 @@ private:
 			}
 			return INT;
 		}
+		PSL_PRINTF(("warning %s %d: unknown token '%c'(%X)\n", filename.c_str(), line, s[i], static_cast<unsigned char>(s[i])));
 		++i;
-		return -1;
+		return doNext();
 	}
 public:
 	int nint;
