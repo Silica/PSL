@@ -2,7 +2,7 @@ class string
 {
 public:
 	static size_t min_s(size_t x, size_t y)	{return (x < y) ? x : y;}
-	static bool empty(const char *s){return s == NULL || s[0] == 0;}
+	static bool empty_s(const char *s){return s == NULL || s[0] == 0;}
 private:
 	class SharedBuffer
 	{
@@ -65,8 +65,8 @@ private:
 public:
 	string()	{buf = NULL;}
 	string(const string &s)			{buf = s.buf ? s.buf->inc() : NULL;}
-	string(const char *s)			{buf = empty(s) ? NULL : new SharedBuffer(s);}
-	string(const char *s, size_t t)	{buf = (empty(s)||t==0) ? NULL : new SharedBuffer(s, t);}
+	string(const char *s)			{buf = empty_s(s) ? NULL : new SharedBuffer(s);}
+	string(const char *s, size_t t)	{buf = (empty_s(s)||t==0) ? NULL : new SharedBuffer(s, t);}
 	string(size_t t, char *&s)		{buf = new SharedBuffer(t);buf->setlen(t);s = buf->buffer();}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
@@ -117,12 +117,12 @@ public:
 	{
 		if (!buf)
 		{
-			if (!empty(s))
+			if (!empty_s(s))
 				buf = new SharedBuffer(s);
 		}
 		else
 		{
-			if (empty(s))
+			if (empty_s(s))
 			{
 				if (buf->shared())
 				{
@@ -145,7 +145,7 @@ public:
 	}
 	string &operator+=(const char *s)
 	{
-		if (empty(s))	return *this;
+		if (empty_s(s))	return *this;
 		if (!buf)
 		{
 			buf = new SharedBuffer(s);
@@ -161,7 +161,7 @@ public:
 	}
 	string operator+(const char *s) const
 	{
-		if (empty(s))	return *this;
+		if (empty_s(s))	return *this;
 		if (!buf)		return new SharedBuffer(s);
 		size_t l = std::strlen(s);
 		SharedBuffer *n = new SharedBuffer(buf->length() + l);
@@ -543,6 +543,20 @@ public:
 	}
 
 	size_t length() const	{return buf ? buf->length() : 0;}
+	bool empty() const		{return !buf || buf->length() == 0;}
+	void clear()
+	{
+		if (!buf)return;
+		if (buf->shared())
+		{
+			buf->finalize();
+			buf = NULL;
+		}
+		else
+		{
+			buf->setlen(0);
+		}
+	}
 	unsigned long hash() const
 	{
 		if (!buf)
@@ -589,6 +603,26 @@ private:
 	string(SharedBuffer *b)	{buf = b;}
 	SharedBuffer *buf;
 public:
+	class iterator : public std::iterator<std::random_access_iterator_tag, char>
+	{
+		SharedBuffer *buf;
+		size_t index;
+	public:
+		iterator(SharedBuffer *x, size_t i){buf = x;index = i;}
+		char &operator*()			{return buf->buffer()[index];}
+		bool operator==(iterator i)	{return index == i.index;}
+		bool operator!=(iterator i)	{return index != i.index;}
+		bool operator<(iterator i)	{return index < i.index;}
+		iterator &operator++()		{++index;return *this;}
+		iterator &operator--()		{--index;return *this;}
+		iterator &operator+=(int i)	{index += i;return *this;}
+		iterator &operator-=(int i)	{index -= i;return *this;}
+		iterator operator+(int i)	{return iterator(buf, index+i);}
+		iterator operator-(int i)	{return iterator(buf, index-i);}
+		int operator-(iterator i)	{return static_cast<int>(index) - static_cast<int>(i.index);}
+	};
+	iterator begin(){if(buf)only_and_extend(length());return iterator(buf, 0);}
+	iterator end()	{return iterator(buf, length());}
 	class wstring
 	{
 		class wsbuffer
