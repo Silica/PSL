@@ -59,6 +59,7 @@ static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0
 	vCCMethodV##n(void(C::*m)t){x=m;this_v=NULL;}vBase *clone(){return new vCCMethodV##n(x);}\
 	Type type()const{return CCMETHOD;}void push(Variable *v){this_v=v;}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
+	Variable *index(size_t i){return i?this_v:NULL;}\
 	void prepare(Environment &env, Variable *v){variable a = env.pop();C*i=static_cast<C*>(this_v->index(0)->toPointer());(i->*x)g;env.push(a);}\
 	rsv call(Environment &env, variable &a, Variable *v){C*i=static_cast<C*>(this_v->index(0)->toPointer());(i->*x)g;return a;}};
 template<class C>MV(0,(),())
@@ -81,6 +82,7 @@ template<class C, class A0, class A1, class A2, class A3, class A4, class A5>MV(
 	vCCMethodR##n(R(C::*m)t){x=m;this_v=NULL;}vBase *clone(){return new vCCMethodR##n(x);}\
 	Type type()const{return CCMETHOD;}void push(Variable *v){this_v=v;}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
+	Variable *index(size_t i){return i?this_v:NULL;}\
 	void prepare(Environment &env, Variable *v){variable a = env.pop();C*i=static_cast<C*>(this_v->index(0)->toPointer());variable r = (i->*x)g;env.push(r);}\
 	rsv call(Environment &env, variable &a, Variable *v){C*i=static_cast<C*>(this_v->index(0)->toPointer());variable r = (i->*x)g;return r;}};
 template<class C, class R>MR(0,(),())
