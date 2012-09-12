@@ -746,6 +746,8 @@ private:
 			else break;
 		}
 	}
+	#undef EXP
+	#undef EXP0
 	void ParseExpression(variable &c, char e, bool l = false)
 	{
 		getexp13(c, l);
