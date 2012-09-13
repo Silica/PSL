@@ -87,6 +87,8 @@ class PSLVM
 {
 	typedef variable::rsv rsv;
 	variable::Environment env;
+	PSLVM(const PSLVM&);
+	void operator=(const PSLVM&);
 public:
 	enum error
 	{
