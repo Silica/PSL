@@ -206,6 +206,7 @@ public:
 	void add(const string &name, variable::method f)	{env.global.get()->set(name, variable(f));}
 	#ifndef PSL_SHARED_GLOBAL
 	operator variable::Environment&()	{return env;}
+	variable call(variable &f, variable &arg = variable())	{return f(env, arg);}
 	#endif
 private:
 	bool parse(variable::Tokenizer *t)
