@@ -64,8 +64,8 @@ static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0
 	rsv call(Environment &env, variable &a, Variable *v){C*i=static_cast<C*>(this_v->index(0)->toPointer());(i->*x)g;return a;}};
 template<class C>MV(0,(),())
 template<class C>MV(C0,()const,())
-template<class C, class A0>MV(1,(A0),(a[0]))
-template<class C, class A0>MV(C1,(A0)const,(a[0]))
+template<class C, class A0>MV(1,(A0),(a))
+template<class C, class A0>MV(C1,(A0)const,(a))
 template<class C, class A0, class A1>MV(2,(A0,A1),(a[0],a[1]))
 template<class C, class A0, class A1>MV(C2,(A0,A1)const,(a[0],a[1]))
 template<class C, class A0, class A1, class A2>MV(3,(A0,A1,A2),(a[0],a[1],a[2]))
@@ -87,8 +87,8 @@ template<class C, class A0, class A1, class A2, class A3, class A4, class A5>MV(
 	rsv call(Environment &env, variable &a, Variable *v){C*i=static_cast<C*>(this_v->index(0)->toPointer());variable r = (i->*x)g;return r;}};
 template<class C, class R>MR(0,(),())
 template<class C, class R>MR(C0,()const,())
-template<class C, class R, class A0>MR(1,(A0),(a[0]))
-template<class C, class R, class A0>MR(C1,(A0)const,(a[0]))
+template<class C, class R, class A0>MR(1,(A0),(a))
+template<class C, class R, class A0>MR(C1,(A0)const,(a))
 template<class C, class R, class A0, class A1>MR(2,(A0,A1),(a[0],a[1]))
 template<class C, class R, class A0, class A1>MR(C2,(A0,A1)const,(a[0],a[1]))
 template<class C, class R, class A0, class A1, class A2>MR(3,(A0,A1,A2),(a[0],a[1],a[2]))
