@@ -136,9 +136,13 @@ public:
 		fclose(fp);
 		return NONE;
 	}
+	error writeCompiledCode(variable::buffer &buf)
+	{
+		env.global.get()->write("", buf);
+		return NONE;
+	}
 	error loadCompiledCode(std::FILE *fp, unsigned long size)
 	{
-		variable cc;
 		unsigned long l;
 		fread(&l, 1, sizeof(l), fp);
 		if (l != 0xBCDEF01A)
@@ -146,11 +150,7 @@ public:
 		size -= sizeof(l);
 		variable::Variable::bytecode b(size);
 		fread(b.get(), 1, size, fp);
-		variable::Variable::bcreader::read(b, cc);
-		variable g = env.global;
-		g.gset(cc);
-		g.prepare(env);
-		return NONE;
+		return loadCompiledCode(b);
 	}
 	error loadCompiledCode(const string &filename)
 	{
@@ -166,6 +166,21 @@ public:
 		error e = loadCompiledCode(fp, static_cast<unsigned long>(size));
 		fclose(fp);
 		return e;
+	}
+	error loadCompiledCode(variable::buffer &buf)
+	{
+		variable c;
+		variable::Variable::bcreader::read(buf, c);
+		variable g = env.global;
+		g.gset(c);
+		g.prepare(env);
+		return NONE;
+	}
+	error loadCompiledCode(void *buf, unsigned long size)
+	{
+		variable::Variable::bytecode b;
+		b.push(buf, size);
+		return loadCompiledCode(b);
 	}
 	rsv run(const variable &arg = 0)
 	{

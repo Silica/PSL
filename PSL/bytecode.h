@@ -15,6 +15,8 @@ public:
 	}
 	void resize(size_t t)	{code.resize(t);}
 private:
+	bytecode(const bytecode&);
+	void operator=(const bytecode&);
 	#ifdef PSL_USE_STL_VECTOR
 	std::
 	#endif
