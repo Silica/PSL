@@ -222,6 +222,7 @@ public:
 	int toInt()			const {return x ? x->toInt() : 0;}
 	double toDouble()	const {return x ? x->toDouble() : 0;}
 	string toString()	const {return x ? x->toString() : string("[nullptr]");}
+	void *toPointer()	const {return x ? x->toPointer() : NULL;}
 
 	size_t length()		const {return x ? x->length() : 0;}
 	bool exist(const string &s)	const {return x ? x->exist(s) : false;}
