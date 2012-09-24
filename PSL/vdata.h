@@ -1,3 +1,28 @@
+static bool isFunction(Variable *v)
+{
+	switch (v->type())
+	{
+	case OBJECT:
+		if (!v->getcode())
+			return false;
+	case CFUNCTION:
+	case BCFUNCTION:
+		return true;
+	}
+	return false;
+}
+static bool isMethod(Variable *v)
+{
+	switch (v->type())
+	{
+	case METHOD:
+	case CMETHOD:
+	case CCMETHOD:
+		return true;
+	}
+	return false;
+}
+
 class vInt : public vBase
 {
 public:
@@ -441,7 +466,7 @@ public:
 
 	vBase *substitution(Variable *v)
 	{
-		if (!toBool())
+		if (!vObject::toBool() || (array.empty() && member.empty() && isFunction(v)))
 		{
 			vBase *x = v->bclone();
 			#ifdef PSL_USE_DESTRUCTOR
@@ -702,8 +727,7 @@ private:
 
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
-			Type t = it->second.get()->type();
-			if (t == CMETHOD || t == METHOD || t == CCMETHOD)
+			if (isMethod(it->second.get()))
 			{
 				rsv z(it->second.get()->clone(), 0);
 				z.get()->push(x);
@@ -811,7 +835,7 @@ public:
 	vBase *clone()	{return new vCFunction(f);}
 
 	vBase *substitution(Variable *v)	{
-		if (v->type() == CFUNCTION)
+		if (isFunction(v))
 		{
 			vBase *x = v->bclone();
 			delete this;
@@ -846,7 +870,7 @@ public:
 	vBase *clone()	{return new vCMethod(f, this_v);}
 
 	vBase *substitution(Variable *v)	{
-		if (v->type() == CMETHOD || v->type() == METHOD)
+		if (isMethod(v))
 		{
 			vBase *x = v->bclone();
 			x->push(this_v);

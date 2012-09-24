@@ -54,13 +54,13 @@ public:
 		POINTER,
 		RARRAY,
 		OBJECT,
-		METHOD,
 		CFUNCTION,
+		BCFUNCTION,
+		METHOD,
 		CMETHOD,
+		CCMETHOD,
 		CPOINTER,
 		THREAD,
-		BCFUNCTION,
-		CCMETHOD,
 	};
 	class Function{};
 	template<class C>class Method{};

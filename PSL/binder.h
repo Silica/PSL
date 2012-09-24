@@ -58,6 +58,7 @@ static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0
 	PSL_MEMORY_MANAGER(vCCMethodV##n)\
 	vCCMethodV##n(void(C::*m)t){x=m;this_v=NULL;}vBase *clone(){return new vCCMethodV##n(x);}\
 	Type type()const{return CCMETHOD;}void push(Variable *v){this_v=v;}\
+	vBase *substitution(Variable *v){if (isMethod(v)){vBase *c = v->bclone();c->push(this_v);delete this;return c;}return this;}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
 	Variable *index(size_t i){return i?this_v:NULL;}\
 	void prepare(Environment &env, Variable *v){variable a = env.pop();C*i=static_cast<C*>(this_v->index(0)->toPointer());(i->*x)g;env.push(a);}\

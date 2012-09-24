@@ -540,9 +540,8 @@ public:
 		variable v = env.pop();
 		env.push(r);
 		#ifdef PSL_OPTIMIZE_TAILCALL
-		Type t = v.type();
 		MNEMONIC::mnemonic n = env.getNext();
-		if (t == CMETHOD || t == METHOD || t == CCMETHOD)
+		if (isMethod(v.x))
 		{
 			rsv z = v[1];
 /*		メソッドはthisを束縛しない為、メソッド呼び出しで末尾最適化がかかると
