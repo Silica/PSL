@@ -495,7 +495,7 @@ public:
 	}
 	vBase *assignment(Variable *v)
 	{
-		if (!toBool() || (v->type() != OBJECT && v->type() != RARRAY))
+		if (!vObject::toBool() || (v->type() != OBJECT && v->type() != RARRAY))
 		{
 			vBase *x = v->bclone();
 			#ifdef PSL_USE_DESTRUCTOR
@@ -573,7 +573,7 @@ public:
 		}
 		return true;
 	}
-	bool ne(Variable *v)	{return !eq(v);}
+	bool ne(Variable *v)	{return !vObject::eq(v);}
 
 	bool toBool()		const {return !array.empty() || !member.empty() || code;}
 	int toInt()			const {return static_cast<int>(array.size());}
@@ -619,17 +619,11 @@ public:
 	{
 		size_t size = array.size();
 		for (size_t i = 0; i < size; ++i)
-		{
-			Type t = array[i].get()->type();
-			if (t == METHOD || t == CMETHOD || t == CCMETHOD)
+			if (isMethod(array[i].get()))
 				array[i].get()->push(v);
-		}
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
-		{
-			Type t = it->second.get()->type();
-			if (t == METHOD || t == CMETHOD || t == CCMETHOD)
+			if (isMethod(it->second.get()))
 				it->second.get()->push(v);
-		}
 	}
 
 	void prepare(Environment &env, Variable *v)
@@ -990,7 +984,7 @@ public:
 
 	void prepare(Environment &env, Variable *v)
 	{
-		if (!toBool())
+		if (!vThread::toBool())
 		{
 			rsv r(new Variable(new vThread(env.pop().get(), NULL)), 0);
 			env.push(r);
@@ -1003,7 +997,7 @@ public:
 	}
 	rsv call(Environment &env, variable &arg, Variable *v)
 	{
-		if (!toBool())
+		if (!vThread::toBool())
 			return variable(NIL);
 		newenv(env);
 		e->push(arg);
