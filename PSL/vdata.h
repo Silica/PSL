@@ -8,8 +8,9 @@ static bool isFunction(Variable *v)
 	case CFUNCTION:
 	case BCFUNCTION:
 		return true;
+	default:
+		return false;
 	}
-	return false;
 }
 static bool isMethod(Variable *v)
 {
@@ -19,8 +20,9 @@ static bool isMethod(Variable *v)
 	case CMETHOD:
 	case CCMETHOD:
 		return true;
+	default:
+		return false;
 	}
-	return false;
 }
 
 class vInt : public vBase
@@ -80,7 +82,7 @@ public:
 
 	vBase *substitution(Variable *v)	{x = static_cast<hex>(v->toInt());return this;}
 
-	#define OP(n,o) void n(Variable *v)	{x o v->toInt();}
+	#define OP(n,o) void n(Variable *v)	{x o static_cast<hex>(v->toInt());}
 	OP(add,+=)
 	OP(sub,-=)
 	OP(mul,*=)
@@ -90,7 +92,7 @@ public:
 	OP(shl,<<=)
 	OP(shr,>>=)
 	#undef OP
-	#define OP(n,o) void n(Variable *v)	{if (int i = v->toInt())x o i;else x=0;}
+	#define OP(n,o) void n(Variable *v)	{if (hex i = static_cast<hex>(v->toInt()))x o i;else x=0;}
 	OP(div,/=)
 	OP(mod,%=)
 	#undef OP

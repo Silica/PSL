@@ -467,7 +467,7 @@ public:
 	}
 	void set(Scope *s)	{owner = s;}
 	void Jump(int l)	{line = static_cast<size_t>(l);}
-	void RJump(int l)	{line += l;}
+	void RJump(int l)	{line = static_cast<size_t>(static_cast<int>(line) + l);}
 	bool Run(Environment &env)	{return code->Run(env, line);}
 	#ifdef PSL_DEBUG
 	void StepExec(Environment &env)	{return code->StepExec(env, line);}

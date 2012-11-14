@@ -174,22 +174,21 @@ public:
 	#endif
 
 	variable operator[](size_t i)			{return x->index(i);}
-	variable operator[](int i)				{return x->index(minusindex(i));}
+	variable operator[](int i)				{return x->index(static_cast<size_t>(minusindex(i)));}
 	variable operator[](const char *s)		{return x->child(s);}
 	variable operator[](const string &s)	{return x->child(s);}
 	variable operator[](const variable &v)	{
 		if (v.type(STRING) || v.type(FLOAT))	return x->child(v);
 		if (v.type(RARRAY))
 		{
-			size_t s = minusindex(v.x->index(0)->toInt());
+			int s = minusindex(v.x->index(0)->toInt());
 			int l = v.x->index(1)->toInt();
 			variable r(RARRAY);
-			if (l < 0)	for (int i = 0; i > l; --i)	r.x->push(x->index(s+i));
-			else		for (int i = 0; i < l; ++i)	r.x->push(x->index(s+i));
+			if (l < 0)	for (int i = 0; i > l; --i)	r.x->push(x->index(static_cast<size_t>(s+i)));
+			else		for (int i = 0; i < l; ++i)	r.x->push(x->index(static_cast<size_t>(s+i)));
 			return r.x;
 		}
-		size_t i = minusindex(v);
-		return x->index(i);
+		return x->index(static_cast<size_t>(minusindex(v)));
 	}
 	size_t length() const				{return x->length();}
 	bool exist(const string &s) const	{return x->exist(s);}
@@ -198,7 +197,7 @@ public:
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
 	void del(const string &s)						{return x->del(s);}
 private:
-	size_t minusindex(int i)
+	int minusindex(int i)
 	{
 		if (i < 0)
 		{
@@ -207,7 +206,7 @@ private:
 			if (i < 0)
 				i = 0;
 		}
-		return static_cast<size_t>(i);
+		return i;
 	}
 	#include "PSLlib.h"
 	#include "tokenizer.h"
@@ -246,7 +245,7 @@ private:
 		{
 			if (rc & 0x40000000)
 				return true;
-			if (rc & 0x80000000)
+			if (static_cast<unsigned>(rc) & 0x80000000)
 			{
 				if (v == this)
 					++c;
@@ -509,17 +508,17 @@ public:
 		Variable *temp;
 	public:
 		iterator(Variable *x, size_t i){v = x;index = i;}
-		variable &operator*()		{temp = v->index(index);return *reinterpret_cast<variable*>(&temp);}
-		bool operator==(iterator i)	{return index == i.index;}
-		bool operator!=(iterator i)	{return index != i.index;}
-		bool operator<(iterator i)	{return index < i.index;}
-		iterator &operator++()		{++index;return *this;}
-		iterator &operator--()		{--index;return *this;}
-		iterator &operator+=(int i)	{index += i;return *this;}
-		iterator &operator-=(int i)	{index -= i;return *this;}
-		iterator operator+(int i)	{return iterator(v, index+i);}
-		iterator operator-(int i)	{return iterator(v, index-i);}
-		int operator-(iterator i)	{return static_cast<int>(index) - static_cast<int>(i.index);}
+		variable &operator*()			{temp = v->index(index);return *reinterpret_cast<variable*>(&temp);}
+		bool operator==(iterator i)		{return index == i.index;}
+		bool operator!=(iterator i)		{return index != i.index;}
+		bool operator<(iterator i)		{return index < i.index;}
+		iterator &operator++()			{++index;return *this;}
+		iterator &operator--()			{--index;return *this;}
+		iterator &operator+=(size_t i)	{index += i;return *this;}
+		iterator &operator-=(size_t i)	{index -= i;return *this;}
+		iterator operator+(size_t i)	{return iterator(v, index+i);}
+		iterator operator-(size_t i)	{return iterator(v, index-i);}
+		int operator-(iterator i)		{return static_cast<int>(index) - static_cast<int>(i.index);}
 	};
 	iterator begin(){return iterator(x, 0);}
 	iterator end()	{return iterator(x, length());}

@@ -564,8 +564,8 @@ public:
 		unsigned long l = buf->length();
 		if (!l)
 			return 0;
-		unsigned char a = static_cast<unsigned char>(buf->at(0));
-		unsigned char b = static_cast<unsigned char>(buf->at(l-1));
+		unsigned long a = static_cast<unsigned long>(buf->at(0));
+		unsigned long b = static_cast<unsigned long>(buf->at(l-1));
 		return (b | (a<<8)) ^ (l<<4);
 	}
 private:
@@ -605,24 +605,23 @@ private:
 public:
 	class iterator : public std::iterator<std::random_access_iterator_tag, char>
 	{
-		SharedBuffer *buf;
-		size_t index;
+		char *p;
 	public:
-		iterator(SharedBuffer *x, size_t i){buf = x;index = i;}
-		char &operator*()			{return buf->buffer()[index];}
-		bool operator==(iterator i)	{return index == i.index;}
-		bool operator!=(iterator i)	{return index != i.index;}
-		bool operator<(iterator i)	{return index < i.index;}
-		iterator &operator++()		{++index;return *this;}
-		iterator &operator--()		{--index;return *this;}
-		iterator &operator+=(int i)	{index += i;return *this;}
-		iterator &operator-=(int i)	{index -= i;return *this;}
-		iterator operator+(int i)	{return iterator(buf, index+i);}
-		iterator operator-(int i)	{return iterator(buf, index-i);}
-		int operator-(iterator i)	{return static_cast<int>(index) - static_cast<int>(i.index);}
+		iterator(char *x)			{p = x;}
+		char &operator*()			{return *p;}
+		bool operator==(iterator i)	{return p == i.p;}
+		bool operator!=(iterator i)	{return p != i.p;}
+		bool operator<(iterator i)	{return p < i.p;}
+		iterator &operator++()		{++p;return *this;}
+		iterator &operator--()		{--p;return *this;}
+		iterator &operator+=(int i)	{p += i;return *this;}
+		iterator &operator-=(int i)	{p -= i;return *this;}
+		iterator operator+(int i)	{return iterator(p+i);}
+		iterator operator-(int i)	{return iterator(p-i);}
+		int operator-(iterator i)	{return p - i.p;}
 	};
-	iterator begin(){if(buf)only_and_extend(length());return iterator(buf, 0);}
-	iterator end()	{return iterator(buf, length());}
+	iterator begin(){if(buf)only_and_extend(length());return iterator(buf->buffer());}
+	iterator end()	{return iterator(buf->buffer() + length());}
 	class wstring
 	{
 		class wsbuffer

@@ -215,7 +215,8 @@ private:
 			{
 				if ((i = s.find(c, i)) < 0)
 					break;
-				if (i-prev)	r.push(s.substr(prev, i-prev));
+				size_t p = static_cast<size_t>(i) - prev;
+				if (p)		r.push(s.substr(prev, p));
 				else		r.push(string());
 				prev = static_cast<size_t>(i+1);
 			}
