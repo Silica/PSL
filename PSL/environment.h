@@ -24,6 +24,7 @@ public:
 			MEMBER,
 			INDEX,
 			LOCALINDEX,
+			SET_MEMBER,
 
 			CALL,RETURN,
 			BREAK,CONTINUE,

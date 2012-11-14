@@ -34,6 +34,7 @@ private:
 		WARNING,
 		IIAE,
 		BINC,
+		ITMN,
 	};
 	void Error(ErrorID n, int op = 0, const char *str = "", int line = -1)
 	{
@@ -60,6 +61,7 @@ private:
 		case TINAE:	PSL_PRINTF(("There is no %c at expression end\n", op));break;
 		case IIAE:	PSL_PRINTF(("'%s' is already exsit\n", str));break;
 		case BINC:	PSL_PRINTF(("block not closed from %d\n", op));break;
+		case ITMN:	PSL_PRINTF(("invalid table member name\n", op));break;
 		default:	PSL_PRINTF(("unknown error\n"));
 		}
 	}
@@ -372,6 +374,39 @@ private:
 		}
 		Error(BINC, line);
 	}
+	void ParseTable(variable &c)
+	{
+		c.pushcode(new Variable::PUSH_NULL);
+		while (int n = t->checkNext())
+		{
+			if (n == ']')
+			{
+				t->getNext();
+				return;
+			}
+			else if (n == Tokenizer::IDENTIFIER || n == Tokenizer::STRING)
+			{
+				t->getNext();
+				string name = t->nstr;
+				if (t->getNext() == ':')
+				{
+					getexp11(c);
+					c.pushcode(new Variable::SET_MEMBER(name));
+					t->getNextIf(',');
+				}
+				else
+				{
+					Error(TINA, ':', "table member name");
+				}
+			}
+			else
+			{
+				Error(ITMN);
+				while (t->getNext() != ']');
+				return;
+			}
+		}
+	}
 	void getSuffOp(variable &c)
 	{
 		while (int n = t->checkNext())
@@ -448,6 +483,12 @@ private:
 					c.pushcode(new Variable::PARENTHESES);
 				}
 			}
+			getSuffOp(c);
+		}
+		else if (n == '[')
+		{
+			t->getNext();
+			ParseTable(c);
 			getSuffOp(c);
 		}
 		else if (n == '@')

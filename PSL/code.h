@@ -810,6 +810,24 @@ public:
 private:
 	int x;
 };
+class SET_MEMBER : public OpCode
+{
+public:
+	PSL_MEMORY_MANAGER(SET_MEMBER)
+	SET_MEMBER(const string &s)	{name = s;}
+	CLONE(SET_MEMBER(name))
+	EXEC
+	{
+		variable v = env.pop();
+		variable x = env.top();
+		x.set(name, v);
+		return RC::NONE;
+	}
+	PSL_DUMP((int d){PSL_PRINTF(("SET_MEMBER %s\n", name.c_str()));})
+	WRITE(SET_MEMBER,b.push(name.c_str(), name.length()+1);)
+private:
+	string name;
+};
 #undef GET
 #undef CLONE
 #undef EXEC

@@ -69,6 +69,7 @@ class bcreader
 			OPC_S(STATIC)
 			OPC_S(DECLARATION)
 			OPC_S(MEMBER)
+			OPC_S(SET_MEMBER)
 		#undef OPC_S
 		#define OPCODE(n) case OpCode::MNEMONIC::n:v.pushcode(new n());break;
 			OPCODE(POP)
