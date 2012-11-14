@@ -145,6 +145,9 @@ public:
 	variable operator++(int i);	// suf
 	variable operator--(int i);
 
+	int toInt()			const	{return x->toInt();}
+	double toDouble()	const	{return x->toDouble();}
+	bool toBool()		const	{return x->toBool();}
 	operator int()		const	{return x->toInt();}
 	operator double()	const	{return x->toDouble();}
 	operator bool()		const	{return x->toBool();}
