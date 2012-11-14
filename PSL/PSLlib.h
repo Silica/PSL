@@ -15,6 +15,7 @@ public:
 		v.set("pointer", POINTER);
 		v.set("nullptr", POINTER);
 		v.set("thread", THREAD);
+		v.set("version", version);
 		v["object"];
 		v["null"];
 

@@ -78,6 +78,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 #include <iterator>
 
 namespace PSL {
+const static int version = 900;
 using std::size_t;
 #include "variable.h"
 typedef variable::string string;
