@@ -386,9 +386,9 @@ private:
 			}
 			else if (n == Tokenizer::IDENTIFIER || n == Tokenizer::STRING)
 			{
-				t->getNext();
 				string name = t->nstr;
-				if (t->getNext() == ':')
+				t->getNext();
+				if (t->getNextIf(':'))
 				{
 					getexp11(c);
 					c.pushcode(new Variable::SET_MEMBER(name));
@@ -396,7 +396,34 @@ private:
 				}
 				else
 				{
-					Error(TINA, ':', "table member name");
+					if (n == Tokenizer::IDENTIFIER)
+						c.pushcode(new Variable::VARIABLE(name));
+					else
+						c.pushcode(new Variable::PUSH_STRING(name));
+					getSuffOp(c);
+					getexp11(c, true);
+					c.pushcode(new Variable::ARRAY_PUSH);
+					t->getNextIf(',');
+//					Error(TINA, ':', "table member name");
+				}
+			}
+			else if (n == Tokenizer::INT)
+			{
+				int i = t->nint;
+				t->getNext();
+				if (t->getNextIf(':'))
+				{
+					getexp11(c);
+					c.pushcode(new Variable::SET_INDEX(i));
+					t->getNextIf(',');
+				}
+				else
+				{
+					c.pushcode(new Variable::PUSH_INT(i));
+					getSuffOp(c);
+					getexp11(c, true);
+					c.pushcode(new Variable::ARRAY_PUSH);
+					t->getNextIf(',');
 				}
 			}
 			else

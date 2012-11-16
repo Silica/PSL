@@ -828,6 +828,37 @@ public:
 private:
 	string name;
 };
+class SET_INDEX : public OpCode
+{
+public:
+	PSL_MEMORY_MANAGER(SET_INDEX)
+	SET_INDEX(int &i)	{x = i;}
+	CLONE(SET_INDEX(x))
+	EXEC
+	{
+		variable v = env.pop();
+		variable w = env.top();
+		w[x] = v;
+		return RC::NONE;
+	}
+	PSL_DUMP((int d){PSL_PRINTF(("SET_INDEX %d\n", x));})
+	WRITE(SET_INDEX,b.push(&x, sizeof(x));)
+private:
+	int x;
+};
+class ARRAY_PUSH : public OpCode
+{
+	CLONE(ARRAY_PUSH)
+	EXEC
+	{
+		variable v = env.pop();
+		variable x = env.top();
+		x.push(v);
+		return RC::NONE;
+	}
+	PSL_DUMP((int d){PSL_PRINTF(("ARRAY_PUSH\n"));})
+	WRITE(ARRAY_PUSH,)
+};
 #undef GET
 #undef CLONE
 #undef EXEC
