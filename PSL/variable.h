@@ -194,6 +194,7 @@ public:
 		return x->index(static_cast<size_t>(minusindex(v)));
 	}
 	size_t length() const				{return x->length();}
+	size_t memberLength() const			{return x->memberLength();}
 	bool exist(const string &s) const	{return x->exist(s);}
 	void push(const variable &v)		{return x->push(v.x);}
 	variable keys()	{return x->keys();}
@@ -323,6 +324,7 @@ private:
 		void *toPointer()	const {return x->toPointer();}
 
 		size_t length()				const {return x->length();}
+		size_t memberLength()		const {return x->memberLength();}
 		bool exist(const string &s)	const {return x->exist(s);}
 		void push(Variable *v)		{x->push(v);}
 		Variable *index(size_t t)			{Variable *v = x->index(t);return v ? v : this;}
@@ -396,6 +398,7 @@ private:
 			virtual void *toPointer()	const {return NULL;}
 
 			virtual size_t length()				const {return 0;}
+			virtual size_t memberLength()		const {return 0;}
 			virtual bool exist(const string &s)	const {return false;}
 			virtual Variable *index(size_t t)			{return NULL;}
 			virtual Variable *child(const string &s)	{return NULL;}
@@ -454,7 +457,6 @@ private:
 
 	void prepare(Environment &env)			{x->prepare(env);}
 
-	size_t codelength()					{return x->codelength();}
 	Variable::Code *getcode()			{return x->getcode();}
 	void pushcode(Variable::OpCode *c)	{return x->pushcode(c);}
 	void pushlabel(const string &s)		{return x->pushlabel(s);}
@@ -466,6 +468,7 @@ private:
 	friend class Variable::bcreader;
 	friend class Variable::Code;
 public:
+	size_t codelength()					{return x->codelength();}
 	typedef Variable::bytecode buffer;
 	rsv ref()		const	{return x;}
 	rsv pointer()	const	{return variable(POINTER, x);}

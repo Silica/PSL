@@ -584,6 +584,7 @@ public:
 	void *toPointer()	const {return array.empty() ? NULL : array[0].get()->toPointer();}
 
 	size_t length()				const {return array.size();}
+	size_t memberLength()		const {return member.size();}
 	bool exist(const string &s)	const {return member.count(s) > 0;}
 	Variable *index(size_t t)			{if(t>=array.size())array.resize(t+1);return array[t].get();}
 	Variable *child(const string &s)	{return member[s].get();}

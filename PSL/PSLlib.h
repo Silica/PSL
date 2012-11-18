@@ -366,12 +366,18 @@ private:
 		static void set(const rsv &r)
 		{
 			variable v = r;
+			v["length"] = variable(Length);
 			v["exist"] = variable(Exist);
 			v["delete"] = variable(Delete);
 			v["keys"] = variable(Keys);
 			v["foreach"] = variable(Foreach);
 		}
 	private:
+		static variable Length(variable &this_v, variable &v)
+		{
+			if (!this_v)	return v.memberLength();
+			else			return this_v.memberLength();
+		}
 		static variable Exist(variable &this_v, variable &v)
 		{
 			if (!this_v)	return v[0].exist(v[1]);
