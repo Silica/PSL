@@ -30,6 +30,9 @@ public:
 		variable v = r;
 		v["range"] = Range;
 		v["foreach"] = Foreach;
+		v["map"] = Map;
+		v["filter"] = Filter;
+		v["reduce"] = Reduce;
 		v["new"] = New;
 		v["eval"] = Eval;
 		#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
@@ -150,6 +153,39 @@ private:
 				f(k[i], l[k[i]]);
 			return k;
 		}
+	}
+	static variable Map(variable &v)
+	{
+		variable l = v[0];
+		variable f = v[1];
+		variable n;
+		size_t size = l.length();
+		for (size_t i = 0; i < size; ++i)
+			n[i] = f(l[i]);
+		return n;
+	}
+	static variable Filter(variable &v)
+	{
+		variable l = v[0];
+		variable f = v[1];
+		variable n;
+		size_t size = l.length();
+		for (size_t i = 0; i < size; ++i)
+			if (f(l[i]))
+				n.push(l[i]);
+		return n;
+	}
+	static variable Reduce(variable &v)
+	{
+		variable l = v[0];
+		variable f = v[1];
+		size_t size = l.length();
+		if (!size)
+			return v;
+		variable a = l[0];
+		for (size_t i = 1; i < size; ++i)
+			a = f(a, l[i]);
+		return a;
 	}
 	static variable New(variable &v)
 	{

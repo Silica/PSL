@@ -404,7 +404,6 @@ private:
 					getexp11(c, true);
 					c.pushcode(new Variable::ARRAY_PUSH);
 					t->getNextIf(',');
-//					Error(TINA, ':', "table member name");
 				}
 			}
 			else if (n == Tokenizer::INT)
