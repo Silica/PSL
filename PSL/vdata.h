@@ -631,7 +631,10 @@ public:
 	void prepare(Environment &env, Variable *v)
 	{
 		if (!code)
+		{
+			vBase::prepare(env, v);
 			return;
+		}
 		env.addScope(new FunctionScope(code, v));
 	}
 	void prepareInstance(Environment &env, Variable *v)
