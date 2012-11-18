@@ -7,16 +7,19 @@ Permission is granted to anyone to use this software for any purpose, including 
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.*/
 
+#define PSL_VERSION 10100
+
 // 設定項目
 //#define PSL_USE_STL_VECTOR
 //#define PSL_USE_STL_STACK
 //#define PSL_USE_STL_MAP
+//#define PSL_NOT_SETLOCALE	// PSLVMでsetlocaleしない
 //#define PSL_NULL_RSV		// rsvはNULLを許容する、STL_VECTORを使う場合は必須
 
 //#define PSL_DEBUG		// 行番号の埋め込みとステップ実行のサポート
 
-#define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
-#define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
+//#define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
+//#define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
 //#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
 //#define PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST	// 宣言済みの名前を更に宣言した場合に通知する
 
@@ -29,7 +32,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 #define PSL_OPTIMIZE_PARENTHESES			// 計算順序を変える為だけの()を演算子にしない
 
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
-#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
+//#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
 #define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 //#define PSL_MEMBER_REGISTER		// メンバアクセスした際に親をレジスタに保存する(メソッドチェーン用)
@@ -78,7 +81,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 #include <iterator>
 
 namespace PSL {
-const static int version = 10000;
+const static int version = PSL_VERSION;
 using std::size_t;
 #include "variable.h"
 typedef variable::string string;
@@ -195,10 +198,15 @@ public:
 		return env.pop();
 	}
 	PSLVM() : env(1)
-	#ifndef PSL_DEBUG
-	{std::setlocale(LC_ALL, "");}
-	#else
-	{std::setlocale(LC_ALL, "");init = false;}
+	{
+	#ifndef PSL_NOT_SETLOCALE
+		std::setlocale(LC_ALL, "");
+	#endif
+	#ifdef PSL_DEBUG
+		init = false;
+	#endif
+	}
+	#ifdef PSL_DEBUG
 	rsv stepExec()
 	{
 		if (!env.Runable())
