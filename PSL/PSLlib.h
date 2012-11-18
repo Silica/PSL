@@ -196,6 +196,7 @@ private:
 	{
 		string s = v;
 		variable g;
+		s += ";";
 		Tokenizer t(s.c_str(), "eval", 0);
 		Parser p(&t);
 		p.Parse(g);
