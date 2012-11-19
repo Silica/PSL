@@ -1,3 +1,4 @@
+public:
 static bool isFunction(Variable *v)
 {
 	switch (v->type())
@@ -24,7 +25,7 @@ static bool isMethod(Variable *v)
 		return false;
 	}
 }
-
+private:
 class vInt : public vBase
 {
 public:
@@ -110,7 +111,7 @@ public:
 	bool toBool()		const {return x != 0;}
 	int toInt()			const {return static_cast<int>(x);}
 	double toDouble()	const {return x;}
-	string toString()	const {string s;return s.sprintf("%X", x);}
+	string toString()	const {return string(x);}
 
 	size_t length()		const {return 1;}
 

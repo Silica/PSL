@@ -69,6 +69,7 @@ public:
 	string(const char *s, size_t t)	{buf = (empty_s(s)||t==0) ? NULL : new SharedBuffer(s, t);}
 	string(size_t t, char *&s)		{buf = new SharedBuffer(t);buf->setlen(t);s = buf->buffer();}
 	string(int i)					{buf = new SharedBuffer(SPARE);setint(i);}
+	string(unsigned long i)			{buf = new SharedBuffer(SPARE);sethex(i);}
 	string(char c)					{buf = new SharedBuffer(SPARE);buf->buffer()[0] = c;buf->setlen(1);}
 	string(double d)
 	{
@@ -589,6 +590,21 @@ private:
 		C(10)
 		#undef C
 		b[c++] = (char)(i%10 + ZERO);
+		buf->setlen(c);
+	}
+	void sethex(unsigned long i, size_t c = 0)
+	{
+		char *b = buf->buffer();
+		#define C(n) if (i >= n){char a = (char)((i/n)&0xF);b[c++] = a<10 ? a+ZERO : a-10+'A';}
+		C(0x10000000)
+		C(0x1000000)
+		C(0x100000)
+		C(0x10000)
+		C(0x1000)
+		C(0x100)
+		C(0x10)
+		#undef C
+		{char a = (char)(i&0xF);b[c++] = a<10 ? a+ZERO : a-10+'A';}
 		buf->setlen(c);
 	}
 	void only_and_extend(size_t t)

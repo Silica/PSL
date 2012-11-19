@@ -12,7 +12,7 @@ qsort(ref list)
 	list = left + p + right;
 }
 
-list = (8,1,5,3,10,9,2,6,7,4);
+list = [8,1,5,3,10,9,2,6,7,4];
 qsort(list);
 int size = list;
 for (int i; i < size; i++)
