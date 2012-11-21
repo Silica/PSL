@@ -35,7 +35,6 @@ private:
 		WARNING,
 		IIAE,
 		BINC,
-		ITMN,
 	};
 	void Error(ErrorID n, int op = 0, const char *str = "", int line = -1)
 	{
@@ -62,7 +61,6 @@ private:
 		case TINAE:	PSL_PRINTF(("There is no %c at expression end\n", op));break;
 		case IIAE:	PSL_PRINTF(("'%s' is already exsit\n", str));break;
 		case BINC:	PSL_PRINTF(("block not closed from %d\n", op));break;
-		case ITMN:	PSL_PRINTF(("invalid table member name\n", op));break;
 		default:	PSL_PRINTF(("unknown error\n"));
 		}
 	}
@@ -428,9 +426,9 @@ private:
 			}
 			else
 			{
-				Error(ITMN);
-				while (t->getNext() != ']');
-				return;
+				getexp11(c);
+				c.pushcode(new Variable::ARRAY_PUSH);
+				t->getNextIf(',');
 			}
 		}
 	}
