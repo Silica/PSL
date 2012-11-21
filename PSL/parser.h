@@ -10,7 +10,8 @@ public:
 	void Parse(variable &v)
 	{
 		string arg = "arg";
-		v.pushcode(new Variable::VARIABLE(arg));
+		v.pushcode(new Variable::PUSH_NULL);
+		v.pushcode(new Variable::LOCAL(arg));
 		v.pushcode(new Variable::ARGUMENT);
 		while (t->checkNext())
 			ParseStatement(v, v);
