@@ -158,12 +158,6 @@ public:
 		v = static_v.get()->getifexist(name);	if (v)return v;
 		return NULL;
 	}
-	bool Declaration(const string &name, variable &v, Environment *env)
-	{
-		bool r = this_v.get()->set(name, v);
-		if (env)	env->push(v);
-		return r;
-	}
 protected:
 	rsv this_v;
 };
@@ -171,6 +165,12 @@ class ConstructorScope : public MethodScope
 {
 public:
 	ConstructorScope(Code *statement, Variable *s, Variable *t) : MethodScope(statement, s, t)	{}
+	bool Declaration(const string &name, variable &v, Environment *env)
+	{
+		bool r = this_v.get()->set(name, v);
+		if (env)	env->push(v);
+		return r;
+	}
 	Scope *End(Environment &env)
 	{
 		Scope *s = owner;
