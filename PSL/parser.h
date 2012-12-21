@@ -667,6 +667,7 @@ private:
 				c.pushcode(oc);
 				size_t b = c.codelength();
 				getexp9(c);
+				c.pushcode(NULL);
 				oc->set(static_cast<int>(c.codelength() - b));
 			}
 			#else
