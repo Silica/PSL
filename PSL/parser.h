@@ -391,7 +391,6 @@ private:
 				{
 					getexp11(c);
 					c.pushcode(new Variable::SET_MEMBER(name));
-					t->getNextIf(',');
 				}
 				else
 				{
@@ -402,7 +401,6 @@ private:
 					getSuffOp(c);
 					getexp11(c, true);
 					c.pushcode(new Variable::ARRAY_PUSH);
-					t->getNextIf(',');
 				}
 			}
 			else if (n == Tokenizer::INT)
@@ -413,7 +411,6 @@ private:
 				{
 					getexp11(c);
 					c.pushcode(new Variable::SET_INDEX(i));
-					t->getNextIf(',');
 				}
 				else
 				{
@@ -421,14 +418,20 @@ private:
 					getSuffOp(c);
 					getexp11(c, true);
 					c.pushcode(new Variable::ARRAY_PUSH);
-					t->getNextIf(',');
 				}
 			}
 			else
 			{
 				getexp11(c);
 				c.pushcode(new Variable::ARRAY_PUSH);
-				t->getNextIf(',');
+			}
+			if (!t->getNextIf(','))
+			{
+				if (t->checkNext() != ']')
+				{
+					Error(TINA, ',', "object member");
+					return;
+				}
 			}
 		}
 	}
