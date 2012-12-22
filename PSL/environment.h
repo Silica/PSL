@@ -100,6 +100,7 @@ class Environment
 		|8
 	#endif
 	;
+public:
 	void warning(const int n, const string &s = "")
 	{
 		if (WARNING & (1 << n))
@@ -111,10 +112,10 @@ class Environment
 			case 1:PSL_PRINTF(("runtime warning : undeclared identidier %s\n", s.c_str()));break;
 			case 2:PSL_PRINTF(("runtime error : pop empty stack\n"));break;
 			case 3:PSL_PRINTF(("runtime warning : declared identidier %s already exist, over write\n", s.c_str()));break;
+			case 4:PSL_PRINTF(("runtime warning : undefined member name %s\n", s.c_str()));break;
 			}
 		}
 	}
-public:
 	PSL_MEMORY_MANAGER(Environment)
 	#if defined(PSL_SHARED_GLOBAL) && defined(PSL_USE_VARIABLE_MEMORY_MANAGER)
 	Environment():global(StaticObject::global())		{scope = NULL;}

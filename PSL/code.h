@@ -766,13 +766,15 @@ public:
 	CLONE(MEMBER(name))
 	EXEC
 	{
-		#ifdef PSL_MEMBER_REGISTER
 		variable v = env.pop();
+		#ifdef PSL_MEMBER_REGISTER
 		env.reg = v;
-		env.push(v[name]);
-		#else
-		env.push(env.pop().get()->child(name));
 		#endif
+		#ifdef PSL_WARNING_UNDEFINED_MEMBER
+		if (!v.exist(name))
+			env.warning(4, name);
+		#endif
+		env.push(v[name]);
 		return RC::NONE;
 	}
 	PSL_DUMP((int d){PSL_PRINTF(("MEMBER %s\n", name.c_str()));})
