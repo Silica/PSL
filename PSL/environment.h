@@ -86,7 +86,7 @@ public:
 class Scope;
 class Environment
 {
-	const static unsigned long WARNING = 0
+	const static unsigned long WARNING = 16
 	#ifdef PSL_WARNING_POP_EMPTY_STACK
 		|4
 	#endif
@@ -104,6 +104,7 @@ class Environment
 	{
 		if (WARNING & (1 << n))
 		{
+			PSL_PRINTF(("%s : ", scope->getCurrentLabel().c_str()));
 			switch (n)
 			{
 			case 0:PSL_PRINTF(("runtime warning : %s stack remained when deleting env\n", s.c_str()));break;
@@ -327,6 +328,18 @@ public:
 	}
 	size_t length()	{return code.size();}
 	Code *inc()	{++rc;return this;}
+	string getCurrentLabel(size_t line)
+	{
+		string s;
+		size_t c = 0;
+		for (table::iterator it = label.begin(); it != label.end(); ++it)
+		{
+			int i = it->second.get()->toInt();
+			if (i <= line && i >= c)
+				s = it->first;
+		}
+		return s;
+	}
 	PSL_DUMP((){
 		for (size_t i = 0; i < code.size(); ++i)
 			code[i]->dump();
@@ -557,6 +570,7 @@ public:
 		}
 		return v;
 	}
+	string getCurrentLabel()	{return code->getCurrentLabel(line);}
 protected:
 	rsv local;
 	Scope *owner;
