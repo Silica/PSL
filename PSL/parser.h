@@ -43,11 +43,11 @@ private:
 		if (n < WARNING)
 		{
 			++error;
-			PSL_PRINTF(("error %s %d: ", t->getFile().c_str(), line));
+			PSL_PRINTF(("error %s %d,%d: ", t->getFile().c_str(), line, t->getByte()));
 		}
 		else
 		{
-			PSL_PRINTF(("warning %s %d: ", t->getFile().c_str(), line));
+			PSL_PRINTF(("warning %s %d,%d: ", t->getFile().c_str(), line, t->getByte()));
 		}
 		switch (n)
 		{

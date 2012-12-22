@@ -85,7 +85,7 @@ public:
 private:
 	void Init(const string &fn, int l, table *dl)
 	{
-		i = 0;
+		prev = i = 0;
 		next = UNSET;
 		filename = fn;
 		line = pline = l;
@@ -111,6 +111,7 @@ private:
 	const char *s;
 	size_t len;
 	size_t i;
+	size_t prev;
 	int next;
 	Tokenizer *including;
 	table *definelist;
@@ -119,6 +120,11 @@ private:
 	int ifdefcount;
 	int ifdefstatus;
 #endif
+	void incline()
+	{
+		++line;
+		prev = i;
+	}
 	bool whitespace()
 	{
 		for (; i < len; ++i)
@@ -146,12 +152,12 @@ private:
 		{
 			if (s[i] == '\n')
 			{
-				++line;
+				incline();
 				continue;
 			}
 			if (s[i] == '\r')
 			{
-				++line;
+				incline();
 				if (i < len && s[i+1] == '\n')
 					++i;
 				continue;
@@ -375,12 +381,12 @@ private:
 				continue;
 			if (s[i] == '\n')
 			{
-				++line;
+				incline();
 				continue;
 			}
 			if (s[i] == '\r')
 			{
-				++line;
+				incline();
 				if (i < len && s[i+1] == '\n')
 					++i;
 				continue;
@@ -529,5 +535,6 @@ public:
 	string nstr;
 	int getLine()		{return including ? including->getLine() : line;}
 	int getPrevLine()	{return including ? including->getPrevLine() : pline;}
+	int getByte()		{return including ? including->getByte() : static_cast<int>(i - prev);}
 	string &getFile()	{return including ? including->getFile() : filename;}
 };
