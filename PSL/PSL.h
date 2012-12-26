@@ -102,9 +102,9 @@ public:
 		PARSE_ERROR,
 		NOT_COMPILED_CODE,
 	};
-	error loadString(const string &str)
+	error loadString(const string &str, const string &label = "loadString")
 	{
-		variable::Tokenizer t(str, "loadString", 0);
+		variable::Tokenizer t(str, label, 0);
 		return parse(&t) ? PARSE_ERROR : NONE;
 	}
 	error loadScript(const string &filename)
