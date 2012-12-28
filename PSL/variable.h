@@ -181,17 +181,24 @@ public:
 	variable operator[](const char *s)		{return x->child(s);}
 	variable operator[](const string &s)	{return x->child(s);}
 	variable operator[](const variable &v)	{
-		if (v.type(STRING) || v.type(FLOAT))	return x->child(v);
-		if (v.type(RARRAY))
+		Type t = v.type();
+		variable z = v.ref();
+		while (t == POINTER)
 		{
-			int s = minusindex(v.x->index(0)->toInt());
-			int l = v.x->index(1)->toInt();
+			z = (*v).ref();
+			t = z.type();
+		}
+		if (t == STRING || t == FLOAT)	return x->child(z);
+		if (t == RARRAY)
+		{
+			int s = minusindex(z.x->index(0)->toInt());
+			int l = z.x->index(1)->toInt();
 			variable r(RARRAY);
 			if (l < 0)	for (int i = 0; i > l; --i)	r.x->push(x->index(static_cast<size_t>(s+i)));
 			else		for (int i = 0; i < l; ++i)	r.x->push(x->index(static_cast<size_t>(s+i)));
 			return r.x;
 		}
-		return x->index(static_cast<size_t>(minusindex(v)));
+		return x->index(static_cast<size_t>(minusindex(z)));
 	}
 	size_t length() const				{return x->length();}
 	size_t memberLength() const			{return x->memberLength();}
