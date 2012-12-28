@@ -335,9 +335,12 @@ public:
 		size_t c = 0;
 		for (table::iterator it = label.begin(); it != label.end(); ++it)
 		{
-			int i = it->second.get()->toInt();
+			size_t i = static_cast<size_t>(it->second.get()->toInt());
 			if (i <= line && i >= c)
+			{
 				s = it->first;
+				c = i;
+			}
 		}
 		return s;
 	}
