@@ -475,7 +475,7 @@ private:
 	friend class Variable::bcreader;
 	friend class Variable::Code;
 public:
-	size_t codelength()					{return x->codelength();}
+	size_t codelength()	const			{return x->codelength();}
 	typedef Variable::bytecode buffer;
 	rsv ref()		const	{return x;}
 	rsv pointer()	const	{return variable(POINTER, x);}
