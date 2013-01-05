@@ -115,7 +115,7 @@ public:
 
 	size_t length()		const {return 1;}
 
-	PSL_DUMP((){PSL_PRINTF(("vHex:%d\n", x));})
+	PSL_DUMP((){PSL_PRINTF(("vHex:%lX\n", x));})
 private:
 	hex x;
 };
@@ -947,7 +947,7 @@ public:
 
 	size_t length()		const {return x ? static_cast<size_t>(1) : 0;}
 
-	PSL_DUMP((){PSL_PRINTF(("vCPointer:%X\n", x));})
+	PSL_DUMP((){PSL_PRINTF(("vCPointer:%p\n", x));})
 private:
 	void *x;
 };
@@ -1012,7 +1012,7 @@ public:
 		return e->pop();
 	}
 
-	PSL_DUMP((){PSL_PRINTF(("vThread:%X\n", e));if(x)x->dump();})
+	PSL_DUMP((){PSL_PRINTF(("vThread:%p\n", e));if(x)x->dump();})
 private:
 	Variable *x;
 	Environment *e;

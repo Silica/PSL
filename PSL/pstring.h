@@ -595,7 +595,7 @@ private:
 	void sethex(unsigned long i, size_t c = 0)
 	{
 		char *b = buf->buffer();
-		#define C(n) if (i >= n){char a = (char)((i/n)&0xF);b[c++] = a<10 ? a+ZERO : a-10+'A';}
+		#define C(n) if (i >= n){char a = (char)((i/n)&0xF);b[c++] = (char)(a<10 ? a+ZERO : a-10+'A');}
 		C(0x10000000)
 		C(0x1000000)
 		C(0x100000)
@@ -604,7 +604,7 @@ private:
 		C(0x100)
 		C(0x10)
 		#undef C
-		{char a = (char)(i&0xF);b[c++] = a<10 ? a+ZERO : a-10+'A';}
+		{char a = (char)(i&0xF);b[c++] = (char)(a<10 ? a+ZERO : a-10+'A');}
 		buf->setlen(c);
 	}
 	void only_and_extend(size_t t)
