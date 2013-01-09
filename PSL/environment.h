@@ -239,7 +239,9 @@ public:
 		variable v;
 		for (size_t i = 0; i < code.size(); ++i)
 			v.pushcode(code[i]->clone());
-		return v.getcode()->inc();
+		if (Code *c = v.getcode())
+			return c->inc();
+		return new Code();
 	}
 	Code *only()
 	{
