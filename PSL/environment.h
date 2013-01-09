@@ -234,14 +234,13 @@ public:
 			delete code[i];
 	}
 	void finalize()	{if (!--rc)delete this;}
-	Code *clone()
+	Code(Code *c)
 	{
-		variable v;
-		for (size_t i = 0; i < code.size(); ++i)
-			v.pushcode(code[i]->clone());
-		if (Code *c = v.getcode())
-			return c->inc();
-		return new Code();
+		rc = 1;
+		for (size_t i = 0; i < c->code.size(); ++i)
+			code.push_back(c->code[i]->clone());
+		for (table::iterator it = c->label.begin(); it != c->label.end(); ++it)
+			label[it->first] = it->second;
 	}
 	Code *only()
 	{
@@ -250,21 +249,23 @@ public:
 		else
 		{
 			finalize();
-			return clone();
+			return new Code(this);
 		}
 	}
 	void add(Code *c)
 	{
 		size_t s = code.size();
-		if (s > 0 && code[--s]->get() == OpCode::MNEMONIC::RETURN)
+		if (s > 0 && code[s-1]->get() == OpCode::MNEMONIC::RETURN)
 		{
-			delete code[s];
+			delete code[--s];
 			code.resize(s);
 		}
-		Code *cl = c->clone();
+		Code *cl = new Code(c);
 		vObject o(cl);
 		cl->finalize();
 		push(cl);
+		for (table::iterator it = cl->label.begin(); it != cl->label.end(); ++it)
+			label[it->first] = variable(it->second.get()->toInt() + s);
 	}
 	bool Run(Environment &env, size_t &line)
 	{
@@ -313,8 +314,8 @@ public:
 		line = static_cast<size_t>(label[s].get()->toInt());
 		return true;
 	}
-	void pushlabel(const string &s)			{variable v = code.size();label[s] = v;}
-	void pushlabel(const string &s, int l)	{variable v = l;label[s] = v;}
+	void pushlabel(const string &s)			{label[s] = variable(code.size());}
+	void pushlabel(const string &s, int l)	{label[s] = variable(l);}
 	void push(OpCode *c)
 	{
 		#ifdef PSL_OPTIMIZE_IN_COMPILE
