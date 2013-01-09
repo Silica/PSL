@@ -18,8 +18,8 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 //#define PSL_DEBUG		// 行番号の埋め込みとステップ実行のサポート
 
-//#define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
-//#define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
+#define PSL_WARNING_POP_EMPTY_STACK			// 空スタックからのPOPを通知する
+#define PSL_WARNING_STACK_REMAINED			// Environmentのdelete時にスタックが残っていることを通知する
 //#define PSL_WARNING_UNDECLARED_IDENTIFIER	// 未宣言の変数の使用を通知する
 //#define PSL_WARNING_DECLARED_IDENTIFIER_ALREADY_EXIST	// 宣言済みの名前を更に宣言した場合に通知する
 //#define PSL_WARNING_UNDEFINED_MEMBER		// 未定義メンバにスクリプト内で.アクセスした際に通知する
@@ -104,7 +104,7 @@ public:
 	};
 	error loadString(const string &str, const string &label = "loadString")
 	{
-		variable::Tokenizer t(str, label, 0);
+		variable::Tokenizer t(str, label, 1);
 		return parse(&t) ? PARSE_ERROR : NONE;
 	}
 	error loadScript(const string &filename)
