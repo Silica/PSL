@@ -26,14 +26,14 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 #define PSL_OPTIMIZE_TAILCALL				// 末尾呼び出しの最適化
 #define PSL_OPTIMIZE_IN_COMPILE				// コンパイル時最適化(これ以下)を利用する
-#define PSL_OPTIMIZE_IMMEDIATELY_POP		// PUSHして即POPするコードの最適化(a;の様な文)
+//#define PSL_OPTIMIZE_IMMEDIATELY_POP		// PUSHして即POPするコードの最適化(a;の様な文)
 #define PSL_OPTIMIZE_CONSTANT_CALCULATION	// 定数計算の最適化(簡易)
 #define PSL_OPTIMIZE_SUFFIX_INCREMENT		// 後置インクリメントの値を利用しない場合の前置への最適化
 #define PSL_OPTIMIZE_BOOL_AND				// 論理AND/ORの左項で結果が決まる場合に右項を評価しない(短絡評価)
 #define PSL_OPTIMIZE_PARENTHESES			// 計算順序を変える為だけの()を演算子にしない
 
 #define PSL_POPSTACK_NULL	// EnvスタックがSTLでない時、POPしたスタックを即空にする(変数の生存期間に影響)
-//#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
+#define PSL_CHECKSTACK_POP	// POP時にスタックをチェックする
 #define PSL_CHECKSTACK_PUSH	// PUSH時にスタックをチェックする(しない場合固定長スタックで高速に動作する)
 //#define PSL_CHECK_SCOPE_NEST	// 実行スコープのネストの深さをチェックする(例外使用)
 //#define PSL_MEMBER_REGISTER		// メンバアクセスした際に親をレジスタに保存する(メソッドチェーン用)
