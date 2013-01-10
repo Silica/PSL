@@ -403,7 +403,7 @@ public:
 	void pushlabel(const string &s)				{if (x.size() == 1)x[0].get()->pushlabel(s);}
 	void write(const string &s, bytecode &b)	{if (x.size() == 1)x[0].get()->write(s, b);}
 
-	PSL_DUMP((){PSL_PRINTF(("vRArray:%d\n", x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();})
+	PSL_DUMP((){PSL_PRINTF(("vRArray:%d\n", (int)x.size()));for (size_t i = 0; i < x.size(); ++i)x[i].get()->dump();})
 private:
 	rlist x;
 };
@@ -687,7 +687,7 @@ public:
 		code->write(b);
 	}
 
-	PSL_DUMP((){PSL_PRINTF(("vObject:%d,%d,%d\n", array.size(), member.size(), codelength()));
+	PSL_DUMP((){PSL_PRINTF(("vObject:%d,%d,%d\n", (int)array.size(), (int)member.size(), (int)codelength()));
 		for (size_t i = 0; i < array.size(); ++i)array[i].get()->dump();
 		for (table::iterator it = member.begin(); it != member.end(); ++it){PSL_PRINTF(("[%s]:\n", it->first.c_str()));it->second.get()->dump();}
 		if(code){PSL_PRINTF(("--CODE--\n"));code->dump();}

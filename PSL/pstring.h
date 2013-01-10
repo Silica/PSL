@@ -634,7 +634,7 @@ public:
 		iterator &operator-=(int i)	{p -= i;return *this;}
 		iterator operator+(int i)	{return iterator(p+i);}
 		iterator operator-(int i)	{return iterator(p-i);}
-		int operator-(iterator i)	{return p - i.p;}
+		std::ptrdiff_t operator-(iterator i)	{return p - i.p;}
 	};
 	iterator begin(){if(buf)only_and_extend(length());return iterator(buf->buffer());}
 	iterator end()	{return iterator(buf->buffer() + length());}
