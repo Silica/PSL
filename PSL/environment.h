@@ -381,25 +381,7 @@ private:
 	bool optimize(OpCode *c)
 	{
 		size_t s = code.size();
-		#ifdef PSL_OPTIMIZE_PARENTHESES
-		if (!c)
-		{
-			if (s >= 1 && code[s-1]->get() == OpCode::MNEMONIC::PARENTHESES)
-			{
-				delete code[s-1];
-				code.resize(--s);
-			}
-			return false;
-		}
-		#endif
 		OpCode::MNEMONIC::mnemonic cn = c->get();
-		#ifdef PSL_OPTIMIZE_PARENTHESES
-		if (cn != OpCode::MNEMONIC::LIST && s >= 1 && code[s-1]->get() == OpCode::MNEMONIC::PARENTHESES)
-		{
-			delete code[s-1];
-			code.resize(--s);
-		}
-		#endif
 		if (cn == OpCode::MNEMONIC::PLUS)
 		{
 			delete c;

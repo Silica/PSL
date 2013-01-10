@@ -508,7 +508,10 @@ private:
 						c.getcode()->push(v.getcode());
 					else
 						c = v;
-					c.pushcode(new Variable::PARENTHESES);
+					#ifdef PSL_OPTIMIZE_PARENTHESES
+					if (t->checkNext() == ',')
+					#endif
+						c.pushcode(new Variable::PARENTHESES);
 				}
 			}
 			getSuffOp(c);
@@ -670,7 +673,6 @@ private:
 				c.pushcode(oc);
 				size_t b = c.codelength();
 				getexp9(c);
-				c.pushcode(NULL);
 				oc->set(static_cast<int>(c.codelength() - b));
 			}
 			#else
@@ -755,14 +757,6 @@ private:
 			b = c.codelength();
 			if (!t->getNextIf(':'))	Error(TINCOT);
 			getexp11(c);
-			#if defined(PSL_OPTIMIZE_PARENTHESES) && defined(PSL_OPTIMIZE_IN_COMPILE)
-			if (t->checkNext() && t->checkNext() != ',')
-			{
-				Variable::Code *code = c.getcode();
-				if (code->get(code->length() - 1) == Variable::OpCode::MNEMONIC::PARENTHESES)
-					b += 1;
-			}
-			#endif
 			oc2->set(static_cast<int>(c.codelength() - b));
 		}
 	}
