@@ -470,7 +470,7 @@ private:
 			FILE *fp = this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
-			this_v["$$__FILE*fp__$$"] = NULL;
+			this_v["$$__FILE*fp__$$"] = 0;
 			this_v["name"] = "";
 			return v;
 		}
@@ -535,7 +535,7 @@ private:
 			FILE *fp = this_v["$$__FILE*fp__$$"];
 			if (fp)
 				fclose(fp);
-			this_v["$$__FILE*fp__$$"] = NULL;
+			this_v["$$__FILE*fp__$$"] = 0;
 			this_v["name"] = "";
 			return v;
 		}

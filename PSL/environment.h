@@ -265,7 +265,7 @@ public:
 		cl->finalize();
 		push(cl);
 		for (table::iterator it = cl->label.begin(); it != cl->label.end(); ++it)
-			label[it->first] = variable(it->second.get()->toInt() + s);
+			label[it->first] = variable(it->second.get()->toInt() + static_cast<int>(s));
 	}
 	bool Run(Environment &env, size_t &line)
 	{

@@ -113,6 +113,11 @@ public:
 		}
 		return *this;
 	}
+	template<class T>variable &operator=(T t)	{
+		variable v = t;
+		x->substitution(v.x);
+		return *this;
+	}
 
 	#define OP(n,o) variable &operator o##=(const variable &v)	{x->n(v.x);return *this;}\
 					variable operator o(const variable &v)	const	{variable z = *this;z.x->n(v.x);return z;}
