@@ -42,6 +42,7 @@ Permission is granted to anyone to use this software for any purpose, including 
 
 #define PSL_USE_VARIABLE_MEMORY_MANAGER		// Variable用オレオレメモリマネージャ PSLライブラリ関数GarbageCollectionを利用可能になる
 #define PSL_SHARED_GLOBAL					// global変数を全ての環境で共通にする
+//#define PSL_GARBAGECOLLECTION_ON_DELETING_STATIC_OBJ	// StaticObjectの破棄時にガベージコレクションを呼ぶ
 
 #define PSL_USE_TOKENIZER_DEFINE			// #defineの使用可否
 #define PSL_USE_CONSOLE						// std::printfを使う

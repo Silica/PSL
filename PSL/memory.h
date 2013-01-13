@@ -210,7 +210,9 @@ class StaticObject
 		VMemoryPool vpool;
 		~sobj()
 		{
+			#ifdef PSL_GARBAGECOLLECTION_ON_DELETING_STATIC_OBJ
 			vpool.GarbageCollection();
+			#endif
 			#ifdef PSL_SHARED_GLOBAL
 			delete global_p();
 			#else
