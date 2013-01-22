@@ -205,11 +205,11 @@ public:
 		}
 		return x->index(static_cast<size_t>(minusindex(z)));
 	}
-	size_t length() const				{return x->length();}
-	size_t memberLength() const			{return x->memberLength();}
+	size_t length()				const	{return x->length();}
+	size_t memberLength()		const	{return x->memberLength();}
 	bool exist(const string &s) const	{return x->exist(s);}
 	void push(const variable &v)		{return x->push(v.x);}
-	variable keys()	{return x->keys();}
+	variable keys()				const	{return x->keys();}
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
 	void del(const string &s)						{return x->del(s);}
 private:

@@ -592,7 +592,7 @@ public:
 	void push(Variable *v)	{rsv x(v->clone(),0);array.push_back(x);}
 	Variable *keys()
 	{
-		rsv v(new Variable(), 0);
+		rsv v;
 		for (table::iterator it = member.begin(); it != member.end(); ++it)
 		{
 			rsv x(new Variable(it->first), 0);
