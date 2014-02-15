@@ -64,6 +64,8 @@ public:
 	};
 	class Function{};
 	template<class C>class Method{};
+	class IntPtr{};
+	class DoublePtr{};
 private:
 	class Variable;
 	#include "container.h"
@@ -456,6 +458,8 @@ private:
 		friend class vRArray;
 		template<class F>Variable(Function z, F f)	{rc = 1;x = BCFunction(f);}
 		template<class C, class M>Variable(Method<C> z, M m)	{rc = 1;x = CCMethod<C>(m);}
+		Variable(IntPtr z, int *i)			{rc = 1;x = new vIntPtr(i);}
+		Variable(DoublePtr z, double *d)	{rc = 1;x = new vFloatPtr(d);}
 	} *x;
 	typedef Variable::Environment Environment;
 	#ifdef PSL_USE_VARIABLE_MEMORY_MANAGER
@@ -516,6 +520,8 @@ public:
 
 	template<class F>variable(Function z, F f)	{x = new Variable(z, f);}
 	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}
+	variable(IntPtr z, int *i)			{x = new Variable(z, i);}
+	variable(DoublePtr z, double *d)	{x = new Variable(z, d);}
 
 	PSL_DUMP((){x->dump();})
 

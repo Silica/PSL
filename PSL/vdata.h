@@ -72,6 +72,52 @@ public:
 private:
 	int x;
 };
+class vIntPtr : public vBase
+{
+public:
+	PSL_MEMORY_MANAGER(vIntPtr)
+	vIntPtr(int *i)	{x = i;}
+	Type type()	const	{return INT;}
+	vBase *clone()	{return new vInt(*x);}
+
+	vBase *substitution(Variable *v)	{*x = v->toInt();return this;}
+
+	#define OP(n,o) void n(Variable *v)	{*x o v->toInt();}
+	OP(add,+=)
+	OP(sub,-=)
+	OP(mul,*=)
+	OP(oand,&=)
+	OP(oor,|=)
+	OP(oxor,^=)
+	OP(shl,<<=)
+	OP(shr,>>=)
+	#undef OP
+	#define OP(n,o) void n(Variable *v)	{if (int i = v->toInt())*x o i;else x=0;}
+	OP(div,/=)
+	OP(mod,%=)
+	#undef OP
+	#define CMP(n,o) bool n(Variable *v)	{return *x o v->toInt();}
+	CMP(eq,==)
+	CMP(ne,!=)
+	CMP(le,<=)
+	CMP(ge,>=)
+	CMP(lt,<)
+	CMP(gt,>)
+	#undef CMP
+	void neg()	{*x = -*x;}
+	void Compl(){*x = ~*x;}
+
+	bool toBool()		const {return *x != 0;}
+	int toInt()			const {return *x;}
+	double toDouble()	const {return *x;}
+	string toString()	const {return *x;}
+
+	size_t length()		const {return 1;}
+
+	PSL_DUMP((){PSL_PRINTF(("vInt:%d\n", *x));})
+private:
+	int *x;
+};
 
 class vHex : public vBase
 {
@@ -156,6 +202,43 @@ public:
 	PSL_DUMP((){PSL_PRINTF(("vFloat:%f\n", x));})
 private:
 	double x;
+};
+class vFloatPtr : public vBase
+{
+public:
+	PSL_MEMORY_MANAGER(vFloatPtr)
+	vFloatPtr(double *d)	{x = d;}
+	Type type()	const	{return FLOAT;}
+	vBase *clone()	{return new vFloat(*x);}
+
+	vBase *substitution(Variable *v)	{*x = v->toDouble();return this;}
+
+	#define OP(n,o) void n(Variable *v)	{*x o v->toDouble();}
+	OP(add,+=)
+	OP(sub,-=)
+	OP(mul,*=)
+	#undef OP
+	void div(Variable *v)	{if (double d = v->toDouble())*x /= d;else x=0;}
+	#define CMP(n,o) bool n(Variable *v)	{return *x o v->toDouble();}
+	CMP(eq,==)
+	CMP(ne,!=)
+	CMP(le,<=)
+	CMP(ge,>=)
+	CMP(lt,<)
+	CMP(gt,>)
+	#undef CMP
+	void neg()	{*x = -*x;}
+
+	bool toBool()		const {return *x != 0;}
+	int toInt()			const {return static_cast<int>(*x);}
+	double toDouble()	const {return *x;}
+	string toString()	const {return *x;}
+
+	size_t length()		const {return 1;}
+
+	PSL_DUMP((){PSL_PRINTF(("vFloat:%f\n", *x));})
+private:
+	double *x;
 };
 
 class vString : public vBase
