@@ -456,7 +456,7 @@ private:
 	private:
 		#include "vdata.h"
 		friend class vRArray;
-		template<class F>Variable(Function z, F f)	{rc = 1;x = BCFunction(f);}
+		template<class F>Variable(Function z, F f, variable &d)	{rc = 1;x = BCFunction(f, d);}
 		template<class C, class M>Variable(Method<C> z, M m)	{rc = 1;x = CCMethod<C>(m);}
 		Variable(IntPtr z, int *i)			{rc = 1;x = new vIntPtr(i);}
 		Variable(DoublePtr z, double *d)	{rc = 1;x = new vFloatPtr(d);}
@@ -518,7 +518,7 @@ public:
 	#undef ap
 	#undef cva
 
-	template<class F>variable(Function z, F f)	{x = new Variable(z, f);}
+	template<class F>variable(Function z, F f, variable &d = variable())	{x = new Variable(z, f, d);}
 	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}
 	variable(IntPtr z, int *i)			{x = new Variable(z, i);}
 	variable(DoublePtr z, double *d)	{x = new Variable(z, d);}

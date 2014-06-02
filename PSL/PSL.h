@@ -287,10 +287,10 @@ private:
 		}
 	};
 public:
-	template<class F>addf addFunction(const string &s, F f)
+	template<class F>addf addFunction(const string &s, F f, variable def = variable())
 	{
 		variable g = env.global;
-		variable v(variable::Function(), f);
+		variable v(variable::Function(), f, def);
 		g.set(s, v);
 		return addf(this);
 	}

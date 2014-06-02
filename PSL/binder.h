@@ -1,9 +1,18 @@
-#define FV(n,t,g) class vBCFunctionV##n:public vBase{void(*x)t;public:vBCFunctionV##n(void(*f)t){x=f;}\
+static variable merge(variable &arg, variable &def)
+{
+	variable m(RARRAY);
+	for (int i = 0; i < arg.length(); i++)
+		m.push(arg[i]);
+	for (int i = arg.length(); i < def.length(); i++)
+		m.push(def[i]);
+	return m.pointer();
+}
+#define FV(n,t,g) class vBCFunctionV##n:public vBase{void(*x)t;rsv d;public:vBCFunctionV##n(void(*f)t,variable de):d(de){x=f;}\
 	PSL_MEMORY_MANAGER(vBCFunctionV##n)\
-	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionV##n(x);}\
+	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionV##n(x, d);}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
-	void prepare(Environment &env, Variable *v){variable a = env.pop();x g;env.push(a);}\
-	rsv call(Environment &env, variable &a, Variable *v){x g;return a;}};
+	void prepare(Environment &env, Variable *v){variable a_ = env.pop();variable a = merge(a_, (variable)d);x g;env.push(a);}\
+	rsv call(Environment &env, variable &a_, Variable *v){variable a = merge(a_, (variable)d);x g;return a;}};
 FV(0,(),())
 template<class A0>FV(1,(A0),(a))
 template<class A0,class A1>FV(2,(A0,A1),(a[0],a[1]))
@@ -12,12 +21,12 @@ template<class A0,class A1,class A2,class A3>FV(4,(A0,A1,A2,A3),(a[0],a[1],a[2],
 template<class A0,class A1,class A2,class A3,class A4>FV(5,(A0,A1,A2,A3,A4),(a[0],a[1],a[2],a[3],a[4]))
 template<class A0,class A1,class A2,class A3,class A4,class A5>FV(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
 #undef FV
-#define FR(n,t,g) class vBCFunctionR##n:public vBase{R(*x)t;public:vBCFunctionR##n(R(*f)t){x=f;}\
+#define FR(n,t,g) class vBCFunctionR##n:public vBase{R(*x)t;rsv d;public:vBCFunctionR##n(R(*f)t,variable de):d(de){x=f;}\
 	PSL_MEMORY_MANAGER(vBCFunctionR##n)\
-	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionR##n(x);}\
+	Type type()const{return BCFUNCTION;}vBase *clone(){return new vBCFunctionR##n(x, d);}\
 	bool toBool()const{return true;}size_t length()const{return 1;}\
-	void prepare(Environment &env, Variable *v){variable a = env.pop();variable r = x g;env.push(r);}\
-	rsv call(Environment &env, variable &a, Variable *v){variable r = x g;return r;}};
+	void prepare(Environment &env, Variable *v){variable a_ = env.pop();variable a = merge(a_, (variable)d);variable r = x g;env.push(r);}\
+	rsv call(Environment &env, variable &a_, Variable *v){variable a = merge(a_, (variable)d);variable r = x g;return r;}};
 template<class R>FR(0,(),())
 template<class R, class A0>FR(1,(A0),(a))
 template<class R, class A0,class A1>FR(2,(A0,A1),(a[0],a[1]))
@@ -26,33 +35,33 @@ template<class R, class A0,class A1,class A2,class A3>FR(4,(A0,A1,A2,A3),(a[0],a
 template<class R, class A0,class A1,class A2,class A3,class A4>FR(5,(A0,A1,A2,A3,A4),(a[0],a[1],a[2],a[3],a[4]))
 template<class R, class A0,class A1,class A2,class A3,class A4,class A5>FR(6,(A0,A1,A2,A3,A4,A5),(a[0],a[1],a[2],a[3],a[4],a[5]))
 #undef FR
-static vBase *BCFunction(void(*f)()){return new vBCFunctionV0(f);}
+static vBase *BCFunction(void(*f)(), variable d){return new vBCFunctionV0(f, d);}
 template<class A0>
-static vBase *BCFunction(void(*f)(A0)){return new vBCFunctionV1<A0>(f);}
+static vBase *BCFunction(void(*f)(A0), variable d){return new vBCFunctionV1<A0>(f, d);}
 template<class A0, class A1>
-static vBase *BCFunction(void(*f)(A0,A1)){return new vBCFunctionV2<A0,A1>(f);}
+static vBase *BCFunction(void(*f)(A0,A1), variable d){return new vBCFunctionV2<A0,A1>(f, d);}
 template<class A0, class A1, class A2>
-static vBase *BCFunction(void(*f)(A0,A1,A2)){return new vBCFunctionV3<A0,A1,A2>(f);}
+static vBase *BCFunction(void(*f)(A0,A1,A2), variable d){return new vBCFunctionV3<A0,A1,A2>(f, d);}
 template<class A0, class A1, class A2, class A3>
-static vBase *BCFunction(void(*f)(A0,A1,A2,A3)){return new vBCFunctionV4<A0,A1,A2,A3>(f);}
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3), variable d){return new vBCFunctionV4<A0,A1,A2,A3>(f, d);}
 template<class A0, class A1, class A2, class A3, class A4>
-static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4)){return new vBCFunctionV5<A0,A1,A2,A3,A4>(f);}
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4), variable d){return new vBCFunctionV5<A0,A1,A2,A3,A4>(f, d);}
 template<class A0, class A1, class A2, class A3, class A4, class A5>
-static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionV6<A0,A1,A2,A3,A4,A5>(f);}
+static vBase *BCFunction(void(*f)(A0,A1,A2,A3,A4,A5), variable d){return new vBCFunctionV6<A0,A1,A2,A3,A4,A5>(f, d);}
 template<class R>
-static vBase *BCFunction(R(*f)()){return new vBCFunctionR0<R>(f);}
+static vBase *BCFunction(R(*f)(), variable d){return new vBCFunctionR0<R>(f, d);}
 template<class R, class A0>
-static vBase *BCFunction(R(*f)(A0)){return new vBCFunctionR1<R,A0>(f);}
+static vBase *BCFunction(R(*f)(A0), variable d){return new vBCFunctionR1<R,A0>(f, d);}
 template<class R, class A0, class A1>
-static vBase *BCFunction(R(*f)(A0,A1)){return new vBCFunctionR2<R,A0,A1>(f);}
+static vBase *BCFunction(R(*f)(A0,A1), variable d){return new vBCFunctionR2<R,A0,A1>(f, d);}
 template<class R, class A0, class A1, class A2>
-static vBase *BCFunction(R(*f)(A0,A1,A2)){return new vBCFunctionR3<R,A0,A1,A2>(f);}
+static vBase *BCFunction(R(*f)(A0,A1,A2), variable d){return new vBCFunctionR3<R,A0,A1,A2>(f, d);}
 template<class R, class A0, class A1, class A2, class A3>
-static vBase *BCFunction(R(*f)(A0,A1,A2,A3)){return new vBCFunctionR4<R,A0,A1,A2,A3>(f);}
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3), variable d){return new vBCFunctionR4<R,A0,A1,A2,A3>(f, d);}
 template<class R, class A0, class A1, class A2, class A3, class A4>
-static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4)){return new vBCFunctionR5<R,A0,A1,A2,A3,A4>(f);}
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4), variable d){return new vBCFunctionR5<R,A0,A1,A2,A3,A4>(f, d);}
 template<class R, class A0, class A1, class A2, class A3, class A4, class A5>
-static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5)){return new vBCFunctionR6<R,A0,A1,A2,A3,A4,A5>(f);}
+static vBase *BCFunction(R(*f)(A0,A1,A2,A3,A4,A5), variable d){return new vBCFunctionR6<R,A0,A1,A2,A3,A4,A5>(f, d);}
 
 #define MV(n,t,g) class vCCMethodV##n : public vBase{void(C::*x)t;Variable *this_v;public:\
 	PSL_MEMORY_MANAGER(vCCMethodV##n)\
