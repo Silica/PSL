@@ -202,6 +202,9 @@ class StaticObject
 		#endif
 		pool(8,8)
 		pool(16,16)
+		#ifdef __BORLANDC__
+		pool(24,24)
+		#endif
 		pool(sizeof(Variable::Code),Co)
 		pool(sizeof(Environment),Env)
 		pool(sizeof(Variable::vObject),VO)
@@ -261,6 +264,9 @@ public:
 	#endif
 	pool(8,8)
 	pool(16,16)
+	#ifdef __BORLANDC__
+	pool(24,24)
+	#endif
 	pool(sizeof(Variable::Code),Co)
 	pool(sizeof(Environment),Env)
 	pool(sizeof(Variable::vObject),VO)

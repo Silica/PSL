@@ -257,9 +257,9 @@ private:
 		PSLVM *p;
 	public:
 		addf(PSLVM *x){p = x;}
-		template<class F>addf &operator()(const string &s, F f)
+		template<class F>addf &operator()(const string &s, F f, const variable &def = variable())
 		{
-			p->addFunction(s, f);
+			p->addFunction(s, f, def);
 			return *this;
 		}
 	};
@@ -269,10 +269,10 @@ private:
 		rsv r;
 	public:
 		addc(rsv &gl, variable &v){g = gl;r = v;}
-		template<class M>addc &operator()(const string &s, M m)
+		template<class M>addc &operator()(const string &s, M m, const variable &def = variable())
 		{
 			variable c = r;
-			variable v(variable::Method<C>(), m);
+			variable v(variable::Method<C>(), m, def);
 			c.set(s, v);
 			return *this;
 		}
@@ -287,7 +287,7 @@ private:
 		}
 	};
 public:
-	template<class F>addf addFunction(const string &s, F f, variable def = variable())
+	template<class F>addf addFunction(const string &s, F f, const variable &def = variable())
 	{
 		variable g = env.global;
 		variable v(variable::Function(), f, def);

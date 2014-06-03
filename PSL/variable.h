@@ -183,11 +183,11 @@ public:
 	const char *c_str()		const	{static string s;s = x->toString();return s.c_str();}
 	#endif
 
-	variable operator[](size_t i)			{return x->index(i);}
-	variable operator[](int i)				{return x->index(static_cast<size_t>(minusindex(i)));}
-	variable operator[](const char *s)		{return x->child(s);}
-	variable operator[](const string &s)	{return x->child(s);}
-	variable operator[](const variable &v)	{
+	variable operator[](size_t i)			const	{return x->index(i);}
+	variable operator[](int i)				const	{return x->index(static_cast<size_t>(minusindex(i)));}
+	variable operator[](const char *s)		const	{return x->child(s);}
+	variable operator[](const string &s)	const	{return x->child(s);}
+	variable operator[](const variable &v)	const	{
 		Type t = v.type();
 		variable z = v.ref();
 		while (t == POINTER)
@@ -215,7 +215,7 @@ public:
 	bool set(const string &s, const variable &v)	{return x->set(s, v);}
 	void del(const string &s)						{return x->del(s);}
 private:
-	int minusindex(int i)
+	int minusindex(int i) const
 	{
 		if (i < 0)
 		{
@@ -456,8 +456,8 @@ private:
 	private:
 		#include "vdata.h"
 		friend class vRArray;
-		template<class F>Variable(Function z, F f, variable &d)	{rc = 1;x = BCFunction(f, d);}
-		template<class C, class M>Variable(Method<C> z, M m)	{rc = 1;x = CCMethod<C>(m);}
+		template<class F>Variable(Function z, F f, const variable &d)	{rc = 1;x = BCFunction(f, d);}
+		template<class C, class M>Variable(Method<C> z, M m, const variable &d)	{rc = 1;x = CCMethod<C>(m, d);}
 		Variable(IntPtr z, int *i)			{rc = 1;x = new vIntPtr(i);}
 		Variable(DoublePtr z, double *d)	{rc = 1;x = new vFloatPtr(d);}
 	} *x;
@@ -518,8 +518,8 @@ public:
 	#undef ap
 	#undef cva
 
-	template<class F>variable(Function z, F f, variable &d = variable())	{x = new Variable(z, f, d);}
-	template<class C, class M>variable(Method<C> z, M m)	{x = new Variable(z, m);}
+	template<class F>variable(Function z, F f, const variable &d = variable())	{x = new Variable(z, f, d);}
+	template<class C, class M>variable(Method<C> z, M m, const variable &d = variable())	{x = new Variable(z, m, d);}
 	variable(IntPtr z, int *i)			{x = new Variable(z, i);}
 	variable(DoublePtr z, double *d)	{x = new Variable(z, d);}
 
