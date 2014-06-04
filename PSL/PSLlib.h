@@ -82,6 +82,7 @@ private:
 		case CFUNCTION:	return "Cfunction";
 		case CMETHOD:	return "Cmethod";
 		case CPOINTER:	return "Cpointer";
+		case SPOINTER:	return "SmartPointer";
 		case THREAD:	return "thread";
 		case BCFUNCTION:return "bind function";
 		case CCMETHOD:	return "bind method";

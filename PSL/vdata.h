@@ -1035,6 +1035,30 @@ private:
 	void *x;
 };
 
+template<class T>class vSmartPointer : public vBase
+{
+public:
+	PSL_MEMORY_MANAGER(vSmartPointer)
+	vSmartPointer(T *p)	{x = p;}
+	~vSmartPointer()	{delete x;}
+	Type type()	const	{return SPOINTER;}
+	vBase *clone()	{return new vBase();}
+
+	vBase *substitution(Variable *v)	{return this;}
+	bool eq(Variable *v)	{return x == v->toPointer();}
+	bool ne(Variable *v)	{return x != v->toPointer();}
+
+	bool toBool()		const {return x ? true : false;}
+	int toInt()			const {return x ? 1 : 0;}
+	string toString()	const {return x ? "[spointer]" : "NULL";}
+	void *toPointer()	const {return x;}
+	size_t length()		const {return x ? static_cast<size_t>(1) : 0;}
+
+	PSL_DUMP((){PSL_PRINTF(("vSmartPointer:%p\n", x));})
+private:
+	T *x;
+};
+
 class vThread : public vBase
 {
 public:

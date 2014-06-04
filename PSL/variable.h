@@ -60,6 +60,7 @@ public:
 		CMETHOD,
 		CCMETHOD,
 		CPOINTER,
+		SPOINTER,
 		THREAD,
 	};
 	class Function{};
@@ -522,6 +523,10 @@ public:
 	template<class C, class M>variable(Method<C> z, M m, const variable &d = variable())	{x = new Variable(z, m, d);}
 	variable(IntPtr z, int *i)			{x = new Variable(z, i);}
 	variable(DoublePtr z, double *d)	{x = new Variable(z, d);}
+	template<class T>static variable make_variable(T *p)
+	{
+		return variable(new Variable(new Variable::vSmartPointer<T>(p)), 0).pointer();
+	}
 
 	PSL_DUMP((){x->dump();})
 
