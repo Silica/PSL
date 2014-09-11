@@ -834,7 +834,7 @@ class SET_INDEX : public OpCode
 {
 public:
 	PSL_MEMORY_MANAGER(SET_INDEX)
-	SET_INDEX(int &i)	{x = i;}
+	SET_INDEX(int i)	{x = i;}
 	CLONE(SET_INDEX(x))
 	EXEC
 	{

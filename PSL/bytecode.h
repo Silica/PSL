@@ -59,6 +59,7 @@ class bcreader
 			OPC_I(JRT)
 			OPC_I(JRF)
 			OPC_I(LOCALINDEX)
+			OPC_I(SET_INDEX)
 		#undef OPC_I
 		#define OPC_S(n) case OpCode::MNEMONIC::n:v.pushcode(new n(readString(byte)));break;
 			OPC_S(PUSH_STRING)
@@ -125,6 +126,7 @@ class bcreader
 			OPCODE(YIELD)
 			OPCODE(INSTANCE)
 			OPCODE(INDEX)
+			OPCODE(ARRAY_PUSH)
 		#undef OPCODE
 		case OpCode::MNEMONIC::PUSH_CODE:
 			{
