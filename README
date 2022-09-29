@@ -9,7 +9,6 @@ C系構文のスクリプト言語
 C++からPSLの関数を呼び出したり
 PSLからC++の関数を呼び出したり出来ます
 C++側のコードを極めて簡単に書けるのが特徴
-Luaとの比較>http://sky.geocities.jp/lordreamon/PSL/lua.htm
 
 includeするだけで使えるよ！
 BCC(古い)とVC(ちょっと前)とgcc(新しい)とclang(微妙)でコンパイル確認済み
